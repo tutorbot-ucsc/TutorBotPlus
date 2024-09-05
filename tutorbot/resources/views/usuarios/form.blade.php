@@ -95,3 +95,15 @@
         </div>
     </div>
 </div>
+
+<div class="row">
+    <div class="form-group">
+        <label for="cursos">Curso</label>
+        <label for="cursos">(Mantenga pulsado CTRL o CMD para seleccionar más de un curso)</label>
+        <select multiple class="form-control" id="cursos" name="cursos[]">
+            @foreach($cursos as $curso)
+                <option value="{{$curso->id}}" @if(isset($user) && $user->cursos()->get()->contains($curso)) selected @endif>{{$curso->nombre}}</option>
+            @endforeach
+        </select>
+      </div>
+</div>

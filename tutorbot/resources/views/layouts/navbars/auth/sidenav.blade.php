@@ -25,14 +25,14 @@
                 <li class="nav-item mt-3 d-flex align-items-center">
                     <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Usuarios</h6>
                 </li>
-            @endcan
+            @endcanany
             @can('ver usuario')
                 <li class="nav-item">
                     <a class="nav-link {{ str_contains(request()->url(), 'usuarios') == true ? 'active' : '' }}"
                         href="{{ route('usuarios.index') }}">
                         <div
                             class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="ni ni-bullet-list-67 text-dark text-sm opacity-10"></i>
+                            <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
                         </div>
                         <span class="nav-link-text ms-1">Usuarios</span>
                     </a>
@@ -47,6 +47,33 @@
                             <i class="fa fa-gear" style="color:black;"></i>
                         </div>
                         <span class="nav-link-text ms-1">Roles</span>
+                    </a>
+                </li>
+            @endcan
+            @can('ver curso')
+                <li class="nav-item">
+                    <a class="nav-link {{ str_contains(request()->url(), 'cursos') == true ? 'active' : '' }}"
+                        href="{{ route('cursos.index') }}">
+                        <div
+                            class="icon border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fa fa-gear" style="color:black;"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Cursos</span>
+                    </a>
+                </li>
+            @endcan
+            <li class="nav-item mt-3">
+                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Juez Virtual</h6>
+            </li>
+            @can('ver lenguaje de programación')
+                <li class="nav-item">
+                    <a class="nav-link {{ str_contains(request()->url(), 'lenguajes_programacion') == true ? 'active' : '' }}"
+                        href="{{ route('lenguaje_programacion.index') }}">
+                        <div
+                            class="icon border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fa fa-gear" style="color:black;"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Lenguajes de Programación</span>
                     </a>
                 </li>
             @endcan
@@ -67,8 +94,5 @@
                 </a>
             </li>
         </ul>
-    </div>
-    <div class="sidenav-footer mx-3 ">
-
     </div>
 </aside>

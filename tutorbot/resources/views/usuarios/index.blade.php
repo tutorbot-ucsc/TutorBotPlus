@@ -32,6 +32,9 @@
                                         Roles
                                     </th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Cursos
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                         Email
                                     </th>
                                     <th
@@ -54,10 +57,25 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>    
-                                            @foreach($user->getRoleNames() as $rol)
-                                                <span class="badge bg-gradient-secondary">{{$rol}}</span>
-                                            @endforeach
+                                        <td>
+                                            <div class="row">
+                                                @foreach ($user->getRoleNames() as $rol)
+                                                    <div class="col-auto">
+                                                        <span class="badge bg-gradient-secondary">{{ $rol }}</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="row">
+                                                @foreach ($user->cursos()->get() as $curso)
+                                                    <div class="col-auto">
+                                                        <span
+                                                            class="badge bg-gradient-secondary">{{ $curso->codigo }}</span>
+
+                                                    </div>
+                                                @endforeach
+                                            </div>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1">
@@ -75,7 +93,8 @@
                                                 <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                     @can('editar usuario')
                                                         <a class="btn btn-outline-warning"
-                                                            href="{{ route('usuarios.editar', ['id' => $user->id]) }}"><i class="fa fa-pencil"></i></a>
+                                                            href="{{ route('usuarios.editar', ['id' => $user->id]) }}"><i
+                                                                class="fa fa-pencil"></i></a>
                                                     @endcan
                                                     @can('eliminar usuario')
                                                         @if (auth()->user()->id != $user->id)
@@ -83,7 +102,7 @@
                                                                 method="POST">
                                                                 @csrf
                                                                 <button type="submit" class="btn btn-outline-danger"><i
-                                                                    class="fa fa-fw fa-trash"></i></button>
+                                                                        class="fa fa-fw fa-trash"></i></button>
                                                             </form>
                                                         @endif
                                                     @endcan

@@ -26,6 +26,8 @@ use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\ResetPassword;
 use App\Http\Controllers\ChangePassword;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\LenguajesProgramacionesController;
+use App\Http\Controllers\CursosController;
 
 Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');
 	Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
@@ -58,5 +60,21 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/eliminar', [RoleController::class, 'eliminar'])->name('roles.eliminar')->middleware('can:eliminar rol'); 
 		Route::post('/store', [RoleController::class, 'store'])->name('roles.store')->middleware('can:crear rol'); 
 		Route::post('/update', [RoleController::class, 'update'])->name('roles.update')->middleware('can:editar rol'); 
+	});
+	Route::prefix('lenguajes_programacion')->group(function () {
+		Route::get('/index', [LenguajesProgramacionesController::class, 'index'])->name('lenguaje_programacion.index')->middleware('can:ver lenguaje de programación'); 
+		Route::get('/crear', [LenguajesProgramacionesController::class, 'crear'])->name('lenguaje_programacion.crear')->middleware('can:crear lenguaje de programación'); 
+		Route::get('/editar', [LenguajesProgramacionesController::class, 'editar'])->name('lenguaje_programacion.editar')->middleware('can:editar lenguaje de programación'); 
+		Route::post('/eliminar', [LenguajesProgramacionesController::class, 'eliminar'])->name('lenguaje_programacion.eliminar')->middleware('can:eliminar lenguaje de programación'); 
+		Route::post('/store', [LenguajesProgramacionesController::class, 'store'])->name('lenguaje_programacion.store')->middleware('can:crear lenguaje de programación'); 
+		Route::post('/update', [LenguajesProgramacionesController::class, 'update'])->name('lenguaje_programacion.update')->middleware('can:editar lenguaje de programación'); 
+	});
+	Route::prefix('cursos')->group(function () {
+		Route::get('/index', [CursosController::class, 'index'])->name('cursos.index')->middleware('can:ver curso'); 
+		Route::get('/crear', [CursosController::class, 'crear'])->name('cursos.crear')->middleware('can:crear curso'); 
+		Route::get('/editar', [CursosController::class, 'editar'])->name('cursos.editar')->middleware('can:editar curso'); 
+		Route::post('/eliminar', [CursosController::class, 'eliminar'])->name('cursos.eliminar')->middleware('can:eliminar curso'); 
+		Route::post('/store', [CursosController::class, 'store'])->name('cursos.store')->middleware('can:crear curso'); 
+		Route::post('/update', [CursosController::class, 'update'])->name('cursos.update')->middleware('can:editar curso'); 
 	});
 });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cursos;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -21,13 +22,15 @@ class UserController extends Controller
 
     public function crear(){
         $roles = Role::all();
-        return view('usuarios.crear', compact('roles'))->with('accion', "crear");;
+        $cursos = Cursos::all();
+        return view('usuarios.crear', compact('roles', 'cursos'))->with('accion', "crear");;
     }
 
     public function editar(Request $request){
         $user = User::find($request->id);
+        $cursos = Cursos::all();
         $roles = Role::all();
-        return view('usuarios.editar', compact('user', 'roles'))->with('accion', "editar");
+        return view('usuarios.editar', compact('user', 'roles', 'cursos'))->with('accion', "editar");
     }
 
     public function store(Request $request){
@@ -53,6 +56,7 @@ class UserController extends Controller
             $usuario->fecha_nacimiento = $request->input('fecha_nacimiento');
             $usuario->password = $request->input('password');
             $usuario->save();
+            $usuario->cursos()->sync($request->input('cursos'));
             db::commit();
         }catch(\Exception $e){
             DB::rollback();
@@ -81,6 +85,7 @@ class UserController extends Controller
             $usuario->lastname = $request->input('lastname');
             $usuario->fecha_nacimiento = $request->input('fecha_nacimiento');
             $usuario->save();
+            $usuario->cursos()->sync($request->input('cursos'));
             db::commit();
         }catch(\Exception $e){
             return redirect()->route('usuarios.index')->with('error', $e->getMessage());

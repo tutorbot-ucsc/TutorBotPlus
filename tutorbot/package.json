@@ -8,5 +8,11 @@
         "axios": "^1.1.2",
         "laravel-vite-plugin": "^0.7.2",
         "vite": "^4.0.0"
+    },
+    "dependencies": {
+        "lodash": "^4.17.21",
+        "perfect-scrollbar": "^1.5.5",
+        "select2": "^4.1.0-rc.0",
+        "sweetalert2": "^11.6.13"
     }
 }

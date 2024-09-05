@@ -21,29 +21,27 @@ class RoleController extends Controller
     }
 
     public function crear(){
-        return view('roles.crear', compact('roles'));
+        $permisos = Permission::all();
+        return view('roles.crear', compact('permisos'));
     }
 
     public function editar(Request $request){
         $rol = Role::find($request->id);
-        return view('roles.editar', compact('rol'));
+        $permisos = Permission::all();
+        return view('roles.editar', compact('rol', 'permisos'));
     }
 
     public function store(Request $request){
         $validated = $request->validate([
-            'username' => 'required|string|max:255',
-            'rut' => 'required|string|unique:App\Models\User,rut',
-            'email' => 'required|email|unique:App\Models\User,email',
-            'firstname' => 'string',
-            'lastname' => 'string',
-            'fecha_nacimiento' => 'date',
-            'password' => 'required|min:8|required_with:password_confirmation|same:password_confirmation',
-            'password_confirmation' => 'required|min:8',
+            'name' => 'required|string|max:255',
         ]);
         
         db::beginTransaction();
         try{
             $rol = new Role;
+            $rol->name = $request->input('name');
+            $rol->save();
+            $rol->syncPermissions($request->input('permisos'));
             db::commit();
         }catch(\Exception $e){
             DB::rollback();
@@ -54,16 +52,14 @@ class RoleController extends Controller
 
     public function update(Request $request){
         $validated = $request->validate([
-            'username' => ['required', 'string', 'max:255'],
-            'rut' => ['required', 'string', Rule::unique('users', 'rut')->ignore($request->id)],
-            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($request->id)],
-            'firstname' => ['string'],
-            'lastname' => ['string'],
-            'fecha_nacimiento' => ['date'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
         try{
             db::beginTransaction();
-            $usuario = Role::find($request->id);
+            $rol = Role::find($request->id);
+            $rol->name = $request->input('name');
+            $rol->save();
+            $rol->syncPermissions($request->input('permisos'));
             db::commit();
         }catch(\Exception $e){
             return redirect()->route('roles.index')->with('error', $e->getMessage());
