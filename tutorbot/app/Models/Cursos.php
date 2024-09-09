@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Models\Problemas;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Validation\Rule;
 
@@ -34,5 +35,10 @@ class Cursos extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'cursa', 'id_curso', 'id_usuario');
+    }
+
+    public function problemas(): BelongsToMany
+    {
+        return $this->belongsToMany(Problemas::class,'disponible','id_curso','id_problema');
     }
 }

@@ -12,7 +12,7 @@ class CursosController extends Controller
 {
     public function index(Request $request)
     {
-        $cursos = Cursos::paginate(15)->through(function($curso){
+        $cursos = Cursos::all()->map(function($curso){
             $curso->fecha = carbon::parse($curso->created_at)->toFormattedDateString();
             return $curso;
         });

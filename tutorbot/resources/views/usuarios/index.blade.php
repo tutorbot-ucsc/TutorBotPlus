@@ -1,4 +1,4 @@
-@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
+@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100', 'title_url'=>'Gestión de Usuarios'])
 
 @section('content')
     @include('layouts.navbars.auth.topnav', ['title' => 'Gestión de Usuarios'])
@@ -23,7 +23,7 @@
                         </div>
                     @endif
                     <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0">
+                        <table class="table align-items-center mb-0" id="table">
                             <thead>
                                 <tr>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre
@@ -48,7 +48,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($users as $user)
+                                @foreach ($users as $user)
                                     <tr>
                                         <td>
                                             <div class="d-flex px-3 py-1">
@@ -110,23 +110,20 @@
                                             </td>
                                         @endcan
                                     </tr>
-                                @empty
-                                    <td>
-                                        <div class="d-flex px-3 py-1">
-                                            <div class="d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm">No hay usuarios disponibles</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                @endforelse
+                                @endforeach
                             </tbody>
                         </table>
-                        <div class="mx-5 mt-3">
-                            {{ $users->links() }}
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 @endsection
+@push('js')
+<link href="{{asset('assets/js/DataTables/datatables.min.css')}}" rel="stylesheet">
+ 
+<script src="{{asset('assets/js/DataTables/datatables.min.js')}}"></script>
+
+<script src="{{asset('assets/js/DataTables/gestion_initialize_es_cl.js')}}"></script>
+
+@endpush

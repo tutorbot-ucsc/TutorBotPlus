@@ -27,7 +27,9 @@ use App\Http\Controllers\ResetPassword;
 use App\Http\Controllers\ChangePassword;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\LenguajesProgramacionesController;
+use App\Http\Controllers\CategoriaProblemaController;
 use App\Http\Controllers\CursosController;
+use App\Http\Controllers\ProblemasController;
 
 Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');
 	Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
@@ -76,5 +78,21 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/eliminar', [CursosController::class, 'eliminar'])->name('cursos.eliminar')->middleware('can:eliminar curso'); 
 		Route::post('/store', [CursosController::class, 'store'])->name('cursos.store')->middleware('can:crear curso'); 
 		Route::post('/update', [CursosController::class, 'update'])->name('cursos.update')->middleware('can:editar curso'); 
+	});
+	Route::prefix('categorias_problemas')->group(function () {
+		Route::get('/index', [CategoriaProblemaController::class, 'index'])->name('categorias.index')->middleware('can:ver categoría de problema'); 
+		Route::get('/crear', [CategoriaProblemaController::class, 'crear'])->name('categorias.crear')->middleware('can:crear categoría de problema'); 
+		Route::get('/editar', [CategoriaProblemaController::class, 'editar'])->name('categorias.editar')->middleware('can:editar categoría de problema'); 
+		Route::post('/eliminar', [CategoriaProblemaController::class, 'eliminar'])->name('categorias.eliminar')->middleware('can:eliminar categoría de problema'); 
+		Route::post('/store', [CategoriaProblemaController::class, 'store'])->name('categorias.store')->middleware('can:crear categoría de problema'); 
+		Route::post('/update', [CategoriaProblemaController::class, 'update'])->name('categorias.update')->middleware('can:editar categoría de problema'); 
+	});
+	Route::prefix('problemas')->group(function () {
+		Route::get('/index', [ProblemasController::class, 'index'])->name('problemas.index')->middleware('can:ver problemas'); 
+		Route::get('/crear', [ProblemasController::class, 'crear'])->name('problemas.crear')->middleware('can:crear problemas'); 
+		Route::get('/editar', [ProblemasController::class, 'editar'])->name('problemas.editar')->middleware('can:editar problemas'); 
+		Route::post('/eliminar', [ProblemasController::class, 'eliminar'])->name('problemas.eliminar')->middleware('can:eliminar problemas'); 
+		Route::post('/store', [ProblemasController::class, 'store'])->name('problemas.store')->middleware('can:crear problemas'); 
+		Route::post('/update', [ProblemasController::class, 'update'])->name('problemas.update')->middleware('can:editar problemas'); 
 	});
 });

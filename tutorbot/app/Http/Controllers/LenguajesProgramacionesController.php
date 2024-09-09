@@ -10,7 +10,7 @@ class LenguajesProgramacionesController extends Controller
 {
     public function index(Request $request)
     {
-        $lenguajes = LenguajesProgramaciones::paginate(10)->through(function($item){
+        $lenguajes = LenguajesProgramaciones::all()->map(function($item){
             $item->fecha = Carbon::parse($item->created_at)->toFormattedDateString();
             return $item;
         });

@@ -13,7 +13,7 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::paginate(10)->through(function($user){
+        $users = User::all()->map(function($user){
             $user->fecha = Carbon::parse($user->created_at)->toFormattedDateString();
             return $user;
         });

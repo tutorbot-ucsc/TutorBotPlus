@@ -9,7 +9,7 @@
         </a>
     </div>
     <hr class="horizontal dark mt-0">
-    <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+    <div class="collapse navbar-collapse w-auto " id="sidenav-collapse-main">
         <ul class="navbar-nav">
             <li class="nav-item">
                 <a class="nav-link {{ Route::currentRouteName() == 'home' ? 'active' : '' }}"
@@ -77,9 +77,35 @@
                     </a>
                 </li>
             @endcan
+            @canany(['ver categoría de problema', 'ver problemas'])
             <li class="nav-item mt-3">
                 <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Problemas</h6>
             </li>
+            @endcanany
+            @can('ver problemas')
+                <li class="nav-item">
+                    <a class="nav-link {{ str_contains(request()->url(), 'problemas') == true ? 'active' : '' }}"
+                        href="{{ route('problemas.index') }}">
+                        <div
+                            class="icon border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fa fa-gear" style="color:black;"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Problemas</span>
+                    </a>
+                </li>
+            @endcan
+            @can('ver categoría de problema')
+                <li class="nav-item">
+                    <a class="nav-link {{ str_contains(request()->url(), 'categorias_problemas') == true ? 'active' : '' }}"
+                        href="{{ route('categorias.index') }}">
+                        <div
+                            class="icon border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fa fa-gear" style="color:black;"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Categorías</span>
+                    </a>
+                </li>
+            @endcan
             <li class="nav-item mt-3">
                 <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
             </li>

@@ -13,7 +13,7 @@ class RoleController extends Controller
 {
     public function index(Request $request)
     {
-        $roles = Role::paginate(15)->through(function($role){
+        $roles = Role::all()->map(function($role){
             $role->fecha = carbon::parse($role->created_at)->toFormattedDateString();
             return $role;
         });

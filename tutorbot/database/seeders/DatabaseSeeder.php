@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
             RolesAndPermission::class,
             UserSeeder::class,
             LenguajesProgramacionesSeeder::class,
+            CategoriaProblemaSeeder::class,
+            ProblemasSeeder::class,
         ]);
     }
 }

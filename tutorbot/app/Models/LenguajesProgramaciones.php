@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rule;
+use App\Models\Problemas;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class LenguajesProgramaciones extends Model
 {
     use HasFactory;
@@ -34,5 +36,10 @@ class LenguajesProgramaciones extends Model
             'abreviatura' => ['required', 'string', 'max:255'],
             'extension' => ['required', 'string', 'max:15'], 
         ];
+    }
+
+    public function problemas(): BelongsToMany
+    {
+        return $this->belongsToMany(Problemas::class, 'resolver', 'id_lenguaje', 'id_problema');
     }
 }
