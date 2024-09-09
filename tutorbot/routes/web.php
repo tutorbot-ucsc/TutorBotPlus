@@ -30,6 +30,7 @@ use App\Http\Controllers\LenguajesProgramacionesController;
 use App\Http\Controllers\CategoriaProblemaController;
 use App\Http\Controllers\CursosController;
 use App\Http\Controllers\ProblemasController;
+use App\Http\Controllers\CasosPruebasController;
 
 Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');
 	Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
@@ -94,5 +95,11 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/eliminar', [ProblemasController::class, 'eliminar'])->name('problemas.eliminar')->middleware('can:eliminar problemas'); 
 		Route::post('/store', [ProblemasController::class, 'store'])->name('problemas.store')->middleware('can:crear problemas'); 
 		Route::post('/update', [ProblemasController::class, 'update'])->name('problemas.update')->middleware('can:editar problemas'); 
+		Route::get('/editar_config_llm', [ProblemasController::class, 'editar_config_llm'])->name('problemas.editar_config_llm')->middleware('can:editar problemas'); 
+		Route::post('/configurar_llm', [ProblemasController::class, 'configurar_llm'])->name('problemas.configurar_llm')->middleware('can:editar problemas'); 
+
+		Route::get('/{id}/casos', [CasosPruebasController::class, 'asignacion_casos'])->name('casos_pruebas.assign')->middleware('can:editar problemas'); 
+		Route::post('/casos/eliminar', [CasosPruebasController::class, 'eliminar_caso'])->name('casos_pruebas.eliminar')->middleware('can:editar problemas'); 
+		Route::post('/casos/add', [CasosPruebasController::class, 'add_caso'])->name('casos_pruebas.add')->middleware('can:editar problemas'); 
 	});
 });

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('body_problema_resumido')->nullable();
             $table->string('memoria_limite')->default('5000');
             $table->string('archivo_adicional')->nullable();
-            $table->string('tiempo_limite')->default('5');
+            $table->string('tiempo_limite')->nullable();
             $table->date('fecha_inicio')->nullable();
             $table->date('fecha_termino')->nullable();
             $table->boolean('visible')->default(true);

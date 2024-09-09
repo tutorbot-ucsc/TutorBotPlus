@@ -10,7 +10,17 @@ class Casos_Pruebas extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        "entradas",
+        "salidas",
+        "puntos"
+    ];
 
+    public static $rules = [
+        "entradas" => ["required","string"],
+        "salidas" => ["required","string"],
+        "puntos" => ["required","numeric"],
+    ];
     public function problema(): BelongsTo
     {
         return $this->belongsTo(Problemas::class, 'id_problema');

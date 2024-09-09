@@ -30,10 +30,10 @@ class RolesAndPermission extends Seeder
             }
             Permission::insert($setPermisos);
             $administrador->givePermissionTo($array_permisos);
-            if(in_array($permiso, ['problemas', 'certamen', 'curso', 'categoría de problema'])){
+            if(in_array($permiso, ['problemas', 'certamen', 'categoría de problema'])){
                 $profesor->givePermissionTo($array_permisos);
             }
-        }
+        }   
 
         //Permisos adicionales
         

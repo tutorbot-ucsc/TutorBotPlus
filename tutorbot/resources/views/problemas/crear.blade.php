@@ -19,3 +19,6 @@
 
     </div>
 @endsection
+@push('js')
+<script src="{{asset('assets/js/plugins/flatpickr.min.js')}}"></script>
+@endpush

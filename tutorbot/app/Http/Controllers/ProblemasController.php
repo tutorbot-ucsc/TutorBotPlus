@@ -11,15 +11,17 @@ use App\Models\Casos_Pruebas;
 use App\Models\LenguajesProgramaciones;
 use App\Models\Categoria_Problema;
 use Illuminate\Validation\Rule;
+use Illuminate\Database\Eloquent\Builder;
+
 
 class ProblemasController extends Controller
 {
     public function index(Request $request)
     {
-        $problemas = Problemas::all()->map(function($problema){
-            $problema->fecha = Carbon::parse($problema->created_at)->toFormattedDateString();
-            return $problema;
-        });
+        $problemas = Problemas::whereHas('cursos', function (Builder $query) {
+            $cursos = auth()->user()->cursos()->select('cursos.id')->pluck('id')->toArray();
+            $query->whereIn('cursos.id', $cursos);
+        })->get();
         return view('problemas.index', compact('problemas'));
     }
 
@@ -37,66 +39,108 @@ class ProblemasController extends Controller
         $lenguajes = LenguajesProgramaciones::all();
         return view('problemas.editar', compact('problema','categorias','lenguajes', 'cursos'))->with('accion', "editar");
     }
+    public function editar_config_llm(Request $request){
+        $problema = Problemas::find($request->id);
+        return view('problemas.llm_config', compact('problema'));
+    }
+
+    public function configurar_llm(Request $request){
+        $validated = $request->validate(Problemas::$llm_config_rules);
+        try{
+            $problema = Problemas::find($request->id);
+            if(isset($request->habilitar_llm)){
+                $problema->habilitar_llm = true;
+            }else{
+                $problema->habilitar_llm = false;
+            }
+            $problema->limite_llm = $request->input('limite_llm');
+            $problema->save();
+        }catch(\PDOException $e){
+            DB::rollBack();
+            return redirect()->route("problemas.configurar_llm", ["id"=>$request->id])->with("error", $e->getMessage());
+        }
+        return redirect()->route("problemas.index")->with("success", "Se ha configurado la Large Language Model en el problema ".$problema->codigo." correctamente");
+    }
 
     public function store(Request $request){
-        $validated = $request->validate([
-            'username' => 'required|string|max:255',
-            'rut' => 'required|string|unique:App\Models\User,rut',
-            'email' => 'required|email|unique:App\Models\User,email',
-            'firstname' => 'string',
-            'lastname' => 'string',
-            'fecha_nacimiento' => 'date',
-            'password' => 'required|min:8|required_with:password_confirmation|same:password_confirmation',
-            'password_confirmation' => 'required|min:8',
-        ]);
+        $validated = $request->validate(Problemas::$createRules);
         
         db::beginTransaction();
         try{
-            $usuario = new Problemas;
-            $usuario->username = $request->input('username');
-            $usuario->rut = $request->input('rut');
-            $usuario->email = $request->input('email');
-            $usuario->firstname = $request->input('firstname');
-            $usuario->lastname = $request->input('lastname');
-            $usuario->fecha_nacimiento = $request->input('fecha_nacimiento');
-            $usuario->password = $request->input('password');
-            $usuario->save();
-            $usuario->cursos()->sync($request->input('cursos'));
+            $problema = new Problemas;
+            $problema->nombre = $request->input('nombre');
+            $problema->codigo = $request->input('codigo');
+            $problema->fecha_inicio = $request->input('fecha_inicio');
+            $problema->fecha_termino = $request->input('fecha_termino');
+            $problema->memoria_limite = $request->input('memoria_limite');
+            $problema->tiempo_limite = $request->input('tiempo_limite');
+            $problema->body_problema = $request->input('body_problema');
+            $problema->body_problema_resumido = $request->input('body_problema_resumido');
+            if(isset($request->visible)){
+                $problema->visible = true;
+            }else{
+                $problema->visible = false;
+            }
+
+            if(isset($request->habilitar_llm)){
+                $problema->habilitar_llm = true;
+            }else{
+                $problema->habilitar_llm = false;
+            }
+            $problema->limite_llm = $request->input('limite_llm');
+            /*if(isset($request->archivos_adicionales)){
+                $request->archivos_adicionales = base64_encode(file_get_contents($request->file('archivos_adcionales')->pat‌​h()));
+            }*/
+            $problema->save();
+            $problema->cursos()->sync($request->input('cursos'));
+            $problema->lenguajes()->sync($request->input('lenguajes'));
+            $problema->categorias()->sync($request->input('categorias'));
             db::commit();
         }catch(\Exception $e){
             DB::rollback();
-            return redirect()->route('usuarios.index')->with('error', $e->getMessage());
+            return redirect()->route('problemas.index')->with('error', $e->getMessage());
         }
-        $usuario->syncRoles($request->roles);
-        return redirect()->route('usuarios.index')->with('success','El usuario ha sido creado');
+        return redirect()->route('casos_pruebas.assign', ["id"=>$problema->id])->with('success','El Problema '.$problema->nombre.' ha sido creado, ingrese los casos de prueba.');
     }
 
     public function update(Request $request){
-        $validated = $request->validate([
-            'username' => ['required', 'string', 'max:255'],
-            'rut' => ['required', 'string', Rule::unique('users', 'rut')->ignore($request->id)],
-            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($request->id)],
-            'firstname' => ['string'],
-            'lastname' => ['string'],
-            'fecha_nacimiento' => ['date'],
-        ]);
+
+        $validated = $request->validate(Problemas::updateRules($request->codigo));
         try{
             db::beginTransaction();
-            $usuario = Problemas::find($request->id);
-            $usuario->username = $request->input('username');
-            $usuario->rut = $request->input('rut');
-            $usuario->email = $request->input('email');
-            $usuario->firstname = $request->input('firstname');
-            $usuario->lastname = $request->input('lastname');
-            $usuario->fecha_nacimiento = $request->input('fecha_nacimiento');
-            $usuario->save();
-            $usuario->cursos()->sync($request->input('cursos'));
+            $problema = Problemas::find($request->id);
+            $problema->nombre = $request->input('nombre');
+            $problema->codigo = $request->input('codigo');
+            $problema->fecha_inicio = $request->input('fecha_inicio');
+            $problema->fecha_termino = $request->input('fecha_termino');
+            $problema->memoria_limite = $request->input('memoria_limite');
+            $problema->tiempo_limite = $request->input('tiempo_limite');
+            $problema->body_problema = $request->input('body_problema');
+            $problema->body_problema_resumido = $request->input('body_problema_resumido');
+            if(isset($request->visible)){
+                $problema->visible = true;
+            }else{
+                $problema->visible = false;
+            }
+
+            if(isset($request->habilitar_llm)){
+                $problema->habilitar_llm = true;
+            }else{
+                $problema->habilitar_llm = false;
+            }
+            $problema->limite_llm = $request->input('limite_llm');
+            /*if(isset($request->archivos_adicionales)){
+                $request->archivos_adicionales = base64_encode(file_get_contents($request->file('archivos_adcionales')->pat‌​h()));
+            }*/
+            $problema->save();
+            $problema->cursos()->sync($request->input('cursos'));
+            $problema->lenguajes()->sync($request->input('lenguajes'));
+            $problema->categorias()->sync($request->input('categorias'));
             db::commit();
         }catch(\Exception $e){
-            return redirect()->route('usuarios.index')->with('error', $e->getMessage());
+            return redirect()->route('problemas.index')->with('error', $e->getMessage());
         }
-        $usuario->syncRoles($request->roles);
-        return redirect()->route('usuarios.index')->with('success','El usuario ha sido modificado');
+        return redirect()->route('problemas.index')->with('success','El problema ha sido modificado');
     }
     public function eliminar(Request $request)
     {

@@ -1,4 +1,4 @@
-@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100', 'title_url'=>'Gestión de Problemas'])
+@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100', 'title_url' => 'Gestión de Problemas'])
 
 @section('content')
     @include('layouts.navbars.auth.topnav', ['title' => 'Gestión de Problemas'])
@@ -27,7 +27,7 @@
                             <thead>
                                 <tr>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre
-                                    </th>   
+                                    </th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                         Categorías
                                     </th>
@@ -77,7 +77,7 @@
                                                 @foreach ($problema->categorias()->get() as $categoria)
                                                     <div class="col-auto">
                                                         <span
-                                                            class="badge bg-gradient-secondary">{{ $categoria->nombre}}</span>
+                                                            class="badge bg-gradient-secondary">{{ $categoria->nombre }}</span>
                                                     </div>
                                                 @endforeach
                                             </div>
@@ -105,14 +105,16 @@
                                         <td>
                                             <div class="d-flex px-3 py-1">
                                                 <div class="d-flex flex-column justify-content-center">
-                                                    <h6 class="mb-0 text-sm">{{ $problema->visible == true? "Si":"No" }}</h6>
+                                                    <h6 class="mb-0 text-sm">{{ $problema->visible == true ? 'Si' : 'No' }}
+                                                    </h6>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1">
                                                 <div class="d-flex flex-column justify-content-center">
-                                                    <h6 class="mb-0 text-sm">{{ $problema->habilitar_llm == true? "Si":"No" }}</h6>
+                                                    <h6 class="mb-0 text-sm">
+                                                        {{ $problema->habilitar_llm == true ? 'Si' : 'No' }}</h6>
                                                 </div>
                                             </div>
                                         </td>
@@ -126,14 +128,18 @@
                                         <td>
                                             <div class="d-flex px-3 py-1">
                                                 <div class="d-flex flex-column justify-content-center">
-                                                    <h6 class="mb-0 text-sm">{{ $problema->fecha_inicio? $problema->fecha_inicio : "No Definido" }}</h6>
+                                                    <h6 class="mb-0 text-sm">
+                                                        {{ $problema->fecha_inicio ? $problema->fecha_inicio : 'No Definido' }}
+                                                    </h6>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="d-flex px-3 py-1">
                                                 <div class="d-flex flex-column justify-content-center">
-                                                    <h6 class="mb-0 text-sm">{{ $problema->fecha_termino? $problema->fecha_termino : "No Definido" }}</h6>
+                                                    <h6 class="mb-0 text-sm">
+                                                        {{ $problema->fecha_termino ? $problema->fecha_termino : 'No Definido' }}
+                                                    </h6>
                                                 </div>
                                             </div>
                                         </td>
@@ -145,6 +151,11 @@
                                             <td class="align-middle text-end">
                                                 <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                     @can('editar problemas')
+                                                        <a class="btn btn-outline-warning"
+                                                            href="{{ route('problemas.editar_config_llm', ['id' => $problema->id]) }}">LLM</a>
+                                                        <a class="btn btn-outline-warning"
+                                                            href="{{ route('casos_pruebas.assign', ['id' => $problema->id]) }}">Casos
+                                                            de Prueba</a>
                                                         <a class="btn btn-outline-warning"
                                                             href="{{ route('problemas.editar', ['id' => $problema->id]) }}"><i
                                                                 class="fa fa-pencil"></i></a>
@@ -171,10 +182,9 @@
     </div>
 @endsection
 @push('js')
-<link href="{{asset('assets/js/DataTables/datatables.min.css')}}" rel="stylesheet">
- 
-<script src="{{asset('assets/js/DataTables/datatables.min.js')}}"></script>
+    <link href="{{ asset('assets/js/DataTables/datatables.min.css') }}" rel="stylesheet">
 
-<script src="{{asset('assets/js/DataTables/gestion_initialize_es_cl.js')}}"></script>
+    <script src="{{ asset('assets/js/DataTables/datatables.min.js') }}"></script>
 
+    <script src="{{ asset('assets/js/DataTables/gestion_initialize_es_cl.js') }}"></script>
 @endpush

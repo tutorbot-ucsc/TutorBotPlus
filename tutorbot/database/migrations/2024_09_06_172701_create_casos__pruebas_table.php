@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('salidas');
             $table->integer('puntos');
 
-            $table->foreign('id_problema')->references('id')->on('problemas')->onDelete('set null')->onUpdate('cascade');
+            $table->foreign('id_problema')->references('id')->on('problemas')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 
