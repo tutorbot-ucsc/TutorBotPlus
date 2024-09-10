@@ -42,6 +42,12 @@ Route::get('/', function () {return redirect('/dashboard');})->middleware('auth'
 	Route::get('/change-password', [ChangePassword::class, 'show'])->middleware('guest')->name('change-password');
 	Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
 	Route::get('/dashboard', [HomeController::class, 'index'])->name('home')->middleware('auth');
+
+//Plataforma de Juez Online
+Route::group(['middleware'=>'auth'], function(){
+	Route::get('/', [CursosController::class, 'listado_cursos'])->name('cursos.listado');
+});
+//Administración
 Route::group(['middleware' => 'auth'], function () {
 	Route::get('/profile', [UserProfileController::class, 'show'])->name('profile');
 	Route::post('/profile', [UserProfileController::class, 'update'])->name('profile.update');
@@ -97,6 +103,9 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/update', [ProblemasController::class, 'update'])->name('problemas.update')->middleware('can:editar problemas'); 
 		Route::get('/editar_config_llm', [ProblemasController::class, 'editar_config_llm'])->name('problemas.editar_config_llm')->middleware('can:editar problemas'); 
 		Route::post('/configurar_llm', [ProblemasController::class, 'configurar_llm'])->name('problemas.configurar_llm')->middleware('can:editar problemas'); 
+
+		Route::get('/{id}/editorial', [ProblemasController::class, 'editar_editorial'])->name('problemas.editorial')->middleware('can:editar problemas'); 
+		Route::post('/editorial/update', [ProblemasController::class, 'update_editorial'])->name('problemas.update_editorial')->middleware('can:editar problemas'); 
 
 		Route::get('/{id}/casos', [CasosPruebasController::class, 'asignacion_casos'])->name('casos_pruebas.assign')->middleware('can:editar problemas'); 
 		Route::post('/casos/eliminar', [CasosPruebasController::class, 'eliminar_caso'])->name('casos_pruebas.eliminar')->middleware('can:editar problemas'); 

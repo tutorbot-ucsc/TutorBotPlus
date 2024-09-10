@@ -153,6 +153,28 @@ class ProblemasController extends Controller
             db::rollBack();
             return redirect()->route('problemas.index')->with('error', $e->getMessage());
         } 
-        return redirect()->route('problemas.index')->with('success', 'El problema "'.$problema->username.'" ha sido eliminado');
+        return redirect()->route('problemas.index')->with('success', 'El problema "'.$problema->nombre.'" ha sido eliminado');
+    }
+
+    public function update_editorial(Request $request){
+        try{
+            $problema = Problemas::find($request->id);
+            $problema->body_editorial = $request->input('body_editorial');
+            $problema->save();
+        }catch(\PDOException $e){
+            DB::rollBack();
+            return redirect()->back()->withInput($request->input())->with('error', $e->getMessage());
+        }
+        return redirect()->route('problemas.index')->with('success', 'El editorial para el problema "'.$problema->nombre.'" ha sido modificado');
+    }
+
+    public function editar_editorial(Request $request){
+        try{
+            $problema = Problemas::find($request->id);
+        }catch(\PDOException $e){
+            db::rollBack();
+            return redirect()->route('problemas.index')->with('error', $e->getMessage());
+        } 
+        return view('problemas.editorial', compact('problema'));
     }
 }

@@ -46,12 +46,6 @@
                                         <a href="{{ route('reset-password') }}" class="text-primary text-gradient font-weight-bold">aquí</a>
                                     </p>
                                 </div>
-                                <div class="card-footer text-center pt-0 px-lg-2 px-1">
-                                    <p class="mb-4 text-sm mx-auto">
-                                       ¿No tienes una cuenta registrada?
-                                        <a href="{{ route('register') }}" class="text-primary text-gradient font-weight-bold">Registrate</a>
-                                    </p>
-                                </div>
                             </div>
                         </div>
                         <div

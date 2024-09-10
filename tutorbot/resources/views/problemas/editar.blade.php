@@ -6,7 +6,7 @@
         @include('components.alert')
     </div>
     <div class="container-fluid py-4">
-        <form role="form" method="POST" action="{{ route('problemas.update', ['id'=>$problema->id]) }}" enctype="multipart/form-data">
+        <form role="form" method="POST" id="problema_form" action="{{ route('problemas.update', ['id'=>$problema->id]) }}" enctype="multipart/form-data">
             @csrf
             <div class="card">
                 <div class="card-body">
@@ -19,3 +19,20 @@
 
     </div>
 @endsection
+
+@push('js')
+<script type="module">
+    const editor = new Editor({
+        el: document.querySelector('#editor'),
+        height: '600px',
+        initialEditType: 'markdown',
+        placeholder: 'Ingrese el enunciado del problema',
+        initialValue: `{{ isset($problema) ? old('body_problema', $problema->body_problema) : old('body_problema') }}`,
+    })
+    document.querySelector('#problema_form').addEventListener('submit', e => {
+        e.preventDefault();
+        document.querySelector('#body_problema').value = editor.getMarkdown();
+        e.target.submit();
+    });
+</script>
+@endpush

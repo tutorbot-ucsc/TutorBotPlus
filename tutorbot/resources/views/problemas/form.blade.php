@@ -17,7 +17,7 @@
             <label for="example-text-input"
                 class="form-control-label @error('codigo') is-invalid @enderror">Código*</label>
             <input class="form-control" type="text" name="codigo" placeholder="Ej. suma-a-b"
-                value="{{ isset($problema) ? old('codigo', $problema->nombre) : old('codigo') }}">
+                value="{{ isset($problema) ? old('codigo', $problema->codigo) : old('codigo') }}">
             @error('codigo')
                 <p class="text-danger text-xs pt-1"> {{ $message }} </p>
             @enderror
@@ -87,14 +87,17 @@
     </label>
 </div>
 <label>Si no ingresa el tiempo y la memoria límite, el juez virtual no evaluara estos dos parametros.</label>
-<p class="text-uppercase text-sm">Enunciado</p>
+<hr>
+<p class="text-uppercase text-sm mt-2">Enunciado</p>
 <div class="row">
     <div class="col">
         <div class="form-group">
             <label for="body_problema">Enunciado del Problema*</label>
-            <textarea class="form-control @error('body_problema') is-invalid @enderror" id="body_problema" name="body_problema"
-                rows="8"
-                placeholder="Ej. Dado dos números A y B, desarrolle un código que entregue como resultado la suma de A y B.">{{ isset($problema) ? old('body_problema', $problema->body_problema) : old('body_problema') }}</textarea>
+            <input type="hidden" id="body_problema" name="body_problema"
+                value="{{ isset($problema) ? old('body_problema', $problema->body_problema) : old('body_problema') }}">
+            <div class="flex flex-col space-y-2">
+                <div id="editor" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></div>
+            </div>
         </div>
         @error('body_problema')
             <p class="text-danger text-xs pt-1"> {{ $message }} </p>

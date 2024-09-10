@@ -86,7 +86,7 @@
             @endcanany
             @can('ver problemas')
                 <li class="nav-item">
-                    <a class="nav-link {{ str_contains(request()->url(), 'problemas') == true ? 'active' : '' }}"
+                    <a class="nav-link {{ str_starts_with(Route::currentRouteName(), 'problemas') == true ? 'active' : '' }}"
                         href="{{ route('problemas.index') }}">
                         <div
                             class="icon border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -98,7 +98,7 @@
             @endcan
             @can('ver categoría de problema')
                 <li class="nav-item">
-                    <a class="nav-link {{ str_contains(request()->url(), 'categorias_problemas') == true ? 'active' : '' }}"
+                    <a class="nav-link {{ str_starts_with(Route::currentRouteName(), 'categorias') == true ? 'active' : '' }}"
                         href="{{ route('categorias.index') }}">
                         <div
                             class="icon border-radius-md text-center me-2 d-flex align-items-center justify-content-center">

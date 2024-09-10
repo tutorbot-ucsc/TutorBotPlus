@@ -1,4 +1,5 @@
 {
-    "/assets/js/argon-dashboard.js": "/assets/js/argon-dashboard.js",
+    "/js/app.js": "/js/app.js",
+    "/css/app.css": "/css/app.css",
     "/assets/css/argon-dashboard.css": "/assets/css/argon-dashboard.css"
 }

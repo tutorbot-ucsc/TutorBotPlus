@@ -73,4 +73,9 @@ class CursosController extends Controller
         } 
         return redirect()->route('cursos.index')->with('success', 'El curso '.$curso->nombre.' ha sido eliminado');
     }
+
+    public function listado_cursos(Request $request){
+        $cursos = auth()->user()->cursos()->get();
+        return view('plataforma.cursos.index', compact('cursos'));
+    }
 }

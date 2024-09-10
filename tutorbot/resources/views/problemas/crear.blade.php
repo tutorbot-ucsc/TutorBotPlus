@@ -20,5 +20,18 @@
     </div>
 @endsection
 @push('js')
-<script src="{{asset('assets/js/plugins/flatpickr.min.js')}}"></script>
+<script type="module">
+    const editor = new Editor({
+        el: document.querySelector('#editor'),
+        height: '600px',
+        initialEditType: 'markdown',
+        placeholder: 'Ingrese el enunciado del problema',
+        initialValue: `{{ isset($problema) ? old('body_problema', $problema->body_problema) : old('body_problema') }}`,
+    })
+    document.querySelector('#problema_form').addEventListener('submit', e => {
+        e.preventDefault();
+        document.querySelector('#body_problema').value = editor.getMarkdown();
+        e.target.submit();
+    });
+</script>
 @endpush

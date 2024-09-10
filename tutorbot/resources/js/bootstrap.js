@@ -1,4 +1,13 @@
+import Editor from '@toast-ui/editor';
+import '@toast-ui/editor/dist/toastui-editor.css'; // Editor's Style
+
 window._ = require('lodash');
+
+const Swal = require('sweetalert2')
+
+
+window.Editor = Editor;
+
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests

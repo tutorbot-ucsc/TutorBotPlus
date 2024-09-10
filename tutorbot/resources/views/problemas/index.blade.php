@@ -154,6 +154,8 @@
                                                         <a class="btn btn-outline-warning"
                                                             href="{{ route('problemas.editar_config_llm', ['id' => $problema->id]) }}">LLM</a>
                                                         <a class="btn btn-outline-warning"
+                                                            href="{{ route('problemas.editorial', ['id' => $problema->id]) }}">Editorial</a>
+                                                        <a class="btn btn-outline-warning"
                                                             href="{{ route('casos_pruebas.assign', ['id' => $problema->id]) }}">Casos
                                                             de Prueba</a>
                                                         <a class="btn btn-outline-warning"

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\Categoria_Problema;
 use App\Models\LenguajesProgramaciones;
+use App\Models\EnvioSolucionProblema;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 class Problemas extends Model
@@ -84,4 +85,8 @@ class Problemas extends Model
         return $this->hasMany(Casos_Pruebas::class, 'id_problema');
     }
     
+    public function envios(): HasMany
+    {
+        return $this->hasMany(EnvioSolucionProblema::class,'id_problema');
+    }
 }
