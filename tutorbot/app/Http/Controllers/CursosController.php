@@ -75,7 +75,7 @@ class CursosController extends Controller
     }
 
     public function listado_cursos(Request $request){
-        $cursos = auth()->user()->cursos()->get();
+        $cursos = auth()->user()->cursos()->paginate(5);
         return view('plataforma.cursos.index', compact('cursos'));
     }
 }

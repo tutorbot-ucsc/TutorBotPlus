@@ -1,0 +1,42 @@
+@extends('layout_plataforma.app', ['title_html' => $problema->nombre, 'title' => 'Problema - '.$problema->nombre])
+@section('content')
+    <div class="container-fluid py-3 px-4">
+        <div class="row">
+            <div class="col">
+                <div class="card border-danger" style="height:100%">
+                    <div class="card-header">
+                        Enunciado
+                    </div>
+                    <div class="card-body">
+                        {!! Str::markdown($problema->body_problema) !!}
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 col-sm-4">
+                <div class="card border-danger">
+                    <div class="card-body px-5">
+                        <div class="row px-5">
+                            <a class="btn btn-primary {{ $problema->disponible? '' : 'disabled' }}" href="#"
+                                role="button">{{ $problema->disponible? 'Resolver Problema' : 'Problema No Disponible' }}</a>
+                        </div>
+                        <div class="row px-5 mt-2">
+                            <a class="btn btn-outline-primary btn-sm {{ isset($problema->body_editorial) ? '' : 'disabled' }}"
+                                href="{{route('problemas.ver_editorial', ['codigo'=>$problema->codigo])}}"
+                                role="button">{{ isset($problema->body_editorial) ? 'Ver Editorial' : 'Editorial No Disponible' }}</a>
+                        </div>
+                        <div class="row px-5 mt-2">
+                            <a class="btn btn-outline-primary btn-sm" href="#" role="button">Ver Mis Envios</a></div>
+                        </div>
+                        <h6 class="ms-4">Puntos: {{$problema->casos_de_prueba()->sum('puntos')}}</h6>
+                        <h6 class="ms-4 mt-3">Límite de Tiempo: {{$problema->tiempo_limite? $problema->tiempo_limite.' s' : 'No definido'}}</h6>
+                        <h6 class="ms-4 mt-3">Límite de Memoria: {{$problema->memoria_limite? $problema->memoria_limite.' KB' : 'No definido'}}</h6>
+                        <h6 class="ms-4 mt-3">Curso: {{implode(', ', $problema->cursos()->get()->intersect(auth()->user()->cursos()->get())->pluck('nombre')->toArray())}}</h6>
+                        <h6 class="ms-4 mt-3">Estado: {{auth()->user()->envios()->where('id_problema', '=', $problema->id)->where('solucionado', '=', true)->exists()? 'Si':'No'}}</h6>
+                        <h6 class="ms-4 mt-3">Categorias: {{implode(', ', $problema->categorias()->get()->pluck('nombre')->toArray())}}</h6>
+                        <h6 class="ms-4 mt-3">Lenguajes: {{implode(', ', $problema->lenguajes()->get()->pluck('abreviatura')->toArray())}}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection

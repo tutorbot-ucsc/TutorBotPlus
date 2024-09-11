@@ -177,4 +177,63 @@ class ProblemasController extends Controller
         } 
         return view('problemas.editorial', compact('problema'));
     }
+
+    public function listado_problemas(Request $request){
+            try{
+            if(!auth()->user()->cursos()->get()->contains($request->id)){
+                return redirect()->route('cursos.listados')->with('error','No tienes acceso al curso que estas tratando de acceder');
+            }
+            $curso = Cursos::find($request->id);
+            $problemas = $curso->problemas()->where('visible', '=', true)->orderBy('created_at', 'DESC')->get()->map(function ($problema){
+                $problema->puntaje_total = $problema->casos_de_prueba()->get()->pluck('puntos')->sum();
+                $problema->categorias = implode(',', $problema->categorias()->get()->pluck('nombre')->toArray());
+                return $problema;
+            });
+        }catch(\PDOException $e){
+            DB::rollBack();
+            return redirect()->route('cursos.listado')->with('error', $e->getMessage());
+        }
+        return view('plataforma.problemas.index', compact('problemas', 'curso'));
+    }
+
+    public function ver_problema(Request $request){
+        try{
+            $problema = Problemas::where('codigo', '=', $request->codigo)->first();
+            $cursos_usuario = auth()->user()->cursos()->get()->pluck('id')->toArray();
+            if(!$problema->cursos()->whereIn('cursos.id', $cursos_usuario)->exists() || $problema->visible==false){
+                return redirect()->route('cursos.listado')->with('error','No tienes acceso al problema '.$problema->nombre);
+            }
+            $problema->disponible = true;
+            if(isset($problema->fecha_termino)){
+                $now = Carbon::now();
+                $fecha_termino = Carbon::parse($problema->fecha_termino);
+                if($now->gt($fecha_termino)){
+                    $problema->disponible = false;
+                }
+            }
+        }catch(\PDOException $e){
+            return redirect()->route('cursos.listado')->with('error',$e->getMessage());
+        }
+        return view('plataforma.problemas.ver_problema', compact('problema'));
+    }
+    public function ver_editorial(Request $request){
+        try{
+            $problema = Problemas::where('codigo', '=', $request->codigo)->first();
+            $cursos_usuario = auth()->user()->cursos()->get()->pluck('id')->toArray();
+            if(!$problema->cursos()->whereIn('cursos.id', $cursos_usuario)->exists() || $problema->visible==false){
+                return redirect()->route('cursos.listado')->with('error','No tienes acceso al problema '.$problema->nombre);
+            }
+            if(isset($problema->fecha_termino)){
+                $now = Carbon::now();
+                $fecha_termino = Carbon::parse($problema->fecha_termino);
+                if($now->gt($fecha_termino)){
+                    return redirect()->route('cursos.listado')->with('error','El problema '.$problema->nombre.'no está disponible');
+                }
+            }
+        }catch(\PDOException $e){
+            return redirect()->route('cursos.listado')->with('error',$e->getMessage());
+        }
+        return view('plataforma.problemas.ver_editorial', compact('problema'));
+    }
+    
 }

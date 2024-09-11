@@ -46,6 +46,12 @@ Route::get('/', function () {return redirect('/dashboard');})->middleware('auth'
 //Plataforma de Juez Online
 Route::group(['middleware'=>'auth'], function(){
 	Route::get('/', [CursosController::class, 'listado_cursos'])->name('cursos.listado');
+	Route::get('/cursos', function () {
+		return redirect()->route('cursos.listado');
+	});
+	Route::get('/cursos/{id}/problemas', [ProblemasController::class, 'listado_problemas'])->name('problemas.listado');
+	Route::get('/problema/{codigo}', [ProblemasController::class, 'ver_problema'])->name('problemas.ver');
+	Route::get('/problema/{codigo}/editorial', [ProblemasController::class, 'ver_editorial'])->name('problemas.ver_editorial');
 });
 //Administración
 Route::group(['middleware' => 'auth'], function () {

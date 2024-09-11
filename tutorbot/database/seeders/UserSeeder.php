@@ -46,10 +46,13 @@ class UserSeeder extends Seeder
         $profesor->assignRole('profesor');
         $estudiante->assignRole('estudiante');
 
-        $curso = Cursos::first();
-        $administrador->cursos()->save($curso);
-        $profesor->cursos()->save($curso);
-        $estudiante->cursos()->save($curso);
+        $cursos = Cursos::all();
+        foreach($cursos as $curso){
+            $administrador->cursos()->save($curso);
+        }
+        $curso_1 = Cursos::first();
+        $profesor->cursos()->save($curso_1);
+        $estudiante->cursos()->save($curso_1);
 
     }
 }
