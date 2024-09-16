@@ -31,7 +31,8 @@ use App\Http\Controllers\CategoriaProblemaController;
 use App\Http\Controllers\CursosController;
 use App\Http\Controllers\ProblemasController;
 use App\Http\Controllers\CasosPruebasController;
-
+use App\Http\Controllers\EnvioSolucionProblemaController;
+use App\Http\Controllers\EvaluacionSolucionController;
 Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');
 	Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
 	Route::post('/register', [RegisterController::class, 'store'])->middleware('guest')->name('register.perform');
@@ -52,6 +53,11 @@ Route::group(['middleware'=>'auth'], function(){
 	Route::get('/cursos/{id}/problemas', [ProblemasController::class, 'listado_problemas'])->name('problemas.listado');
 	Route::get('/problema/{codigo}', [ProblemasController::class, 'ver_problema'])->name('problemas.ver');
 	Route::get('/problema/{codigo}/editorial', [ProblemasController::class, 'ver_editorial'])->name('problemas.ver_editorial');
+	Route::get('/problema/{codigo}/resolver', [ProblemasController::class, 'resolver_problema'])->name('problemas.resolver');
+
+	Route::post('/problema/enviar', [EnvioSolucionProblemaController::class, 'enviar_solucion'])->name('problemas.enviar');
+	Route::get('/envio/{token}', [EvaluacionSolucionController::class, 'ver_evaluacion'])->name('envios.ver');
+
 });
 //Administración
 Route::group(['middleware' => 'auth'], function () {

@@ -10,6 +10,7 @@ use App\Models\Cursos;
 use App\Models\Casos_Pruebas;
 use App\Models\LenguajesProgramaciones;
 use App\Models\Categoria_Problema;
+use App\Models\JuecesVirtuales;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -236,4 +237,14 @@ class ProblemasController extends Controller
         return view('plataforma.problemas.ver_editorial', compact('problema'));
     }
     
+    public function resolver_problema(Request $request){
+        try{
+            $problema = Problemas::where('codigo','=',$request->codigo)->first();
+            $lenguajes = $problema->lenguajes()->get();
+            $jueces = JuecesVirtuales::all();
+        }catch(\PDOException $e){
+            return redirect()->route('cursos.listado')->with('error', $e->getMessage());
+        }
+        return view('plataforma.problemas.resolver_problema', compact('problema', 'lenguajes', 'jueces'));
+    }
 }

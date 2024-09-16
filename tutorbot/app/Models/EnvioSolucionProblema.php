@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\JuecesVirtuales;
 use App\Models\EvaluacionSolucion;
 use App\Models\Problemas;
+use App\Models\LenguajesProgramaciones;
 use App\Models\SolicitudRaLlm;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -16,6 +17,10 @@ class EnvioSolucionProblema extends Model
 {
     use HasFactory;
 
+
+    public static $rules = [
+        "codigo" => ["required", "min:5"],
+    ];
     public function usuario(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_usuario');
@@ -31,13 +36,18 @@ class EnvioSolucionProblema extends Model
         return $this->belongsTo(Problemas::class, 'id_problema');
     }
 
-    public function evaluaciones(): BelongsTo
+    public function evaluaciones(): HasMany
     {
-        return $this->belongsTo(EvaluacionSolucion::class, 'id_envio');
+        return $this->hasMany(EvaluacionSolucion::class, 'id_envio');
     }
 
     public function retroalimentacion(): HasMany
     {
         return $this->hasMany(SolicitudRaLlm::class,'id_envio');
+    }
+
+    public function lenguaje(): BelongsTo
+    {
+        return $this->belongsTo(LenguajesProgramaciones::class, 'id_lenguaje');
     }
 }

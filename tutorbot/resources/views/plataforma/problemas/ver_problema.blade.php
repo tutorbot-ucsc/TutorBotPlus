@@ -16,7 +16,7 @@
                     <div class="card border-danger" style="height:100%">
                         <div class="card-body px-5">
                             <div class="row px-5">
-                                <a class="btn btn-primary text-nowrap btn-block {{ $problema->disponible? '' : 'disabled' }}" href="#"
+                                <a class="btn btn-primary text-nowrap btn-block {{ $problema->disponible? '' : 'disabled' }}" href="{{route('problemas.resolver', ['codigo'=>$problema->codigo])}}"
                                     role="button">{{ $problema->disponible? 'Resolver Problema' : 'Problema No Disponible' }}</a>
                             </div>
                             <div class="row px-5 mt-2">

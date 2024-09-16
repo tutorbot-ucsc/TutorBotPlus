@@ -16,12 +16,12 @@ return new class extends Migration
             $table->unsignedBigInteger('id_envio');
             $table->string('token');
             $table->unsignedBigInteger('id_caso');
-            $table->enum('estado', ['Aceptado', 'Rechazado', 'En Proceso']);
-            $table->string('resultado');
-            $table->text('error_compilacion');
-            $table->text('stout');
-            $table->string('tiempo');
-            $table->string('memoria');
+            $table->enum('estado', ['Aceptado', 'Rechazado', 'En Proceso'])->default('En Proceso');
+            $table->string('resultado')->nullable();
+            $table->text('error_compilacion')->nullable();
+            $table->text('stout')->nullable();
+            $table->string('tiempo')->nullable();
+            $table->string('memoria')->nullable();
             $table->timestamps();
 
             $table->foreign('id_envio')->references('id')->on('envio_solucion_problemas')->onDelete('cascade')->onUpdate('cascade');
