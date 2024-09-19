@@ -11,13 +11,13 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link {{Route::is('cursos.*')? 'active fw-bold':''}}" aria-current="page" href="{{ route('cursos.listado') }}">Cursos</a>
+                    <a class="nav-link {{Route::is('cursos.*') || Route::is('problemas.*')? 'active fw-bold':''}}" aria-current="page" href="{{ route('cursos.listado') }}">Cursos</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="#">Evaluaciones</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Envios</a>
+                    <a class="nav-link {{Route::is('envios.*')? 'active fw-bold':''}}" href="{{route('envios.listado')}}">Envios</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"

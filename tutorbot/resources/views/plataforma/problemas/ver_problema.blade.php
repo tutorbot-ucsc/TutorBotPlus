@@ -25,14 +25,14 @@
                                     role="button">{{ isset($problema->body_editorial) ? 'Ver Editorial' : 'Editorial No Disponible' }}</a>
                             </div>
                             <div class="row px-5 mt-2">
-                                <a class="btn btn-outline-primary text-nowrap btn-sm btn-block" href="#" role="button">Ver Mis Envios</a></div>
+                                <a class="btn btn-outline-primary text-nowrap btn-sm btn-block" href="{{route('envios.listado', ['id_problema'=>$problema->id])}}" role="button">Ver Mis Envios</a></div>
                             </div>
                             <h6 class="ms-4">Puntos: {{$problema->casos_de_prueba()->sum('puntos')}}</h6>
                             <h6 class="ms-4 mt-3">Límite de Tiempo: {{$problema->tiempo_limite? $problema->tiempo_limite.' s' : 'No definido'}}</h6>
                             <h6 class="ms-4 mt-3">Límite de Memoria: {{$problema->memoria_limite? $problema->memoria_limite.' KB' : 'No definido'}}</h6>
                             <h6 class="ms-4 mt-3">Curso: {{implode(', ', $problema->cursos()->get()->intersect(auth()->user()->cursos()->get())->pluck('nombre')->toArray())}}</h6>
-                            <h6 class="ms-4 mt-3">Estado: {{auth()->user()->envios()->where('id_problema', '=', $problema->id)->where('solucionado', '=', true)->exists()? 'Si':'No'}}</h6>
-                            <h6 class="ms-4 mt-3">Categorias: {{implode(', ', $problema->categorias()->get()->pluck('nombre')->toArray())}}</h6>
+                            <h6 class="ms-4 mt-3">Estado: {{auth()->user()->envios()->where('id_problema', '=', $problema->id)->where('solucionado', '=', true)->exists()? 'Resuelto':'No Resuelto'}}</h6>
+                            <h6 class="ms-4 mt-3">Categorías: {{implode(', ', $problema->categorias()->get()->pluck('nombre')->toArray())}}</h6>
                             <h6 class="ms-4 mt-3">Lenguajes: {{implode(', ', $problema->lenguajes()->get()->pluck('abreviatura')->toArray())}}</h6>
                         </div>
                     </div>

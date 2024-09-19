@@ -41,7 +41,7 @@ class EnvioSolucionProblema extends Model
         return $this->hasMany(EvaluacionSolucion::class, 'id_envio');
     }
 
-    public function retroalimentacion(): HasMany
+    public function retroalimentaciones(): HasMany
     {
         return $this->hasMany(SolicitudRaLlm::class,'id_envio');
     }

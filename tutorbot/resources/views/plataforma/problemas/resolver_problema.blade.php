@@ -1,6 +1,6 @@
 @extends('layout_plataforma.app', ['title_html' => $problema->nombre, 'title' => 'Problema - ' . $problema->nombre . ' - Resolver'])
 @section('content')
-    <div class="container-fluid py-3 px-4">
+    <div class="container-fluid px-4">
         @include('components.alert')
         <div class="row">
             <div class="col">
@@ -18,7 +18,7 @@
                 </div>
             </div>
             <div class="col-4 col-sm-4">
-                <div class="card border-danger">
+                <div class="card border-danger" style="height:100%;">
                     <div class="card-body px-5">
                         <form action="{{ route('problemas.enviar', ["id_problema"=>$problema->id]) }}" method="POST" id="evaluacion_form">
                             @csrf
@@ -31,7 +31,7 @@
                                     role="button">Volver</a>
                             </div>
                             <h6 class="text-center mt-4">Lenguaje de Programación</h6>
-                            <select class="form-select form-select-lg mb-3" id="lenguaje" name="lenguaje"
+                            <select class="form-select mb-3" id="lenguaje" name="lenguaje"
                                 onchange="change_language(this)">
                                 @foreach ($lenguajes as $item)
                                     <option value="{{ $item->codigo }}" abreviatura="{{ $item->abreviatura }}">
@@ -39,7 +39,7 @@
                                 @endforeach
                             </select>
                             <h6 class="text-center mt-2">Evaluador</h6>
-                            <select class="form-select form-select-lg mb-3" id="juez_virtual" name="juez_virtual">
+                            <select class="form-select mb-3" id="juez_virtual" name="juez_virtual">
                                 <option value="0">Selección Aleatoria de Juez Virtual</option>
                                 @foreach ($jueces as $item)
                                     <option value="{{ $item->id }}">{{ $item->nombre }}</option>
@@ -75,7 +75,7 @@
         editor.setTheme("ace/theme/monokai");
         editor.session.setMode("ace/mode/" + set_lenguaje);
         editor.setOptions({
-            fontSize: "13pt"
+            fontSize: "10pt"
         })
 
         function change_language(item) {

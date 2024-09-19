@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_envio');
             $table->string('token');
             $table->unsignedBigInteger('id_caso');
-            $table->enum('estado', ['Aceptado', 'Rechazado', 'En Proceso'])->default('En Proceso');
+            $table->enum('estado', ['Aceptado', 'Rechazado', 'Error', 'En Proceso'])->default('En Proceso');
             $table->string('resultado')->nullable();
             $table->text('error_compilacion')->nullable();
             $table->text('stout')->nullable();

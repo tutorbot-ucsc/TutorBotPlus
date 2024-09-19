@@ -18,7 +18,7 @@
                                             data-bs-target="#resultados_{{ $i }}" aria-expanded="false"
                                             aria-controls="resultados_{{ $i }}">Caso de Prueba
                                             #{{ $i + 1 }}:<span
-                                                class="mx-2 badge {{ $evaluaciones[$i]->estado == 'Aceptado' ? 'text-bg-success' : 'text-bg-danger' }}">{{ $evaluaciones[$i]->resultado }}</span>
+                                                class="mx-2 badge {{ $evaluaciones[$i]->estado == 'Rechazado' ? 'text-bg-danger' : 'text-bg-success' }}">{{ $evaluaciones[$i]->resultado }}</span>
                                             - Tiempo: {{ $evaluaciones[$i]->tiempo ? $evaluaciones[$i]->tiempo : '0' }}
                                             segundos - Memoria:
                                             {{ $evaluaciones[$i]->memoria ? $evaluaciones[$i]->memoria : '0' }} KB
@@ -42,7 +42,7 @@
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div class="card {{ $evaluaciones[$i]->estado == 'Aceptado' ? 'border-success' : 'border-danger' }}"
+                                                <div class="card {{ $evaluaciones[$i]->estado == 'Rechazado' || $evaluaciones[$i]->estado == 'Error' ? 'border-danger' : 'border-success' }}"
                                                     style="width: 18rem;">
                                                     <div class="card-body">
                                                         <h5 class="card-title">Salidas</h5>
@@ -51,7 +51,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            @if ($evaluaciones[$i]->estado == 'Rechazado')
+                                            @if (isset($evaluaciones[$i]->error_compilacion))
                                                 <div class="card border-danger">
                                                     <div class="card-body">
                                                         <h5 class="card-title">Mensaje del Compilador</h5>
@@ -71,22 +71,39 @@
             <div class="col-4 col-sm-4">
                 <div class="card border-danger">
                     <div class="card-body px-5">
+                        @if ($envio->solucionado == false && $tieneRetroalimentacion == false)
+                            <div class="row px-5">
+                                <a class="btn btn-primary btn-block {{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? '' : 'disabled' }}"
+                                    href="{{route('envios.generar_retroalimentacion', ['token'=>$envio->token])}}"
+                                    role="button">{{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? 'Solicitar Retroalimentacion (Cantidad Disponible: ' . $cant_retroalimentacion . ')' : 'Retroalimentación no disponible' }}</a>
+                            </div>
+                        @elseif($tieneRetroalimentacion == true)
+                            <div class="row px-5">
+                                <a class="btn btn-primary text-nowrap btn-block" href="{{route('envios.retroalimentacion', ['token'=>$envio->token])}}" role="button">Ver Retroalimentación</a>
+                            </div>
+                        @endif
+                        <div class="row px-5 mt-2">
+                            <a class="btn btn-outline-primary text-nowrap btn-sm btn-block"
+                                href="{{ route('problemas.ver', ['codigo' => $problema->codigo]) }}" role="button">Volver al
+                                Enunciado</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row mt-3">
-            <div class="col">
-                <div class="card border-danger" style="height:100%">
-                    <div class="card-header">
-                        Código Fuente
-                    </div>
-                    <div class="card-body">
-                        <pre><code class="{{ $highlightjs_choice }}-html">{{ $envio->codigo }}</code></pre>
-                    </div>
+    </div>
+    <div class="row mt-3 mx-2">
+        <div class="col">
+            <div class="card border-danger" style="height:100%">
+                <div class="card-header">
+                    Código Fuente
+                </div>
+                <div class="card-body">
+                    <pre><code class="{{ $highlightjs_choice }}-html">{{ $envio->codigo }}</code></pre>
                 </div>
             </div>
         </div>
+    </div>
     </div>
     <link rel="stylesheet" href="{{ asset('assets/js/highlightjs/styles/dark.css') }}">
 @endsection

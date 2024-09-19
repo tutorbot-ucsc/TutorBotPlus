@@ -5,24 +5,34 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\EvaluacionSolucion;
 use App\Models\EnvioSolucionProblema;
+use App\Models\JuecesVirtuales;
 use App\Models\Problemas;
+use App\Models\SolicitudRaLlm;
 use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
+use Carbon\Carbon;
 class EvaluacionSolucionController extends Controller
 {
-    protected  $higlightjs_language = [
+    protected $higlightjs_language = [
         "py" => "python",
         "c++" => "cpp",
         "c"=> "c",
         "java" => "java",
         "sql" => "sql",
     ];
+
     public function ver_evaluacion(Request $request){
         $envio = EnvioSolucionProblema::where("token", "=", $request->token)->first();
+        $problema = $envio->problema()->first();
         $highlightjs_choice = $this->higlightjs_language[strtolower($envio->lenguaje->abreviatura)];
         $juez = $envio->juez_virtual;
         $evaluaciones = $envio->evaluaciones()->get();
+        //Calculo de intentos restante de retroalimentación
+        $cant_retroalimentacion = $problema->limite_llm - DB::table('solicitud_ra_llms')->leftJoin('envio_solucion_problemas', 'solicitud_ra_llms.id_envio', '=', 'envio_solucion_problemas.id')->where('envio_solucion_problemas.id_problema', '=', $problema->id)->where('id_usuario','=', auth()->user()->id)->count();
+        //Booleano que verifica si hay una retroalimentación asociado al código.
+        $tieneRetroalimentacion = SolicitudRaLlm::where('id_envio', '=', $envio->id)->exists();
         $evaluacion_arr = [];
+        //Verifica si hay evaluaciones por procesar, si hay casos que no han sido evaluados entonces se almacenara en un array.
         foreach($evaluaciones as $evaluacion){
             if ($evaluacion->estado == "En Proceso") {
                 $evaluacion_arr[$evaluacion->token] = $evaluacion;
@@ -30,12 +40,11 @@ class EvaluacionSolucionController extends Controller
         }
         if(sizeof($evaluacion_arr)>0){
             $client = new Client();
+            //Crea el header para el request dependiendo del tipo de autenticación que se utiliza, revisar el modelo JuecesVirtuales.
+            $header = JuecesVirtuales::generateBodyRequest($juez);
             try {
                 $response = $client->request('GET', $juez->direccion.'/submissions/batch?tokens=' . implode('%2C', array_keys($evaluacion_arr)) . '&base64_encoded=true&fields=*', [
-                    'headers' => [
-                        'x-rapidapi-host' => $juez->host,
-                        'x-rapidapi-key' => $juez->api_token,
-                    ],
+                    'headers' => $header,
                 ]);
                 $data = json_decode($response->getBody(), true);
                 foreach ($data["submissions"] as $item) {
@@ -52,8 +61,11 @@ class EvaluacionSolucionController extends Controller
                         }
                         if ($item['status']["id"] == 3) {
                             $evaluacion->estado = "Aceptado";
-                        } else if($item['status']["id"] >=4 && $item['status']["id"] <=12) {
+                            $envio->cant_casos_resuelto = $envio->cant_casos_resuelto + 1;
+                        } else if($item['status']["id"] ==4) {
                             $evaluacion->estado = "Rechazado";
+                        }else if($item['status']["id"] >=5 && $item['status']["id"] <=12){
+                            $evaluacion->estado = "Error";
                         }
                         $evaluacion->save();
                     }
@@ -62,6 +74,10 @@ class EvaluacionSolucionController extends Controller
                 return $e->getMessage();
             }
         }
-        return view('plataforma.problemas.resultado', compact('envio', 'evaluaciones', 'highlightjs_choice'));
+        if(sizeof($evaluaciones) == $envio->cant_casos_resuelto){
+            $envio->solucionado = true;
+        }
+        $envio->save();
+        return view('plataforma.problemas.resultado', compact('envio', 'evaluaciones', 'highlightjs_choice', 'cant_retroalimentacion', 'tieneRetroalimentacion', 'problema'));
     }
 }

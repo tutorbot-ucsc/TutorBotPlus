@@ -18,7 +18,7 @@ class JuecesVirtualesSeeder extends Seeder
             'direccion' => 'https://judge0-ce.p.rapidapi.com',
             'host' => 'judge0-ce.p.rapidapi.com',
             'api_token' => env('JUDGE0_API_KEY'),
-            'autenticacion' => 'rapidapi',
+            'autenticacion' => 'x-rapid-key',
             'created_at' => Carbon::now()->toDateString(),
         ]);
     }

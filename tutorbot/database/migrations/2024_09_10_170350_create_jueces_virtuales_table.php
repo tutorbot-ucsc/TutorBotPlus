@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('direccion');
             $table->string('api_token');
             $table->string('host');
-            $table->enum('autenticacion', ['rapidapi', 'bearer']);
+            $table->enum('autenticacion', ['x-rapid-key', 'x-auth-token']);
             $table->timestamps();
         });
     }

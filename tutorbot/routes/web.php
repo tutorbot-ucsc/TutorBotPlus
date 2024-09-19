@@ -33,6 +33,7 @@ use App\Http\Controllers\ProblemasController;
 use App\Http\Controllers\CasosPruebasController;
 use App\Http\Controllers\EnvioSolucionProblemaController;
 use App\Http\Controllers\EvaluacionSolucionController;
+use App\Http\Controllers\LlmController;
 Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');
 	Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
 	Route::post('/register', [RegisterController::class, 'store'])->middleware('guest')->name('register.perform');
@@ -56,7 +57,12 @@ Route::group(['middleware'=>'auth'], function(){
 	Route::get('/problema/{codigo}/resolver', [ProblemasController::class, 'resolver_problema'])->name('problemas.resolver');
 
 	Route::post('/problema/enviar', [EnvioSolucionProblemaController::class, 'enviar_solucion'])->name('problemas.enviar');
+	Route::get('/envios/{id_problema?}', [EnvioSolucionProblemaController::class, 'ver_envios'])->name('envios.listado');
 	Route::get('/envio/{token}', [EvaluacionSolucionController::class, 'ver_evaluacion'])->name('envios.ver');
+
+	Route::get('/envio/{token}/retroalimentacion', [LlmController::class, 'ver_retroalimentacion'])->name('envios.retroalimentacion');
+	Route::get('/retroalimentacion/generar', [LlmController::class, 'generar_retroalimentacion'])->name('envios.generar_retroalimentacion');
+
 
 });
 //Administración

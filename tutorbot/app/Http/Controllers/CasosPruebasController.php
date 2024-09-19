@@ -18,7 +18,10 @@ class CasosPruebasController extends Controller
         try{
             DB::beginTransaction();
             $caso = Casos_Pruebas::find($request->id);
+            $problema = Problemas::find($caso->id_problema);
+            $problema->puntaje_total = $problema->puntaje_total - $caso->puntos;
             $caso->delete();
+            $problema->save();
             DB::commit();
         }catch(\PDOException $e){
             DB::rollback();
@@ -39,6 +42,7 @@ class CasosPruebasController extends Controller
             $caso->salidas = $request->input("salidas");
             $caso->puntos = $request->input("puntos");
             $problema->casos_de_prueba()->save($caso);
+            $problema->puntaje_total = $problema->puntaje_total + $caso->puntos;
         }catch( \PDOException $e){
             DB::rollback();
             return redirect()->back()->with('error', $e->getMessage());

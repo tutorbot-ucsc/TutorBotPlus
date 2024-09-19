@@ -11,8 +11,10 @@ use App\Models\Casos_Pruebas;
 use App\Models\LenguajesProgramaciones;
 use App\Models\Categoria_Problema;
 use App\Models\JuecesVirtuales;
+use App\Models\EnvioSolucionProblema;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 
 class ProblemasController extends Controller
@@ -26,48 +28,53 @@ class ProblemasController extends Controller
         return view('problemas.index', compact('problemas'));
     }
 
-    public function crear(){
+    public function crear()
+    {
         $categorias = Categoria_Problema::all();
         $cursos = Cursos::all();
         $lenguajes = LenguajesProgramaciones::all();
         return view('problemas.crear', compact('categorias', 'cursos', 'lenguajes'))->with('accion', "crear");;
     }
 
-    public function editar(Request $request){
+    public function editar(Request $request)
+    {
         $problema = Problemas::find($request->id);
         $categorias = Categoria_Problema::all();
         $cursos = Cursos::all();
         $lenguajes = LenguajesProgramaciones::all();
-        return view('problemas.editar', compact('problema','categorias','lenguajes', 'cursos'))->with('accion', "editar");
+        return view('problemas.editar', compact('problema', 'categorias', 'lenguajes', 'cursos'))->with('accion', "editar");
     }
-    public function editar_config_llm(Request $request){
+    public function editar_config_llm(Request $request)
+    {
         $problema = Problemas::find($request->id);
         return view('problemas.llm_config', compact('problema'));
     }
 
-    public function configurar_llm(Request $request){
+    public function configurar_llm(Request $request)
+    {
         $validated = $request->validate(Problemas::$llm_config_rules);
-        try{
+        try {
             $problema = Problemas::find($request->id);
-            if(isset($request->habilitar_llm)){
+            if (isset($request->habilitar_llm)) {
                 $problema->habilitar_llm = true;
-            }else{
+            } else {
                 $problema->habilitar_llm = false;
             }
             $problema->limite_llm = $request->input('limite_llm');
             $problema->save();
-        }catch(\PDOException $e){
+        } catch (\PDOException $e) {
             DB::rollBack();
-            return redirect()->route("problemas.configurar_llm", ["id"=>$request->id])->with("error", $e->getMessage());
+            return redirect()->route("problemas.configurar_llm", ["id" => $request->id])->with("error", $e->getMessage());
         }
-        return redirect()->route("problemas.index")->with("success", "Se ha configurado la Large Language Model en el problema ".$problema->codigo." correctamente");
+        return redirect()->route("problemas.index")->with("success", "Se ha configurado la Large Language Model en el problema " . $problema->codigo . " correctamente");
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $validated = $request->validate(Problemas::$createRules);
-        
+
         db::beginTransaction();
-        try{
+        try {
             $problema = new Problemas;
             $problema->nombre = $request->input('nombre');
             $problema->codigo = $request->input('codigo');
@@ -77,15 +84,15 @@ class ProblemasController extends Controller
             $problema->tiempo_limite = $request->input('tiempo_limite');
             $problema->body_problema = $request->input('body_problema');
             $problema->body_problema_resumido = $request->input('body_problema_resumido');
-            if(isset($request->visible)){
+            if (isset($request->visible)) {
                 $problema->visible = true;
-            }else{
+            } else {
                 $problema->visible = false;
             }
 
-            if(isset($request->habilitar_llm)){
+            if (isset($request->habilitar_llm)) {
                 $problema->habilitar_llm = true;
-            }else{
+            } else {
                 $problema->habilitar_llm = false;
             }
             $problema->limite_llm = $request->input('limite_llm');
@@ -97,17 +104,18 @@ class ProblemasController extends Controller
             $problema->lenguajes()->sync($request->input('lenguajes'));
             $problema->categorias()->sync($request->input('categorias'));
             db::commit();
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             DB::rollback();
             return redirect()->route('problemas.index')->with('error', $e->getMessage());
         }
-        return redirect()->route('casos_pruebas.assign', ["id"=>$problema->id])->with('success','El Problema '.$problema->nombre.' ha sido creado, ingrese los casos de prueba.');
+        return redirect()->route('casos_pruebas.assign', ["id" => $problema->id])->with('success', 'El Problema ' . $problema->nombre . ' ha sido creado, ingrese los casos de prueba.');
     }
 
-    public function update(Request $request){
+    public function update(Request $request)
+    {
 
         $validated = $request->validate(Problemas::updateRules($request->codigo));
-        try{
+        try {
             db::beginTransaction();
             $problema = Problemas::find($request->id);
             $problema->nombre = $request->input('nombre');
@@ -118,15 +126,15 @@ class ProblemasController extends Controller
             $problema->tiempo_limite = $request->input('tiempo_limite');
             $problema->body_problema = $request->input('body_problema');
             $problema->body_problema_resumido = $request->input('body_problema_resumido');
-            if(isset($request->visible)){
+            if (isset($request->visible)) {
                 $problema->visible = true;
-            }else{
+            } else {
                 $problema->visible = false;
             }
 
-            if(isset($request->habilitar_llm)){
+            if (isset($request->habilitar_llm)) {
                 $problema->habilitar_llm = true;
-            }else{
+            } else {
                 $problema->habilitar_llm = false;
             }
             $problema->limite_llm = $request->input('limite_llm');
@@ -138,113 +146,137 @@ class ProblemasController extends Controller
             $problema->lenguajes()->sync($request->input('lenguajes'));
             $problema->categorias()->sync($request->input('categorias'));
             db::commit();
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return redirect()->route('problemas.index')->with('error', $e->getMessage());
         }
-        return redirect()->route('problemas.index')->with('success','El problema ha sido modificado');
+        return redirect()->route('problemas.index')->with('success', 'El problema ha sido modificado');
     }
     public function eliminar(Request $request)
     {
-        try{
+        try {
             DB::beginTransaction();
             $problema = Problemas::find($request->id);
             $problema->delete();
             DB::commit();
-        }catch(\PDOException $e){
+        } catch (\PDOException $e) {
             db::rollBack();
             return redirect()->route('problemas.index')->with('error', $e->getMessage());
-        } 
-        return redirect()->route('problemas.index')->with('success', 'El problema "'.$problema->nombre.'" ha sido eliminado');
+        }
+        return redirect()->route('problemas.index')->with('success', 'El problema "' . $problema->nombre . '" ha sido eliminado');
     }
 
-    public function update_editorial(Request $request){
-        try{
+    public function update_editorial(Request $request)
+    {
+        try {
             $problema = Problemas::find($request->id);
             $problema->body_editorial = $request->input('body_editorial');
             $problema->save();
-        }catch(\PDOException $e){
+        } catch (\PDOException $e) {
             DB::rollBack();
             return redirect()->back()->withInput($request->input())->with('error', $e->getMessage());
         }
-        return redirect()->route('problemas.index')->with('success', 'El editorial para el problema "'.$problema->nombre.'" ha sido modificado');
+        return redirect()->route('problemas.index')->with('success', 'El editorial para el problema "' . $problema->nombre . '" ha sido modificado');
     }
 
-    public function editar_editorial(Request $request){
-        try{
+    public function editar_editorial(Request $request)
+    {
+        try {
             $problema = Problemas::find($request->id);
-        }catch(\PDOException $e){
+        } catch (\PDOException $e) {
             db::rollBack();
             return redirect()->route('problemas.index')->with('error', $e->getMessage());
-        } 
+        }
         return view('problemas.editorial', compact('problema'));
     }
 
-    public function listado_problemas(Request $request){
-            try{
-            if(!auth()->user()->cursos()->get()->contains($request->id)){
-                return redirect()->route('cursos.listados')->with('error','No tienes acceso al curso que estas tratando de acceder');
+    public function listado_problemas(Request $request)
+    {
+        try {
+            if (!auth()->user()->cursos()->get()->contains($request->id)) {
+                return redirect()->route('cursos.listados')->with('error', 'No tienes acceso al curso que estas tratando de acceder');
             }
             $curso = Cursos::find($request->id);
-            $problemas = $curso->problemas()->where('visible', '=', true)->orderBy('created_at', 'DESC')->get()->map(function ($problema){
+            $problemas = $curso->problemas()->where('visible', '=', true)->orderBy('created_at', 'DESC')->get()->map(function ($problema) {
                 $problema->puntaje_total = $problema->casos_de_prueba()->get()->pluck('puntos')->sum();
                 $problema->categorias = implode(',', $problema->categorias()->get()->pluck('nombre')->toArray());
                 return $problema;
             });
-        }catch(\PDOException $e){
+        } catch (\PDOException $e) {
             DB::rollBack();
             return redirect()->route('cursos.listado')->with('error', $e->getMessage());
         }
         return view('plataforma.problemas.index', compact('problemas', 'curso'));
     }
 
-    public function ver_problema(Request $request){
-        try{
+    public function ver_problema(Request $request)
+    {
+        try {
             $problema = Problemas::where('codigo', '=', $request->codigo)->first();
             $cursos_usuario = auth()->user()->cursos()->get()->pluck('id')->toArray();
-            if(!$problema->cursos()->whereIn('cursos.id', $cursos_usuario)->exists() || $problema->visible==false){
-                return redirect()->route('cursos.listado')->with('error','No tienes acceso al problema '.$problema->nombre);
+            if (!$problema->cursos()->whereIn('cursos.id', $cursos_usuario)->exists() || $problema->visible == false) {
+                return redirect()->route('cursos.listado')->with('error', 'No tienes acceso al problema ' . $problema->nombre);
             }
             $problema->disponible = true;
-            if(isset($problema->fecha_termino)){
+            if (isset($problema->fecha_termino)) {
                 $now = Carbon::now();
                 $fecha_termino = Carbon::parse($problema->fecha_termino);
-                if($now->gt($fecha_termino)){
+                if ($now->gt($fecha_termino)) {
                     $problema->disponible = false;
                 }
             }
-        }catch(\PDOException $e){
-            return redirect()->route('cursos.listado')->with('error',$e->getMessage());
+        } catch (\PDOException $e) {
+            return redirect()->route('cursos.listado')->with('error', $e->getMessage());
         }
         return view('plataforma.problemas.ver_problema', compact('problema'));
     }
-    public function ver_editorial(Request $request){
-        try{
+    public function ver_editorial(Request $request)
+    {
+        try {
             $problema = Problemas::where('codigo', '=', $request->codigo)->first();
             $cursos_usuario = auth()->user()->cursos()->get()->pluck('id')->toArray();
-            if(!$problema->cursos()->whereIn('cursos.id', $cursos_usuario)->exists() || $problema->visible==false){
-                return redirect()->route('cursos.listado')->with('error','No tienes acceso al problema '.$problema->nombre);
+            if (!$problema->cursos()->whereIn('cursos.id', $cursos_usuario)->exists() || $problema->visible == false) {
+                return redirect()->route('cursos.listado')->with('error', 'No tienes acceso al problema ' . $problema->nombre);
             }
-            if(isset($problema->fecha_termino)){
+            if (isset($problema->fecha_termino)) {
                 $now = Carbon::now();
                 $fecha_termino = Carbon::parse($problema->fecha_termino);
-                if($now->gt($fecha_termino)){
-                    return redirect()->route('cursos.listado')->with('error','El problema '.$problema->nombre.'no está disponible');
+                if ($now->gt($fecha_termino)) {
+                    return redirect()->route('cursos.listado')->with('error', 'El problema ' . $problema->nombre . 'no está disponible');
                 }
             }
-        }catch(\PDOException $e){
-            return redirect()->route('cursos.listado')->with('error',$e->getMessage());
+        } catch (\PDOException $e) {
+            return redirect()->route('cursos.listado')->with('error', $e->getMessage());
         }
         return view('plataforma.problemas.ver_editorial', compact('problema'));
     }
-    
-    public function resolver_problema(Request $request){
-        try{
-            $problema = Problemas::where('codigo','=',$request->codigo)->first();
+
+    public function resolver_problema(Request $request)
+    {
+        try {
+            $problema = Problemas::where('codigo', '=', $request->codigo)->first();
             $lenguajes = $problema->lenguajes()->get();
             $jueces = JuecesVirtuales::all();
-        }catch(\PDOException $e){
+            $last_envio = auth()->user()->envios()->where('id_problema', '=', $problema->id)->orderBy('created_at', 'DESC')->first();
+            $codigo = null;
+            if (isset($last_envio->termino)) {
+                DB::beginTransaction();
+                $envio = new EnvioSolucionProblema;
+                $envio->token = Str::random(40);
+                $envio->problema()->associate($problema);
+                $envio->usuario()->associate(auth()->user());
+                if($last_envio->solucionado==false){
+                    $codigo = $last_envio->codigo;
+                    $envio->codigo = $codigo;
+                    $envio->inicio = $last_envio->inicio;
+                }
+                $envio->save();
+                DB::commit();
+            }else{
+                $codigo = $last_envio->codigo;
+            }
+        } catch (\PDOException $e) {
             return redirect()->route('cursos.listado')->with('error', $e->getMessage());
         }
-        return view('plataforma.problemas.resolver_problema', compact('problema', 'lenguajes', 'jueces'));
+        return view('plataforma.problemas.resolver_problema', compact('problema', 'lenguajes', 'jueces', 'codigo'));
     }
 }

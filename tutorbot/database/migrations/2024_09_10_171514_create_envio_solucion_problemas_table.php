@@ -17,11 +17,11 @@ return new class extends Migration
             $table->unsignedBigInteger('id_usuario');
             $table->unsignedBigInteger('id_problema');
             $table->unsignedBigInteger('id_certamen')->nullable();
-            $table->unsignedBigInteger('id_juez');
+            $table->unsignedBigInteger('id_juez')->nullable();
             $table->unsignedBigInteger('id_lenguaje')->nullable();
             $table->string('codigo')->nullable();
-            $table->date('inicio')->default(Carbon::now());
-            $table->date('termino')->nullable();
+            $table->dateTime('inicio')->default(Carbon::now());
+            $table->dateTime('termino')->nullable();
             $table->integer('cant_casos_resuelto')->default(0);
             $table->boolean('solucionado')->default(false);
             $table->timestamps();
