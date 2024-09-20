@@ -9,7 +9,7 @@
             <div class="card mb-4">
                 <div class="card-header pb-0">
                     <div class="d-flex justify-content-between">
-                        <h6>Casos de Prueba</h6>
+                        <h6>Caso de Prueba (SQL)</h6>
                     </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
@@ -45,9 +45,6 @@
                                     @enderror
                                 </div>
                                 <button class="btn btn-primary" type="submit">Añadir</button>
-                                <button type="button" class="btn bg-outline-primary" data-bs-toggle="modal" data-bs-target="#ejemplo_modal">
-                                    Ver Ejemplo
-                                </button>
                             </div>
                         </div>
                     </form>
@@ -56,7 +53,6 @@
             </div>
         </div>
     </div>
-@include('problemas.casos_pruebas.ejemplo')
 @endsection
 @push('js')
     <link href="{{ asset('assets/js/DataTables/datatables.min.css') }}" rel="stylesheet">

@@ -31,7 +31,7 @@
             el: document.querySelector('#editor'),
             height: '600px',
             initialEditType: 'markdown',
-            placeholder: 'La editorial es una forma para ayudar al estudiante para que pueda comprender el problema.',
+            placeholder: "La editorial es una forma para ayudar al estudiante para que pueda comprender el problema.",
             initialValue: `{{ $problema->body_editorial }}`,
         })
         document.querySelector('#editorial_form').addEventListener('submit', e => {

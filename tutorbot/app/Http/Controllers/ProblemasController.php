@@ -32,7 +32,7 @@ class ProblemasController extends Controller
     {
         $categorias = Categoria_Problema::all();
         $cursos = Cursos::all();
-        $lenguajes = LenguajesProgramaciones::all();
+        $lenguajes = LenguajesProgramaciones::where('abreviatura', '!=', 'sql')->get();
         return view('problemas.crear', compact('categorias', 'cursos', 'lenguajes'))->with('accion', "crear");;
     }
 
@@ -117,7 +117,11 @@ class ProblemasController extends Controller
             }
             $problema->save();
             $problema->cursos()->sync($request->input('cursos'));
-            $problema->lenguajes()->sync($request->input('lenguajes'));
+            if($request->sql==true){
+                $problema->lenguajes()->sync(LenguajesProgramaciones::where('abreviatura', '=', 'sql')->get()->pluck('id'));
+            }else{
+                $problema->lenguajes()->sync($request->input('lenguajes'));
+            }
             $problema->categorias()->sync($request->input('categorias'));
     }
     public function update(Request $request)

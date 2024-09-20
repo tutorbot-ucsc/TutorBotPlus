@@ -143,8 +143,13 @@
         </select>
     </div>
 </div>
-
-<div class="row">
+<div class="form-check my-3">
+    <input class="form-check-input" type="checkbox" value="{{ true }}" id="sql" name="sql">
+    <label class="form-check-label" for="sql">
+       Problema de SQL
+    </label>
+</div>
+<div class="row" id="div_lenguajes">
     <div class="form-group">
         <label for="lenguajes">Lenguajes de Programación*</label>
         <label for="lenguajes">(Mantenga pulsado CTRL o CMD para seleccionar más de un curso)</label>
@@ -156,16 +161,17 @@
         </select>
     </div>
 </div>
-@include('problemas.form_llm')
-
-<p class="text-uppercase text-sm">Base de Datos (Solo para problemas de SQL)</p>
-<p class="text-sm">En caso de utilizar SQL como lenguaje de programación, suba el archivo de la base de datos comprimido en .zip con la
-    que se utilizara para realizar las consultas.</p>
-<div class="mb-3">
-    <input class="form-control form-control-sm" id="archivos_adicionales" name="archivos_adicionales"
-        type="file">
-    @error('archivos_adicionales')
-        <p class="text-danger text-xs pt-1"> {{ $message }} </p>
-    @enderror
-    <label for="archivos_adicionales">Formato: .zip</label>
+<div id="sql_file" class="d-none">
+    <p class="text-uppercase text-sm">Base de Datos (Solo para problemas de SQL)</p>
+    <p class="text-sm">En caso de que sea un problema de SQL, suba el archivo de la base de datos comprimido en .zip
+        que se utilizara para realizar las consultas.</p>
+    <div class="mb-3">
+        <input class="form-control form-control-sm" id="archivos_adicionales" name="archivos_adicionales"
+            type="file">
+        @error('archivos_adicionales')
+            <p class="text-danger text-xs pt-1"> {{ $message }} </p>
+        @enderror
+        <label for="archivos_adicionales">Formato: .zip</label>
+    </div>
 </div>
+@include('problemas.form_llm')
