@@ -16,43 +16,45 @@ class LlmController extends Controller
 {
     public function generar_retroalimentacion(Request $request){
         $evaluacion = DB::table('evaluacion_solucions')
+        ->join('casos__pruebas', 'casos__pruebas.id', '=', 'evaluacion_solucions.id_caso')
         ->join('envio_solucion_problemas', 'envio_solucion_problemas.id', '=', 'evaluacion_solucions.id_envio')
-        ->select('evaluacion_solucions.*' ,'envio_solucion_problemas.codigo', 'envio_solucion_problemas.token','envio_solucion_problemas.id_lenguaje', 'envio_solucion_problemas.id_problema')
+        ->join('lenguajes_programaciones', 'lenguajes_programaciones.id', '=', 'envio_solucion_problemas.id_lenguaje')
+        ->join('problemas', 'problemas.id', '=', 'envio_solucion_problemas.id_problema')
+        ->select('evaluacion_solucions.*' ,'envio_solucion_problemas.codigo', 'envio_solucion_problemas.token','envio_solucion_problemas.id_lenguaje', 'lenguajes_programaciones.nombre as nombre_lenguaje','envio_solucion_problemas.id_problema', 'problemas.limite_llm', 'casos__pruebas.entradas', 'casos__pruebas.salidas')
         ->where('envio_solucion_problemas.token', '=', $request->token)
         ->where('estado', '=', 'Rechazado')
         ->orWhere('estado', '=', 'Error')
         ->orderBy('estado', 'ASC')->first();
-        $problema = Problemas::find($evaluacion->id_problema);
-        $cant_retroalimentacion = $problema->limite_llm - DB::table('solicitud_ra_llms')->leftJoin('envio_solucion_problemas', 'solicitud_ra_llms.id_envio', '=', 'envio_solucion_problemas.id')->where('envio_solucion_problemas.id_problema', '=', $problema->id)->where('id_usuario','=', auth()->user()->id)->count();
+
+        $cant_retroalimentacion = $evaluacion->limite_llm - DB::table('solicitud_ra_llms')->leftJoin('envio_solucion_problemas', 'solicitud_ra_llms.id_envio', '=', 'envio_solucion_problemas.id')->where('envio_solucion_problemas.id_problema', '=', $evaluacion->id_problema)->where('id_usuario','=', auth()->user()->id)->count();
         if($cant_retroalimentacion == 0){
             return redirect()->route('envios.ver', ['token'=>$request->token])->with('error', 'Has superado el límite de uso de la LLM');
         }
         $codigo = $evaluacion->codigo;
-        $lenguaje = LenguajesProgramaciones::find($evaluacion->id_lenguaje)->value('nombre');
-        
-       /* if($evaluacion->estado == "Error"){
+
+       if($evaluacion->estado == "Error"){
             $result = OpenAI::chat()->create([
                 'model' => 'gpt-4o-mini',
                 'messages' => [
-                    ['role' => 'system', 'content' => SolicitudRaLlm::promptErrorCompilacion($evaluacion->error_compilacion, $lenguaje)],
+                    ['role' => 'system', 'content' => SolicitudRaLlm::promptErrorCompilacion(base64_decode($evaluacion->error_compilacion), $evaluacion->nombre_lenguaje)],
                     ['role' => 'user', 'content' => $codigo],
                 ],
             ]);
         }else if($evaluacion->estado == "Rechazado"){
-            $entradas = $evaluacion->casos_pruebas->entradas;
-            $salidas = $evaluacion->casos_pruebas->entradas;
+            $entradas = $evaluacion->entradas;
+            $salidas = $evaluacion->salidas;
             $result = OpenAI::chat()->create([
                 'model' => 'gpt-4o-mini',
                 'messages' => [
-                    ['role' => 'system', 'content' => SolicitudRaLlm::promptErrorRespuestaErronea($entradas, $salidas, $evaluacion->stout, $lenguaje)],
+                    ['role' => 'system', 'content' => SolicitudRaLlm::promptErrorRespuestaErronea($entradas, $salidas, base64_decode($evaluacion->stout), $evaluacion->nombre_lenguaje)],
                     ['role' => 'user', 'content' => $codigo],
                 ],
             ]);
-        }*/
+        }
         try{
             DB::beginTransaction();
             $retroalimentacion = new SolicitudRaLlm;
-            $retroalimentacion->retroalimentacion = "test";
+            $retroalimentacion->retroalimentacion = $result->choices[0]->message->content;
             $retroalimentacion->id_envio = $evaluacion->id_envio;
             $retroalimentacion->save();
             DB::commit();
@@ -67,14 +69,14 @@ class LlmController extends Controller
         $envios = EnvioSolucionProblema::where('token', '=', $request->token)->first();
         $retroalimentacion = DB::table('solicitud_ra_llms')
         ->join('envio_solucion_problemas', 'envio_solucion_problemas.id', '=', 'solicitud_ra_llms.id_envio')
-        ->select('solicitud_ra_llms.*')
+        ->join('problemas', 'envio_solucion_problemas.id_problema', '=', 'problemas.id')
+        ->select('solicitud_ra_llms.*', 'problemas.id as id_problema', 'problemas.limite_llm', 'problemas.habilitar_llm')
         ->where('envio_solucion_problemas.token', '=', $request->token)
         ->orderBy('created_at', 'DESC')->first();
-        $problema = Problemas::find($envios->id_problema);
-        $cant_retroalimentacion = $problema->limite_llm -  DB::table('solicitud_ra_llms')->leftJoin('envio_solucion_problemas', 'solicitud_ra_llms.id_envio', '=', 'envio_solucion_problemas.id')->where('envio_solucion_problemas.id_problema', '=', $problema->id)->where('id_usuario','=', auth()->user()->id)->count();
+        $cant_retroalimentacion = $retroalimentacion->limite_llm - DB::table('solicitud_ra_llms')->leftJoin('envio_solucion_problemas', 'solicitud_ra_llms.id_envio', '=', 'envio_solucion_problemas.id')->where('envio_solucion_problemas.id_problema', '=', $retroalimentacion->id_problema)->where('id_usuario','=', auth()->user()->id)->count();
         if(!isset($retroalimentacion)){
             return redirect()->route('generar_retroalimentacion', ['token'=>$request->token]);
         }
-        return view('plataforma.problemas.retroalimentacion', compact('retroalimentacion', 'problema', 'cant_retroalimentacion'))->with('token', $request->token);
+        return view('plataforma.problemas.retroalimentacion', compact('retroalimentacion', 'cant_retroalimentacion'))->with('token', $request->token);
     }
 }

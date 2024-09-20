@@ -6,7 +6,7 @@
         @include('components.alert')
     </div>
     <div class="container-fluid py-4">
-        <form method="POST" action='{{ route('problemas.store') }}'>
+        <form method="POST" action='{{ route('problemas.store') }}' id="problema_form" enctype="multipart/form-data">
             @csrf
             <div class="card">
                 <div class="card-body">

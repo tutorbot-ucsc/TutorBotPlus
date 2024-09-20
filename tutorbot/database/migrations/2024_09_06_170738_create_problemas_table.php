@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('problemas', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->string('codigo')->nullable();
+            $table->text('codigo')->nullable();
             $table->text('body_problema');
             $table->text('body_problema_resumido')->nullable();
             $table->string('memoria_limite')->default('5000');
@@ -26,11 +26,11 @@ return new class extends Migration
             $table->boolean('habilitar_llm')->default(false);
             $table->integer('limite_llm')->default(0);
             $table->text('body_editorial')->nullable();
-            $table->float('tasa_exito')->nullable();
-            $table->integer('cantidad_resueltos')->nullable();
-            $table->integer('cantidad_intentos')->nullable();
-            $table->float('tiempo_promedio')->nullable();
-            $table->integer('puntaje_total')->nullable();
+            $table->integer('cantidad_resueltos')->nullable()->default(0);
+            $table->integer('cantidad_intentos')->nullable()->default(0);
+            $table->float('tiempo_promedio')->nullable()->default(0);
+            $table->integer('puntaje_total')->nullable()->default(0);
+            $table->integer('cant_retroalimentacion_solicitada')->nullable()->default(0);
             $table->timestamps();
         });
     }

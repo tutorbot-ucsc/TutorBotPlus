@@ -10,7 +10,7 @@ class JuecesVirtuales extends Model
 {
     use HasFactory;
 
-    public static function generateBodyRequest(JuecesVirtuales $juez){
+    public static function generateHeaderRequest(JuecesVirtuales $juez){
         if($juez->autenticacion == "x-auth-token"){
             return [
                 'x-auth-key' => $juez->api_token,

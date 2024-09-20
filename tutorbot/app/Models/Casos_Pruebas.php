@@ -17,9 +17,9 @@ class Casos_Pruebas extends Model
     ];
 
     public static $rules = [
-        "entradas" => ["required","string"],
-        "salidas" => ["required","string"],
-        "puntos" => ["required","numeric"],
+        "entradas" => ["nullable","string"],
+        "salidas" => ["nullable","string"],
+        "puntos" => ["nullable","numeric"],
     ];
     public function problema(): BelongsTo
     {

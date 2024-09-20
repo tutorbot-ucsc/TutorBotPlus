@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Casos_Pruebas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\EnvioSolucionProblema;
@@ -11,7 +12,7 @@ use App\Models\LenguajesProgramaciones;
 use App\Models\Problemas;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
-
+use Illuminate\Support\Facades\Storage;
 class EnvioSolucionProblemaController extends Controller
 {
 
@@ -66,19 +67,42 @@ class EnvioSolucionProblemaController extends Controller
             $juez = JuecesVirtuales::find($envio->id_juez);
             $codigo = base64_encode($envio->codigo);
         } catch (\PDOException $e) {
-            return false;
+            return ["estado" => false];
         }
         //Transformación a JSON en batch del código fuente, los casos de prueba (entradas y salidas) y su memoria limite y tiempo limite.
         $batch_submissions = [];
         $casos = $problema->casos_de_prueba()->get();
+        $initial_json_string = '{"language_id":' . $lenguaje . ',"source_code":"' . $codigo . '"';
+        if(isset($memoria_limite)){
+            $initial_json_string = $initial_json_string.',"memory_limit":"'.$problema->memoria_limite.'"';
+        }
+        if(isset($problema->tiempo_limite)){
+            $initial_json_string = $initial_json_string.',"cpu_time_limit":"'.$problema->tiempo_limite.'"';
+        }
+        if(isset($problema->archivo_adicional)){
+            $base64_encoded_file = base64_encode(Storage::get('public/archivos_adicionales/'.$problema->archivo_adicional));
+            $initial_json_string = $initial_json_string.',"additional_files":"'.$base64_encoded_file.'"';
+        }
+        if(sizeof($casos)==0){
+            $string_json = $initial_json_string.'}';
+            array_push($batch_submissions, $string_json);
+        }
         foreach ($casos as $caso) {
             $entrada = base64_encode($caso->entradas);
             $salida = base64_encode($caso->salidas);
-            array_push($batch_submissions, '{"language_id":' . $lenguaje . ',"source_code":"' . $codigo . '","stdin":"' . $entrada . '","expected_output":"' . $salida . '", "memory_limit":"' . $problema->memoria_limite . '", "cpu_time_limit":"' . $problema->tiempo_limite . '"}');
+            $string_json = $initial_json_string;
+            if(isset($entrada)){
+                $string_json = $string_json.',"stdin":"'.$entrada.'"';
+            }
+            if(isset($salida)){
+                $string_json = $string_json.',"expected_output":"'.$salida.'"';
+            }
+            $string_json = $string_json.'}';
+            array_push($batch_submissions, $string_json);
         }
         $client = new Client();
         //Crea el header para el request dependiendo del tipo de autenticación que se utiliza, revisar el modelo JuecesVirtuales.
-        $headerRequest = JuecesVirtuales::generateBodyRequest($juez);
+        $headerRequest = JuecesVirtuales::generateHeaderRequest($juez);
         $headerRequest['Content-Type'] = 'application/json';
         try {
             $response = $client->request('POST', $juez->direccion . '/submissions/batch?base64_encoded=true', [
@@ -96,7 +120,9 @@ class EnvioSolucionProblemaController extends Controller
                 $evaluacion = new EvaluacionSolucion;
                 $evaluacion->token = $data[$i]['token'];
                 $evaluacion->envio()->associate($envio);
-                $evaluacion->casos_pruebas()->associate($casos[$i]);
+                if(sizeof($casos)>0){
+                    $evaluacion->casos_pruebas()->associate($casos[$i]);
+                }
                 $evaluacion->save();
                 DB::commit();
             }

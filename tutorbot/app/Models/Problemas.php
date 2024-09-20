@@ -41,12 +41,12 @@ class Problemas extends Model
         "body_problema" => ["required", "string", "min:50"],
         "body_problema_resumido" => ["string", 'nullable'],
         "habilitar_llm" => ["boolean"],
-        "limite_llm" => ["numeric"],
-        "archivo_adicional" => ["mimes:sql"]
+        "limite_llm" => ["nullable","numeric"],
+        "archivo_adicional" => ["mimes:zip"]
     ];
     public static $llm_config_rules = [
         "habilitar_llm" => ["boolean"],
-        "limite_llm" => ["numeric"],
+        "limite_llm" => ["nullable","numeric"],
     ];
     public static function updateRules($codigo){
         return 
@@ -61,8 +61,8 @@ class Problemas extends Model
             "body_problema" => ["required", "string", "min:50"],
             "body_problema_resumido" => ["string" ,'nullable'],
             "habilitar_llm" => ["boolean"],
-            "limite_llm" => ["numeric"],
-            "archivo_adicional" => ["mimes:sql"]
+            "limite_llm" => ["nullable","numeric"],
+            "archivo_adicional" => ["mimes:zip"]
         ];
     }
     public function categorias(): BelongsToMany

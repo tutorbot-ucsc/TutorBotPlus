@@ -15,7 +15,7 @@ use App\Models\EnvioSolucionProblema;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
-
+use Illuminate\Support\Facades\Storage;
 
 class ProblemasController extends Controller
 {
@@ -72,37 +72,10 @@ class ProblemasController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate(Problemas::$createRules);
-
-        db::beginTransaction();
         try {
+            db::beginTransaction();
             $problema = new Problemas;
-            $problema->nombre = $request->input('nombre');
-            $problema->codigo = $request->input('codigo');
-            $problema->fecha_inicio = $request->input('fecha_inicio');
-            $problema->fecha_termino = $request->input('fecha_termino');
-            $problema->memoria_limite = $request->input('memoria_limite');
-            $problema->tiempo_limite = $request->input('tiempo_limite');
-            $problema->body_problema = $request->input('body_problema');
-            $problema->body_problema_resumido = $request->input('body_problema_resumido');
-            if (isset($request->visible)) {
-                $problema->visible = true;
-            } else {
-                $problema->visible = false;
-            }
-
-            if (isset($request->habilitar_llm)) {
-                $problema->habilitar_llm = true;
-            } else {
-                $problema->habilitar_llm = false;
-            }
-            $problema->limite_llm = $request->input('limite_llm');
-            /*if(isset($request->archivos_adicionales)){
-                $request->archivos_adicionales = base64_encode(file_get_contents($request->file('archivos_adcionales')->pat‌​h()));
-            }*/
-            $problema->save();
-            $problema->cursos()->sync($request->input('cursos'));
-            $problema->lenguajes()->sync($request->input('lenguajes'));
-            $problema->categorias()->sync($request->input('categorias'));
+            $this->problemaModificacion($problema, $request);
             db::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -110,14 +83,7 @@ class ProblemasController extends Controller
         }
         return redirect()->route('casos_pruebas.assign', ["id" => $problema->id])->with('success', 'El Problema ' . $problema->nombre . ' ha sido creado, ingrese los casos de prueba.');
     }
-
-    public function update(Request $request)
-    {
-
-        $validated = $request->validate(Problemas::updateRules($request->codigo));
-        try {
-            db::beginTransaction();
-            $problema = Problemas::find($request->id);
+    private static function problemaModificacion(Problemas $problema, Request $request){
             $problema->nombre = $request->input('nombre');
             $problema->codigo = $request->input('codigo');
             $problema->fecha_inicio = $request->input('fecha_inicio');
@@ -138,13 +104,30 @@ class ProblemasController extends Controller
                 $problema->habilitar_llm = false;
             }
             $problema->limite_llm = $request->input('limite_llm');
-            /*if(isset($request->archivos_adicionales)){
-                $request->archivos_adicionales = base64_encode(file_get_contents($request->file('archivos_adcionales')->pat‌​h()));
-            }*/
+            if(isset($request->archivos_adicionales)){
+                $archivo = $request->file('archivos_adicionales');
+                $nombre = $archivo->hashName();
+                $request->file('archivos_adicionales')->storeAs(
+                    'archivos_adicionales',$nombre,'public'
+                );
+                if(isset($problema->archivo_adicional)){
+                    Storage::delete('public/archivos_adicionales/'.$problema->archivo_adicional);
+                }
+                $problema->archivo_adicional = $nombre;
+            }
             $problema->save();
             $problema->cursos()->sync($request->input('cursos'));
             $problema->lenguajes()->sync($request->input('lenguajes'));
             $problema->categorias()->sync($request->input('categorias'));
+    }
+    public function update(Request $request)
+    {
+
+        $validated = $request->validate(Problemas::updateRules($request->codigo));
+        try {
+            db::beginTransaction();
+            $problema = Problemas::find($request->id);
+            $this->problemaModificacion($problema, $request);
             db::commit();
         } catch (\Exception $e) {
             return redirect()->route('problemas.index')->with('error', $e->getMessage());
@@ -157,6 +140,7 @@ class ProblemasController extends Controller
             DB::beginTransaction();
             $problema = Problemas::find($request->id);
             $problema->delete();
+            Storage::delete('public/archivos_adicionales/'.$problema->archivo_adicional);
             DB::commit();
         } catch (\PDOException $e) {
             db::rollBack();
@@ -258,20 +242,22 @@ class ProblemasController extends Controller
             $jueces = JuecesVirtuales::all();
             $last_envio = auth()->user()->envios()->where('id_problema', '=', $problema->id)->orderBy('created_at', 'DESC')->first();
             $codigo = null;
-            if (isset($last_envio->termino)) {
+            if (isset($last_envio->termino) || !isset($last_envio)) {
                 DB::beginTransaction();
                 $envio = new EnvioSolucionProblema;
                 $envio->token = Str::random(40);
                 $envio->problema()->associate($problema);
                 $envio->usuario()->associate(auth()->user());
-                if($last_envio->solucionado==false){
+                if(isset($last_envio->termino) && $last_envio->solucionado==false){
                     $codigo = $last_envio->codigo;
                     $envio->codigo = $codigo;
                     $envio->inicio = $last_envio->inicio;
                 }
                 $envio->save();
+                $problema->cantidad_intentos = $problema->cantidad_intentos + 1;
+                $problema->save();
                 DB::commit();
-            }else{
+            }else if(isset($last_envio)){
                 $codigo = $last_envio->codigo;
             }
         } catch (\PDOException $e) {

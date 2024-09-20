@@ -124,7 +124,7 @@
         <label for="cursos">(Mantenga pulsado CTRL o CMD para seleccionar más de un curso)</label>
         <select multiple class="form-control" id="cursos" name="cursos[]">
             @foreach ($cursos as $curso)
-                <option value="{{ $curso->id }}" @if (isset($problema) && $problema->cursos()->get()->contains($curso)) selected @endif>
+                <option value="{{ $curso->id }}" @if (isset($problema) && $problema->cursos()->get()->contains($curso->id)) selected @endif>
                     {{ $curso->nombre }}</option>
             @endforeach
         </select>
@@ -137,7 +137,7 @@
         <label for="categorias">(Mantenga pulsado CTRL o CMD para seleccionar más de un curso)</label>
         <select multiple class="form-control" id="categorias" name="categorias[]">
             @foreach ($categorias as $categoria)
-                <option value="{{ $categoria->id }}" @if (isset($problema) && $problema->categorias()->get()->contains($categoria)) selected @endif>
+                <option value="{{ $categoria->id }}" @if (isset($problema) && $problema->categorias()->get()->contains($categoria->id)) selected @endif>
                     {{ $categoria->nombre }}</option>
             @endforeach
         </select>
@@ -150,7 +150,7 @@
         <label for="lenguajes">(Mantenga pulsado CTRL o CMD para seleccionar más de un curso)</label>
         <select multiple class="form-control" id="lenguajes" name="lenguajes[]">
             @foreach ($lenguajes as $lenguaje)
-                <option value="{{ $lenguaje->id }}" @if (isset($problema) && $problema->lenguajes()->get()->contains($lenguaje)) selected @endif>
+                <option value="{{ $lenguaje->id }}" @if (isset($problema) && $problema->lenguajes()->get()->contains($lenguaje->id)) selected @endif>
                     {{ $lenguaje->nombre }}</option>
             @endforeach
         </select>
@@ -159,7 +159,7 @@
 @include('problemas.form_llm')
 
 <p class="text-uppercase text-sm">Base de Datos (Solo para problemas de SQL)</p>
-<p class="text-sm">En caso de utilizar SQL como lenguaje de programación, suba el archivo de la base de datos con la
+<p class="text-sm">En caso de utilizar SQL como lenguaje de programación, suba el archivo de la base de datos comprimido en .zip con la
     que se utilizara para realizar las consultas.</p>
 <div class="mb-3">
     <input class="form-control form-control-sm" id="archivos_adicionales" name="archivos_adicionales"
@@ -167,5 +167,5 @@
     @error('archivos_adicionales')
         <p class="text-danger text-xs pt-1"> {{ $message }} </p>
     @enderror
-    <label for="archivos_adicionales">Formato: .sql</label>
+    <label for="archivos_adicionales">Formato: .zip</label>
 </div>

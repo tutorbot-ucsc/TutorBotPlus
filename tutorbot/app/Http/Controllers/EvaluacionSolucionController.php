@@ -39,9 +39,21 @@ class EvaluacionSolucionController extends Controller
             }
         }
         if(sizeof($evaluacion_arr)>0){
+            $this::api_request($juez, $evaluacion_arr, $envio);
+        }
+        if(sizeof($evaluaciones) == $envio->cant_casos_resuelto && $envio->solucionado == false){
+            $envio->solucionado = true;
+            $problema->cantidad_resueltos = $problema->cantidad_resueltos + 1;
+            $problema->save();
+        }
+        $envio->save();
+        return view('plataforma.problemas.resultado', compact('envio', 'evaluaciones', 'highlightjs_choice', 'cant_retroalimentacion', 'tieneRetroalimentacion', 'problema'));
+    }
+
+    private static function api_request($juez, $evaluacion_arr, $envio){
             $client = new Client();
             //Crea el header para el request dependiendo del tipo de autenticación que se utiliza, revisar el modelo JuecesVirtuales.
-            $header = JuecesVirtuales::generateBodyRequest($juez);
+            $header = JuecesVirtuales::generateHeaderRequest($juez);
             try {
                 $response = $client->request('GET', $juez->direccion.'/submissions/batch?tokens=' . implode('%2C', array_keys($evaluacion_arr)) . '&base64_encoded=true&fields=*', [
                     'headers' => $header,
@@ -73,11 +85,5 @@ class EvaluacionSolucionController extends Controller
             } catch (\Exception $e) {
                 return $e->getMessage();
             }
-        }
-        if(sizeof($evaluaciones) == $envio->cant_casos_resuelto){
-            $envio->solucionado = true;
-        }
-        $envio->save();
-        return view('plataforma.problemas.resultado', compact('envio', 'evaluaciones', 'highlightjs_choice', 'cant_retroalimentacion', 'tieneRetroalimentacion', 'problema'));
     }
 }

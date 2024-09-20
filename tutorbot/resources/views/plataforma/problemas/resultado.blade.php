@@ -18,7 +18,7 @@
                                             data-bs-target="#resultados_{{ $i }}" aria-expanded="false"
                                             aria-controls="resultados_{{ $i }}">Caso de Prueba
                                             #{{ $i + 1 }}:<span
-                                                class="mx-2 badge {{ $evaluaciones[$i]->estado == 'Rechazado' ? 'text-bg-danger' : 'text-bg-success' }}">{{ $evaluaciones[$i]->resultado }}</span>
+                                                class="mx-2 badge {{ $evaluaciones[$i]->estado == 'Aceptado' ? 'text-bg-success' : 'text-bg-danger' }}">{{ $evaluaciones[$i]->resultado }}</span>
                                             - Tiempo: {{ $evaluaciones[$i]->tiempo ? $evaluaciones[$i]->tiempo : '0' }}
                                             segundos - Memoria:
                                             {{ $evaluaciones[$i]->memoria ? $evaluaciones[$i]->memoria : '0' }} KB
@@ -28,22 +28,25 @@
                                         data-bs-parent="#resultados_accord">
                                         <div class="accordion-body">
                                             <div class="d-flex flex-row mb-3">
-                                                <div class="card" style="width: 18rem;">
+                                                @if(isset($evaluaciones[$i]->casos_pruebas->entradas))
+                                                <div class="card">
                                                     <div class="card-body">
                                                         <h5 class="card-title">Entradas</h5>
                                                         <p class="card-text">
                                                             {!! nl2br($evaluaciones[$i]->casos_pruebas->entradas) !!}</p>
                                                     </div>
                                                 </div>
-                                                <div class="card mx-2" style="width: 18rem;">
+                                                @endif
+                                                @if(isset($evaluaciones[$i]->casos_pruebas->salidas))
+                                                <div class="card mx-2">
                                                     <div class="card-body">
                                                         <h5 class="card-title">Salidas Esperadas</h5>
                                                         <p class="card-text">{!! nl2br($evaluaciones[$i]->casos_pruebas->salidas) !!}
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div class="card {{ $evaluaciones[$i]->estado == 'Rechazado' || $evaluaciones[$i]->estado == 'Error' ? 'border-danger' : 'border-success' }}"
-                                                    style="width: 18rem;">
+                                                @endif
+                                                <div class="card {{ $evaluaciones[$i]->estado == 'Rechazado' || $evaluaciones[$i]->estado == 'Error' ? 'border-danger' : 'border-success' }}">
                                                     <div class="card-body">
                                                         <h5 class="card-title">Salidas</h5>
                                                         <p class="card-text">
@@ -80,6 +83,11 @@
                         @elseif($tieneRetroalimentacion == true)
                             <div class="row px-5">
                                 <a class="btn btn-primary text-nowrap btn-block" href="{{route('envios.retroalimentacion', ['token'=>$envio->token])}}" role="button">Ver Retroalimentación</a>
+                            </div>
+                        @endif
+                        @if ($envio->solucionado == false)
+                            <div class="row px-5 mt-2">
+                                <a class="btn btn-outline-primary text-nowrap btn-block" href="{{route('problemas.resolver', ['codigo'=>$envio->problema->codigo])}}" role="button">Volver al intento</a>
                             </div>
                         @endif
                         <div class="row px-5 mt-2">
