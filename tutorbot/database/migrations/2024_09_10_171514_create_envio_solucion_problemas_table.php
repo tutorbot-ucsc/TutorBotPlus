@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('token');
             $table->unsignedBigInteger('id_usuario');
             $table->unsignedBigInteger('id_problema');
+            $table->unsignedBigInteger('id_curso')->nullable();
             $table->unsignedBigInteger('id_certamen')->nullable();
             $table->unsignedBigInteger('id_juez')->nullable();
             $table->unsignedBigInteger('id_lenguaje')->nullable();
@@ -23,10 +24,12 @@ return new class extends Migration
             $table->dateTime('inicio')->default(Carbon::now());
             $table->dateTime('termino')->nullable();
             $table->integer('cant_casos_resuelto')->default(0);
+            $table->integer('puntaje')->default(0);
             $table->boolean('solucionado')->default(false);
             $table->timestamps();
 
             $table->foreign('id_usuario')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('id_curso')->references('id')->on('cursos')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('id_problema')->references('id')->on('problemas')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('id_juez')->references('id')->on('jueces_virtuales')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('id_lenguaje')->references('id')->on('lenguajes_programaciones')->onDelete('set null')->onUpdate('cascade');

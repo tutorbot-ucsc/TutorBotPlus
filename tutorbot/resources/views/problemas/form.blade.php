@@ -105,20 +105,6 @@
     </div>
 </div>
 <div class="row">
-    <div class="col">
-        <div class="form-group">
-            <label for="body_problema_resumido">Enunciado del Problema Resumido</label>
-            <p class="opacity-25"><small>Esté es un resumen del problema, que se utilizara para la Large Languge Model
-                    para la retroalimentación.</small></p>
-            <textarea class="form-control @error('body_problema_resumido') is-invalid @enderror" id="body_problema_resumido"
-                name="body_problema_resumido" rows="8" placeholder="Ej. El código debe entregar una suma de dos numeros">{{ isset($problema) ? old('body_problema_resumido', $problema->body_problema_resumido) : old('body_problema_resumido') }}</textarea>
-        </div>
-        @error('body_problema_resumido')
-            <p class="text-danger text-xs pt-1"> {{ $message }} </p>
-        @enderror
-    </div>
-</div>
-<div class="row">
     <div class="form-group">
         <label for="cursos">Cursos*</label>
         <label for="cursos">(Mantenga pulsado CTRL o CMD para seleccionar más de un curso)</label>
@@ -174,4 +160,5 @@
         <label for="archivos_adicionales">Formato: .zip</label>
     </div>
 </div>
+<hr>
 @include('problemas.form_llm')

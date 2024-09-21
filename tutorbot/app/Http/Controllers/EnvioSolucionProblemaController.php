@@ -20,9 +20,10 @@ class EnvioSolucionProblemaController extends Controller
         $envios_query = DB::table('envio_solucion_problemas')
         ->join('problemas', 'problemas.id', '=', 'envio_solucion_problemas.id_problema')
         ->join('lenguajes_programaciones', 'lenguajes_programaciones.id', '=', 'envio_solucion_problemas.id_lenguaje')
+        ->join('cursos', 'cursos.id', '=', 'envio_solucion_problemas.id_curso')
         ->whereNull('id_certamen')
         ->where('id_usuario', '=', auth()->user()->id)
-        ->select('problemas.nombre as nombre_problema', 'problemas.codigo as codigo_problema','envio_solucion_problemas.id as id_envio', 'envio_solucion_problemas.created_at','envio_solucion_problemas.token', 'lenguajes_programaciones.abreviatura as nombre_lenguaje', 'envio_solucion_problemas.solucionado', 'envio_solucion_problemas.inicio', 'envio_solucion_problemas.termino')
+        ->select('problemas.nombre as nombre_problema', 'problemas.codigo as codigo_problema','envio_solucion_problemas.id as id_envio', 'envio_solucion_problemas.created_at','envio_solucion_problemas.token', 'lenguajes_programaciones.abreviatura as nombre_lenguaje', 'envio_solucion_problemas.solucionado', 'envio_solucion_problemas.inicio', 'envio_solucion_problemas.termino', 'cursos.nombre as nombre_curso', 'cursos.id as id_curso')
         ->orderBy('envio_solucion_problemas.created_at', 'DESC');
         if(isset($request->id_problema)){
             $envios_query = $envios_query->where('problemas.id', '=', $request->id_problema);
@@ -40,7 +41,7 @@ class EnvioSolucionProblemaController extends Controller
         }
         try {
             DB::beginTransaction();
-            $envio = auth()->user()->envios()->where('id_problema', '=', $request->id_problema)->orderBy('created_at', 'DESC')->first();
+            $envio = auth()->user()->envios()->where('id_problema', '=', $request->id_problema)->where('id_curso','=', $request->id_curso)->orderBy('created_at', 'DESC')->first();
             $envio->codigo = $request->codigo;
             $envio->juez_virtual()->associate(JuecesVirtuales::find($request->juez_virtual));
             $envio->lenguaje()->associate(LenguajesProgramaciones::where("codigo", "=", $request->lenguaje)->first());
@@ -51,6 +52,7 @@ class EnvioSolucionProblemaController extends Controller
             DB::rollBack();
             return back()->with('error', $e->getMessage())->with('codigo', $request->codigo);
         }
+        
         $resultado = $this->enviar_api_juez($envio, $request->lenguaje);
         if ($resultado["estado"]) {
             return redirect()->route('envios.ver', ["token" => $envio->token]);

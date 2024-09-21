@@ -20,7 +20,7 @@
             <div class="col-4 col-sm-4">
                 <div class="card border-danger" style="height:100%;">
                     <div class="card-body px-5">
-                        <form action="{{ route('problemas.enviar', ["id_problema"=>$problema->id]) }}" method="POST" id="evaluacion_form">
+                        <form action="{{ route('problemas.enviar', ["id_problema"=>$problema->id, "id_curso"=>$id_curso]) }}" method="POST" id="evaluacion_form">
                             @csrf
                             <div class="row px-5">
                                 <button class="btn btn-primary" type="submit">Enviar Solución</button>

@@ -52,9 +52,9 @@ Route::group(['middleware'=>'auth'], function(){
 		return redirect()->route('cursos.listado');
 	});
 	Route::get('/cursos/{id}/problemas', [ProblemasController::class, 'listado_problemas'])->name('problemas.listado');
-	Route::get('/problema/{codigo}', [ProblemasController::class, 'ver_problema'])->name('problemas.ver');
+	Route::get('/problema/{id_curso?}/{codigo}', [ProblemasController::class, 'ver_problema'])->name('problemas.ver');
 	Route::get('/problema/{codigo}/editorial', [ProblemasController::class, 'ver_editorial'])->name('problemas.ver_editorial');
-	Route::get('/problema/{codigo}/resolver', [ProblemasController::class, 'resolver_problema'])->name('problemas.resolver');
+	Route::get('/problema/{id_curso?}/{codigo}/resolver', [ProblemasController::class, 'resolver_problema'])->name('problemas.resolver');
 
 	Route::post('/problema/enviar', [EnvioSolucionProblemaController::class, 'enviar_solucion'])->name('problemas.enviar');
 	Route::get('/envios/{id_problema?}', [EnvioSolucionProblemaController::class, 'ver_envios'])->name('envios.listado');

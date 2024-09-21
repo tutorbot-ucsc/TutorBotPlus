@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\JuecesVirtuales;
 use App\Models\EvaluacionSolucion;
 use App\Models\Problemas;
+use App\Models\Cursos;
 use App\Models\LenguajesProgramaciones;
 use App\Models\SolicitudRaLlm;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -49,5 +50,10 @@ class EnvioSolucionProblema extends Model
     public function lenguaje(): BelongsTo
     {
         return $this->belongsTo(LenguajesProgramaciones::class, 'id_lenguaje');
+    }
+
+    public function curso(): BelongsTo
+    {
+        return $this->belongsTo(Cursos::class, 'id_curso');
     }
 }

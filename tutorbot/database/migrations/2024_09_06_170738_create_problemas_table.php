@@ -25,12 +25,8 @@ return new class extends Migration
             $table->boolean('visible')->default(true);
             $table->boolean('habilitar_llm')->default(false);
             $table->integer('limite_llm')->default(0);
-            $table->text('body_editorial')->nullable();
-            $table->integer('cantidad_resueltos')->nullable()->default(0);
-            $table->integer('cantidad_intentos')->nullable()->default(0);
-            $table->float('tiempo_promedio')->nullable()->default(0);
             $table->integer('puntaje_total')->nullable()->default(0);
-            $table->integer('cant_retroalimentacion_solicitada')->nullable()->default(0);
+            $table->text('body_editorial')->nullable();
             $table->timestamps();
         });
     }

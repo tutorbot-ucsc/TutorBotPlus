@@ -11,12 +11,10 @@ class LlmObserver
      */
     public function created(SolicitudRaLlm $solicitudRaLlm): void
     {
-        DB::table('problemas')
-        ->join('envio_solucion_problemas', 'envio_solucion_problemas.id_problema', 'problemas.id')
-        ->join('evaluacion_solucions', 'evaluacion_solucions.id_envio', '=', 'envio_solucion_problemas.id')
-        ->select('problemas.*')
-        ->where('id_envio', '=', $solicitudRaLlm->id_envio)
-        ->increment('problemas.cant_retroalimentacion_solicitada');
+        DB::table('disponible')
+        ->where('id_curso', '=', $solicitudRaLlm->envio()->id_curso)
+        ->where('id_problema', '=', $solicitudRaLlm->envio()->id_problema)
+        ->increment('cant_retroalimentacion_solicitada');
     }
 
     /**
@@ -32,12 +30,10 @@ class LlmObserver
      */
     public function deleted(SolicitudRaLlm $solicitudRaLlm): void
     {
-        DB::table('problemas')
-        ->join('envio_solucion_problemas', 'envio_solucion_problemas.id_problema', 'problemas.id')
-        ->join('evaluacion_solucions', 'evaluacion_solucions.id_envio', '=', 'envio_solucion_problemas.id')
-        ->select('problemas.*')
-        ->where('id_envio', '=', $solicitudRaLlm->id_envio)
-        ->decrement('problemas.cant_retroalimentacion_solicitada');
+        DB::table('disponible')
+        ->where('id_curso', '=', $solicitudRaLlm->envio()->id_curso)
+        ->where('id_problema', '=', $solicitudRaLlm->envio()->id_problema)
+        ->decrement('cant_retroalimentacion_solicitada');
     }
 
     /**

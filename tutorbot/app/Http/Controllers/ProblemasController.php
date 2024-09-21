@@ -32,7 +32,7 @@ class ProblemasController extends Controller
     {
         $categorias = Categoria_Problema::all();
         $cursos = Cursos::all();
-        $lenguajes = LenguajesProgramaciones::where('abreviatura', '!=', 'sql')->get();
+        $lenguajes = LenguajesProgramaciones::where('abreviatura', 'NOT LIKE', '%sql%')->get();
         return view('problemas.crear', compact('categorias', 'cursos', 'lenguajes'))->with('accion', "crear");;
     }
 
@@ -41,7 +41,7 @@ class ProblemasController extends Controller
         $problema = Problemas::find($request->id);
         $categorias = Categoria_Problema::all();
         $cursos = Cursos::all();
-        $lenguajes = LenguajesProgramaciones::all();
+        $lenguajes = LenguajesProgramaciones::where('abreviatura', 'NOT LIKE', '%sql%')->get();
         return view('problemas.editar', compact('problema', 'categorias', 'lenguajes', 'cursos'))->with('accion', "editar");
     }
     public function editar_config_llm(Request $request)
@@ -215,7 +215,7 @@ class ProblemasController extends Controller
         } catch (\PDOException $e) {
             return redirect()->route('cursos.listado')->with('error', $e->getMessage());
         }
-        return view('plataforma.problemas.ver_problema', compact('problema'));
+        return view('plataforma.problemas.ver_problema', compact('problema'))->with('id_curso', $request->id_curso);
     }
     public function ver_editorial(Request $request)
     {
@@ -244,7 +244,11 @@ class ProblemasController extends Controller
             $problema = Problemas::where('codigo', '=', $request->codigo)->first();
             $lenguajes = $problema->lenguajes()->get();
             $jueces = JuecesVirtuales::all();
-            $last_envio = auth()->user()->envios()->where('id_problema', '=', $problema->id)->orderBy('created_at', 'DESC')->first();
+            $last_envio = auth()->user()->envios()->where('id_problema', '=', $problema->id)->orderBy('created_at', 'DESC');
+            if(isset($request->id_curso)){
+                $last_envio = $last_envio->where('id_curso', '=', $request->id_curso);
+            }
+            $last_envio = $last_envio->first();
             $codigo = null;
             if (isset($last_envio->termino) || !isset($last_envio)) {
                 DB::beginTransaction();
@@ -252,13 +256,16 @@ class ProblemasController extends Controller
                 $envio->token = Str::random(40);
                 $envio->problema()->associate($problema);
                 $envio->usuario()->associate(auth()->user());
+                if(isset($request->id_curso)){
+                    $envio->curso()->associate(Cursos::find($request->id_curso));
+                    DB::table('disponible')->where('id_curso', '=', $request->id_curso)->where('id_problema', '=', $problema->id)->increment('cantidad_intentos');
+                }
                 if(isset($last_envio->termino) && $last_envio->solucionado==false){
                     $codigo = $last_envio->codigo;
                     $envio->codigo = $codigo;
                     $envio->inicio = $last_envio->inicio;
                 }
                 $envio->save();
-                $problema->cantidad_intentos = $problema->cantidad_intentos + 1;
                 $problema->save();
                 DB::commit();
             }else if(isset($last_envio)){
@@ -267,6 +274,6 @@ class ProblemasController extends Controller
         } catch (\PDOException $e) {
             return redirect()->route('cursos.listado')->with('error', $e->getMessage());
         }
-        return view('plataforma.problemas.resolver_problema', compact('problema', 'lenguajes', 'jueces', 'codigo'));
+        return view('plataforma.problemas.resolver_problema', compact('problema', 'lenguajes', 'jueces', 'codigo'))->with('id_curso', $request->id_curso);
     }
 }

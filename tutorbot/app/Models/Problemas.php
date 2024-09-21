@@ -47,6 +47,7 @@ class Problemas extends Model
     public static $llm_config_rules = [
         "habilitar_llm" => ["boolean"],
         "limite_llm" => ["nullable","numeric"],
+        "body_problema_resumido" => ["string", 'nullable'],
     ];
     public static function updateRules($codigo){
         return 

@@ -9,6 +9,7 @@
                             <th>ID</th>
                             <th>Problema</th>
                             <th>Lenguaje</th>
+                            <th>Curso</th>
                             <th>¿Resuelto?</th>
                             <th>Inicio</th>
                             <th>Termino</th>
@@ -20,8 +21,9 @@
                         @foreach ($envios as $envio)
                             <tr>
                                 <td>{{$envio->id_envio}}</td>
-                                <td><a href="{{route('problemas.ver', ['codigo'=>$envio->codigo_problema])}}">{{$envio->nombre_problema}}</a></td>
+                                <td><a href="{{route('problemas.ver', ['codigo'=>$envio->codigo_problema, 'id_curso'=>$envio->id_curso])}}">{{$envio->nombre_problema}}</a></td>
                                 <td>{{$envio->nombre_lenguaje}}</td>
+                                <td><a href="{{route('problemas.listado', ["id"=>$envio->id_curso])}}">{{$envio->nombre_curso}}</a></td>
                                 <td>{{$envio->solucionado == true? "Si":"No"}}</td>
                                 <td>{{$envio->inicio}}</td>
                                 <td>{{$envio->termino}}</td>
