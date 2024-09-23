@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->unsignedBigInteger('id_problema')->nullable();
-            $table->text('entradas');
-            $table->text('salidas');
-            $table->integer('puntos');
+            $table->text('entradas')->nullable();
+            $table->text('salidas')->nullable();
+            $table->integer('puntos')->default(0);
 
-            $table->foreign('id_problema')->references('id')->on('problemas')->onDelete('set null')->onUpdate('cascade');
+            $table->foreign('id_problema')->references('id')->on('problemas')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

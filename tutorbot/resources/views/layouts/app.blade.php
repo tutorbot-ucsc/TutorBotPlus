@@ -4,7 +4,6 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="apple-touch-icon" sizes="76x76" href="{{asset('img/apple-icon.png')}}">
     <link rel="icon" type="image/png" href="{{asset('img/favicon.png')}}">
     <title>
         @if(isset($title_url)){{$title_url}} - @endif TutorBot+
@@ -18,8 +17,12 @@
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
     <link href="{{asset('assets/css/nucleo-svg.css')}}" rel="stylesheet" />
     <!-- CSS Files -->
-    <link id="pagestyle" href="{{asset('assets/css/argon-dashboard.css')}}" rel="stylesheet" />
     <link href="{{asset('assets/vendor/@fortawesome/fontawesome-free/css/all.min.css')}}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ mix('css/app.css') }}">
+    <script src="{{ mix('js/app.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ mix('assets/css/argon-dashboard.css') }}">
+
+    @stack('css')
 </head>
 
 <body class="{{ $class ?? '' }}">
@@ -52,7 +55,6 @@
     <script src="{{asset('assets/js/core/bootstrap.min.js')}}"></script>
     <script src="{{asset('assets/js/plugins/perfect-scrollbar.min.js')}}"></script>
     <script src="{{asset('assets/js/plugins/smooth-scrollbar.min.js')}}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         var win = navigator.platform.indexOf('Win') > -1;
         if (win && document.querySelector('#sidenav-scrollbar')) {

@@ -90,7 +90,7 @@
                                                     @endcan
                                                     @can('eliminar lenguaje de programación')
                                                         <form action="{{ route('lenguaje_programacion.eliminar', ['id' => $item->id]) }}"
-                                                            method="POST">
+                                                            method="POST" onsubmit="event.preventDefault();submitFormEliminar('{{'el lenguaje '.$item->nombre}}')" id="eliminarForm">
                                                             @csrf
                                                             <button type="submit" class="btn btn-outline-danger"><i
                                                                 class="fa fa-fw fa-trash"></i></button>
@@ -116,4 +116,5 @@
 
 <script src="{{asset('assets/js/DataTables/gestion_initialize_es_cl.js')}}"></script>
 
+<script src="{{ asset('assets/js/alertas_administracion.js') }}"></script>
 @endpush

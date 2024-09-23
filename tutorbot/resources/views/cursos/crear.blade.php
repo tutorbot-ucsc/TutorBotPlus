@@ -6,7 +6,7 @@
         @include('components.alert')
     </div>
     <div class="container-fluid py-4">
-        <form method="POST" action='{{ route('cursos.store') }}'>
+        <form method="POST" action='{{ route('cursos.store') }}' onsubmit="event.preventDefault();submitFormCrear()" id="crearForm">
             @csrf
             <div class="card">
                 <div class="card-body">
@@ -19,5 +19,6 @@
 
     </div>
 @endsection
-
-
+@push('js')
+    <script src="{{ asset('assets/js/alertas_administracion.js') }}"></script> 
+@endpush

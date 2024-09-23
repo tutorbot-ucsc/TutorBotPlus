@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             LenguajesProgramacionesSeeder::class,
             CategoriaProblemaSeeder::class,
             ProblemasSeeder::class,
+            JuecesVirtualesSeeder::class,
         ]);
     }
 }

@@ -47,7 +47,7 @@ class RoleController extends Controller
             DB::rollback();
             return redirect()->route('roles.index')->with('error', $e->getMessage());
         }
-        return redirect()->route('roles.index')->with('success','El rol ha sido creado');
+        return redirect()->route('roles.index')->with('success','El rol "'.$rol->name.'" ha sido creado');
     }
 
     public function update(Request $request){

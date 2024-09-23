@@ -1,4 +1,4 @@
-@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100', 'title_url'=>'Gestión de Cursos'])
+@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100', 'title_url' => 'Gestión de Cursos'])
 
 @section('content')
     @include('layouts.navbars.auth.topnav', ['title' => 'Gestión de Cursos'])
@@ -72,7 +72,7 @@
                                                     @endcan
                                                     @can('eliminar curso')
                                                         <form action="{{ route('cursos.eliminar', ['id' => $curso->id]) }}"
-                                                            method="POST">
+                                                            method="POST" onsubmit="submitFormEliminar('{{'el curso '.$curso->nombre}})'">
                                                             @csrf
                                                             <button type="submit" class="btn btn-outline-danger"><i
                                                                     class="fa fa-fw fa-trash"></i></button>
@@ -85,7 +85,7 @@
                                 @endforeach
                             </tbody>
                         </table>
-                       
+
                     </div>
                 </div>
             </div>
@@ -94,9 +94,10 @@
 @endsection
 
 @push('js')
-<link href="{{asset('assets/js/DataTables/datatables.min.css')}}" rel="stylesheet">
- 
-<script src="{{asset('assets/js/DataTables/datatables.min.js')}}"></script>
+    <link href="{{ asset('assets/js/DataTables/datatables.min.css') }}" rel="stylesheet">
 
-<script src="{{asset('assets/js/DataTables/gestion_initialize_es_cl.js')}}"></script>
+    <script src="{{ asset('assets/js/DataTables/datatables.min.js') }}"></script>
+
+    <script src="{{ asset('assets/js/DataTables/gestion_initialize_es_cl.js') }}"></script>
+    <script src="{{ asset('assets/js/alertas_administracion') }}"></script>
 @endpush

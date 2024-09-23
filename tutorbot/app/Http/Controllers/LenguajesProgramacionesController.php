@@ -42,7 +42,7 @@ class LenguajesProgramacionesController extends Controller
             DB::rollback();
             return redirect()->route('lenguaje_programacion.index')->with('error', $e->getMessage());
         }
-        return redirect()->route('lenguaje_programacion.index')->with('success','El rol ha sido creado');
+        return redirect()->route('lenguaje_programacion.index')->with('success','El lenguaje de programacion "'.$lenguaje->nombre.'" ha sido creado');
     }
 
     public function update(Request $request){

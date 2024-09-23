@@ -10,6 +10,9 @@ use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\Cursos;
+use App\Models\EnvioSolucionProblema;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
@@ -64,6 +67,11 @@ class User extends Authenticatable
         $this->attributes['password'] = bcrypt($value);
     }
 
+    
+    public function envios(): HasMany
+    {
+        return $this->hasMany(EnvioSolucionProblema::class,'id_usuario');
+    }
     public function cursos(): BelongsToMany
     {
         return $this->belongsToMany(Cursos::class, 'cursa', 'id_usuario', 'id_curso');

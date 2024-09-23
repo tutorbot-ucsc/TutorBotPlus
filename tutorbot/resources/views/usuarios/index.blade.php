@@ -99,7 +99,7 @@
                                                     @can('eliminar usuario')
                                                         @if (auth()->user()->id != $user->id)
                                                             <form action="{{ route('usuarios.eliminar', ['id' => $user->id]) }}"
-                                                                method="POST">
+                                                                method="POST" onsubmit="event.preventDefault();submitFormEliminar('{{'el usuario '.$user->nombre}}')" id="eliminarForm">
                                                                 @csrf
                                                                 <button type="submit" class="btn btn-outline-danger"><i
                                                                         class="fa fa-fw fa-trash"></i></button>
@@ -125,5 +125,5 @@
 <script src="{{asset('assets/js/DataTables/datatables.min.js')}}"></script>
 
 <script src="{{asset('assets/js/DataTables/gestion_initialize_es_cl.js')}}"></script>
-
+<script src="{{ asset('assets/js/alertas_administracion.js') }}"></script> 
 @endpush

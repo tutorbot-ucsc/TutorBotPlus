@@ -1,4 +1,12 @@
+import Editor from '@toast-ui/editor';
+import '@toast-ui/editor/dist/toastui-editor.css'; // Editor's Style
+import Swal from 'sweetalert2'
 window._ = require('lodash');
+
+
+window.Editor = Editor;
+window.Swal = Swal;
+
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
@@ -10,7 +18,6 @@ window.axios = require('axios');
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
-window.swal = require('sweetalert2');
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
