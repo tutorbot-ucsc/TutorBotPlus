@@ -20,7 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_certamen')->nullable();
             $table->unsignedBigInteger('id_juez')->nullable();
             $table->unsignedBigInteger('id_lenguaje')->nullable();
-            $table->string('codigo')->nullable();
+            $table->text('codigo')->nullable();
             $table->dateTime('inicio')->default(Carbon::now());
             $table->dateTime('termino')->nullable();
             $table->integer('cant_casos_resuelto')->default(0);

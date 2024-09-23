@@ -13,7 +13,7 @@ class JuecesVirtuales extends Model
     public static function generateHeaderRequest(JuecesVirtuales $juez){
         if($juez->autenticacion == "x-auth-token"){
             return [
-                'x-auth-key' => $juez->api_token,
+                
             ];
         }else{
             return [

@@ -28,25 +28,26 @@
                                         data-bs-parent="#resultados_accord">
                                         <div class="accordion-body">
                                             <div class="d-flex flex-row mb-3">
-                                                @if(isset($evaluaciones[$i]->casos_pruebas->entradas))
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <h5 class="card-title">Entradas</h5>
-                                                        <p class="card-text">
-                                                            {!! nl2br($evaluaciones[$i]->casos_pruebas->entradas) !!}</p>
+                                                @if (isset($evaluaciones[$i]->casos_pruebas->entradas))
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <h5 class="card-title">Entradas</h5>
+                                                            <p class="card-text">
+                                                                {!! nl2br($evaluaciones[$i]->casos_pruebas->entradas) !!}</p>
+                                                        </div>
                                                     </div>
-                                                </div>
                                                 @endif
-                                                @if(isset($evaluaciones[$i]->casos_pruebas->salidas))
-                                                <div class="card mx-2">
-                                                    <div class="card-body">
-                                                        <h5 class="card-title">Salidas Esperadas</h5>
-                                                        <p class="card-text">{!! nl2br($evaluaciones[$i]->casos_pruebas->salidas) !!}
-                                                        </p>
+                                                @if (isset($evaluaciones[$i]->casos_pruebas->salidas))
+                                                    <div class="card mx-2">
+                                                        <div class="card-body">
+                                                            <h5 class="card-title">Salidas Esperadas</h5>
+                                                            <p class="card-text">{!! nl2br($evaluaciones[$i]->casos_pruebas->salidas) !!}
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                </div>
                                                 @endif
-                                                <div class="card {{ $evaluaciones[$i]->estado == 'Rechazado' || $evaluaciones[$i]->estado == 'Error' ? 'border-danger' : 'border-success' }}">
+                                                <div
+                                                    class="card {{ $evaluaciones[$i]->estado == 'Rechazado' || $evaluaciones[$i]->estado == 'Error' ? 'border-danger' : 'border-success' }}">
                                                     <div class="card-body">
                                                         <h5 class="card-title">Salidas</h5>
                                                         <p class="card-text">
@@ -74,25 +75,32 @@
             <div class="col-4 col-sm-4">
                 <div class="card border-danger">
                     <div class="card-body px-5">
+                        <h6 class="text-center">Tiempo en Total:</h6>
+                        <h5 id="tiempo" class="text-center"></h5>
                         @if ($envio->solucionado == false && $tieneRetroalimentacion == false)
                             <div class="row px-5">
                                 <a class="btn btn-primary btn-block {{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? '' : 'disabled' }}"
-                                    href="{{route('envios.generar_retroalimentacion', ['token'=>$envio->token])}}"
+                                    href="{{ route('envios.generar_retroalimentacion', ['token' => $envio->token]) }}"
                                     role="button">{{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? 'Solicitar Retroalimentacion (Cantidad Disponible: ' . $cant_retroalimentacion . ')' : 'Retroalimentación no disponible' }}</a>
                             </div>
                         @elseif($tieneRetroalimentacion == true)
                             <div class="row px-5">
-                                <a class="btn btn-primary text-nowrap btn-block" href="{{route('envios.retroalimentacion', ['token'=>$envio->token])}}" role="button">Ver Retroalimentación</a>
+                                <a class="btn btn-primary text-nowrap btn-block"
+                                    href="{{ route('envios.retroalimentacion', ['token' => $envio->token]) }}"
+                                    role="button">Ver Retroalimentación</a>
                             </div>
                         @endif
                         @if ($envio->solucionado == false)
                             <div class="row px-5 mt-2">
-                                <a class="btn btn-outline-primary text-nowrap btn-block" href="{{route('problemas.resolver', ['codigo'=>$envio->problema->codigo])}}" role="button">Volver al intento</a>
+                                <a class="btn btn-outline-primary text-nowrap btn-block"
+                                    href="{{ route('problemas.resolver', ['codigo' => $envio->problema->codigo]) }}"
+                                    role="button">Volver al intento</a>
                             </div>
                         @endif
                         <div class="row px-5 mt-2">
                             <a class="btn btn-outline-primary text-nowrap btn-sm btn-block"
-                                href="{{ route('problemas.ver', ['codigo' => $problema->codigo]) }}" role="button">Volver al
+                                href="{{ route('problemas.ver', ['codigo' => $problema->codigo, 'id_curso' => $envio->id_curso]) }}"
+                                role="button">Volver al
                                 Enunciado</a>
                         </div>
                     </div>
@@ -112,12 +120,16 @@
             </div>
         </div>
     </div>
-    </div>
     <link rel="stylesheet" href="{{ asset('assets/js/highlightjs/styles/dark.css') }}">
 @endsection
 @push('js')
     <script src="{{ asset('assets/js/highlightjs/highlight.min.js') }}" type="text/javascript"></script>
     <script>
+        Swal.fire("SweetAlert2 is working!");
         hljs.highlightAll();
+        const tiempo_desarrollo = {{ $diferencia }}
+        const string_tiempo_desarrollo = new Date(tiempo_desarrollo * 1000).toISOString().slice(11, 19);
+        const tiempo = document.getElementById("tiempo")
+        tiempo.innerHTML = string_tiempo_desarrollo
     </script>
 @endpush

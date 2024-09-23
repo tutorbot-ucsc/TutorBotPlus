@@ -13,21 +13,23 @@
                             <p class="text-danger text-xs pt-1"> Debes escribir al menos una línea de código para enviarlo como
                                 solución.</p>
                         @enderror
-                        <div id="editor">{{isset($codigo)? $codigo : ""}}</div>
+                        <div id="editor">{{ isset($codigo) ? $codigo : '' }}</div>
                     </div>
                 </div>
             </div>
             <div class="col-4 col-sm-4">
                 <div class="card border-danger" style="height:100%;">
                     <div class="card-body px-5">
-                        <form action="{{ route('problemas.enviar', ["id_problema"=>$problema->id, "id_curso"=>$id_curso]) }}" method="POST" id="evaluacion_form">
+                        <form
+                            action="{{ route('problemas.enviar', ['id_problema' => $problema->id, 'id_curso' => $id_curso]) }}"
+                            method="POST" id="evaluacion_form">
                             @csrf
                             <div class="row px-5">
                                 <button class="btn btn-primary" type="submit">Enviar Solución</button>
                             </div>
                             <div class="row px-5 mt-2">
                                 <a class="btn btn-outline-primary btn-sm "
-                                    href="{{ route('problemas.ver', ['codigo' => $problema->codigo]) }}"
+                                    href="{{ route('problemas.ver', ['codigo' => $problema->codigo, 'id_curso'=> $id_curso]) }}"
                                     role="button">Volver</a>
                             </div>
                             <h6 class="text-center mt-4">Lenguaje de Programación</h6>
@@ -55,6 +57,7 @@
 @endsection
 @push('js')
     <script src="{{ asset('assets/js/ace-builds/src-min/ace.js') }}" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ asset('assets/js/alertas_plataforma.js') }}"></script> 
     <script>
         var editor = ace.edit("editor");
         const lenguajes = {
@@ -77,14 +80,14 @@
         editor.setOptions({
             fontSize: "10pt"
         })
+        
 
         function change_language(item) {
             editor.session.setMode("ace/mode/" + lenguajes[item.value]);
         }
         document.querySelector('#evaluacion_form').addEventListener('submit', e => {
             e.preventDefault();
-            document.querySelector('#codigo').value = editor.getValue();
-            e.target.submit();
+            submitCodigo()
         });
     </script>
 @endpush

@@ -7,7 +7,7 @@
     </div>
     <div class="container-fluid py-4">
         <form role="form" method="POST" id="problema_form" action="{{ route('problemas.update', ['id' => $problema->id]) }}"
-            enctype="multipart/form-data">
+            enctype="multipart/form-data" onsubmit="event.preventDefault();submitFormEditar('{{'el problema '.$problema->nombre}}')" id="editarForm">
             @csrf
             <div class="card">
                 <div class="card-body">
@@ -22,6 +22,7 @@
 @endsection
 
 @push('js')
+    <script src="{{ asset('assets/js/alertas_administracion.js') }}"></script> 
     <script type="module">
         const checkbox = document.getElementById('sql')
         const lenguajes = document.getElementById("lenguajes");

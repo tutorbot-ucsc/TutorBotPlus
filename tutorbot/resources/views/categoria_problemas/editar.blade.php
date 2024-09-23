@@ -6,7 +6,7 @@
         @include('components.alert')
     </div>
     <div class="container-fluid py-4">
-        <form role="form" method="POST" action="{{ route('categorias.update', ['id'=>$categoria->id]) }}" enctype="multipart/form-data">
+        <form role="form" method="POST" action="{{ route('categorias.update', ['id'=>$categoria->id]) }}" onsubmit="event.preventDefault();submitFormEditar('{{'la categoria '.$categoria->nombre}}')" id="editarForm">
             @csrf
             <div class="card">
                 <div class="card-body">
@@ -19,3 +19,6 @@
 
     </div>
 @endsection
+@push('js')
+    <script src="{{ asset('assets/js/alertas_administracion.js') }}"></script> 
+@endpush

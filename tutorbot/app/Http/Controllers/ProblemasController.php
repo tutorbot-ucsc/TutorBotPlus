@@ -254,6 +254,7 @@ class ProblemasController extends Controller
                 DB::beginTransaction();
                 $envio = new EnvioSolucionProblema;
                 $envio->token = Str::random(40);
+                $envio->inicio = Carbon::now();
                 $envio->problema()->associate($problema);
                 $envio->usuario()->associate(auth()->user());
                 if(isset($request->id_curso)){

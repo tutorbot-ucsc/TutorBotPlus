@@ -6,7 +6,7 @@
         @include('components.alert')
     </div>
     <div class="container-fluid py-4">
-        <form method="POST" action='{{ route('problemas.store') }}' id="problema_form" enctype="multipart/form-data">
+        <form method="POST" action='{{ route('problemas.store') }}' id="problema_form" enctype="multipart/form-data" onsubmit="event.preventDefault();submitFormCrear()" id="crearForm">
             @csrf
             <div class="card">
                 <div class="card-body">
@@ -20,6 +20,7 @@
     </div>
 @endsection
 @push('js')
+<script src="{{ asset('assets/js/alertas_administracion.js') }}"></script> 
     <script type="module">
         const checkbox = document.getElementById('sql')
         const lenguajes = document.getElementById("lenguajes");

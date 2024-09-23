@@ -14,19 +14,12 @@ use Carbon\Carbon;
 
 class EvaluacionSolucionController extends Controller
 {
-    protected $higlightjs_language = [
-        "py" => "python",
-        "c++" => "cpp",
-        "c" => "c",
-        "java" => "java",
-        "sql" => "sql",
-    ];
 
     public function ver_evaluacion(Request $request)
     {
         $envio = EnvioSolucionProblema::where("token", "=", $request->token)->first();
         $problema = $envio->problema()->first();
-        $highlightjs_choice = $this->higlightjs_language[strtolower($envio->lenguaje->abreviatura)];
+        $highlightjs_choice = EnvioSolucionProblema::$higlightjs_language[strtolower($envio->lenguaje->abreviatura)];
         $juez = $envio->juez_virtual;
         $evaluaciones = $envio->evaluaciones()->with('casos_pruebas')->get();
         //Calculo de intentos restante de retroalimentación
@@ -43,9 +36,11 @@ class EvaluacionSolucionController extends Controller
         if (sizeof($evaluacion_arr) > 0) {
             $this::api_request($juez, $evaluacion_arr, $envio);
         }
+        if(isset($envio->termino)){
+            $diferencia = Carbon::parse($envio->termino)->diffInSeconds(Carbon::parse($envio->inicio));
+        }
         if (sizeof($evaluaciones) == $envio->cant_casos_resuelto && $envio->solucionado == false) {
             $envio->solucionado = true;
-            $diferencia = Carbon::parse($envio->termino)->diffInSeconds(Carbon::parse($envio->inicio));
             DB::table('disponible')->where('id_curso', '=', $envio->id_curso)->where('id_problema', '=', $problema->id)->incrementEach(
                 ["cantidad_resueltos"=>1,
                 "tiempo_total"=>$diferencia,
@@ -53,7 +48,7 @@ class EvaluacionSolucionController extends Controller
             );
         }
         $envio->save();
-        return view('plataforma.problemas.resultado', compact('envio', 'evaluaciones', 'highlightjs_choice', 'cant_retroalimentacion', 'tieneRetroalimentacion', 'problema'));
+        return view('plataforma.problemas.resultado', compact('envio', 'evaluaciones', 'highlightjs_choice', 'cant_retroalimentacion', 'tieneRetroalimentacion', 'problema', 'diferencia'));
     }
 
     private static function api_request($juez, $evaluacion_arr, $envio)

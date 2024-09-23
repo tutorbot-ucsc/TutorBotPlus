@@ -69,7 +69,8 @@
                                                     @endcan
                                                     @can('eliminar rol')
                                                         <form action="{{ route('roles.eliminar', ['id' => $rol->id]) }}"
-                                                            method="POST">
+                                                            method="POST" 
+                                                            onsubmit="event.preventDefault();submitFormEliminar('{{'el rol '.$rol->nombre}}')" id="eliminarForm">
                                                             @csrf
                                                             <button type="submit" class="btn btn-outline-danger"><i
                                                                     class="fa fa-fw fa-trash"></i></button>
@@ -95,4 +96,5 @@
 
 <script src="{{asset('assets/js/DataTables/gestion_initialize_es_cl.js')}}"></script>
 
+<script src="{{ asset('assets/js/alertas_administracion.js') }}"></script> 
 @endpush

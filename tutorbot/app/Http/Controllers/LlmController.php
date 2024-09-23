@@ -74,9 +74,10 @@ class LlmController extends Controller
         ->where('envio_solucion_problemas.token', '=', $request->token)
         ->orderBy('created_at', 'DESC')->first();
         $cant_retroalimentacion = $retroalimentacion->limite_llm - DB::table('solicitud_ra_llms')->leftJoin('envio_solucion_problemas', 'solicitud_ra_llms.id_envio', '=', 'envio_solucion_problemas.id')->where('envio_solucion_problemas.id_problema', '=', $retroalimentacion->id_problema)->where('id_usuario','=', auth()->user()->id)->count();
+        $highlightjs_choice = EnvioSolucionProblema::$higlightjs_language[strtolower($envios->lenguaje->abreviatura)];
         if(!isset($retroalimentacion)){
             return redirect()->route('generar_retroalimentacion', ['token'=>$request->token]);
         }
-        return view('plataforma.problemas.retroalimentacion', compact('retroalimentacion', 'cant_retroalimentacion'))->with('token', $request->token);
+        return view('plataforma.problemas.retroalimentacion', compact('retroalimentacion', 'cant_retroalimentacion', 'envios', 'highlightjs_choice'))->with('token', $request->token);
     }
 }

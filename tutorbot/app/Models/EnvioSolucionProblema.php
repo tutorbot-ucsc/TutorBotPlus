@@ -22,6 +22,14 @@ class EnvioSolucionProblema extends Model
     public static $rules = [
         "codigo" => ["required", "min:5"],
     ];
+
+    public static $higlightjs_language = [
+        "py" => "python",
+        "c++" => "cpp",
+        "c" => "c",
+        "java" => "java",
+        "sql" => "sql",
+    ];
     public function usuario(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_usuario');
