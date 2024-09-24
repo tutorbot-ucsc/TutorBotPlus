@@ -125,7 +125,6 @@
 @push('js')
     <script src="{{ asset('assets/js/highlightjs/highlight.min.js') }}" type="text/javascript"></script>
     <script>
-        Swal.fire("SweetAlert2 is working!");
         hljs.highlightAll();
         const tiempo_desarrollo = {{ $diferencia }}
         const string_tiempo_desarrollo = new Date(tiempo_desarrollo * 1000).toISOString().slice(11, 19);

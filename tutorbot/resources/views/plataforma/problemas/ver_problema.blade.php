@@ -1,4 +1,7 @@
 @extends('layout_plataforma.app', ['title_html' => $problema->nombre, 'title' => 'Problema - '.$problema->nombre])
+@php
+    $estado = auth()->user()->envios()->where('id_problema', '=', $problema->id)->where('id_curso', '=', $id_curso)->where('solucionado', '=', true)->exists();    
+@endphp
 @section('content')
     <div class="container-fluid py-3 px-4">
             <div class="row">
@@ -8,7 +11,10 @@
                             Enunciado
                         </div>
                         <div class="card-body">
-                            {!! Str::markdown($problema->body_problema) !!}
+                            {!! Str::markdown($problema->body_problema, [
+                                'html_input' => 'strip',
+                                'allow_unsafe_links' => false
+                            ]) !!}
                         </div>
                     </div>
                 </div>
@@ -20,20 +26,24 @@
                                     role="button">{{ $problema->disponible? 'Resolver Problema' : 'Problema No Disponible' }}</a>
                             </div>
                             <div class="row px-5 mt-2">
-                                <a class="btn btn-outline-primary text-nowrap btn-sm btn-block {{ isset($problema->body_editorial) ? '' : 'disabled' }}"
-                                    href="{{route('problemas.ver_editorial', ['codigo'=>$problema->codigo])}}"
+                                <a class="btn btn-outline-secondary btn-sm btn-block" href="{{route('problemas.pdf_enunciado', ['id_problema'=>$problema->id])}}"
+                                    target="_blank" role="button">Descargar PDF del Enunciado</a>
+                            </div>
+                            <div class="row px-5 mt-2">
+                                <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block {{ isset($problema->body_editorial) ? '' : 'disabled' }}"
+                                    href="{{route('problemas.ver_editorial', ['codigo'=>$problema->codigo, 'id_curso'=>$id_curso])}}"
                                     role="button">{{ isset($problema->body_editorial) ? 'Ver Editorial' : 'Editorial No Disponible' }}</a>
                             </div>
                             <div class="row px-5 mt-2">
-                                <a class="btn btn-outline-primary text-nowrap btn-sm btn-block" href="{{route('envios.listado', ['id_problema'=>$problema->id])}}" role="button">Ver Mis Envios</a></div>
+                                <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block" href="{{route('envios.listado', ['id_problema'=>$problema->id])}}" role="button">Ver Mis Envios</a></div>
                             </div>
-                            <h6 class="ms-4">Puntos: {{$problema->casos_de_prueba()->sum('puntos')}}</h6>
-                            <h6 class="ms-4 mt-3">Límite de Tiempo: {{$problema->tiempo_limite? $problema->tiempo_limite.' s' : 'No definido'}}</h6>
-                            <h6 class="ms-4 mt-3">Límite de Memoria: {{$problema->memoria_limite? $problema->memoria_limite.' KB' : 'No definido'}}</h6>
-                            <h6 class="ms-4 mt-3">Curso: {{implode(', ', $problema->cursos()->where('cursos.id','=', $id_curso)->pluck('nombre')->toArray())}}</h6>
-                            <h6 class="ms-4 mt-3">Estado: {{auth()->user()->envios()->where('id_problema', '=', $problema->id)->where('id_curso', '=', $id_curso)->where('solucionado', '=', true)->exists()? 'Resuelto':'No Resuelto'}}</h6>
-                            <h6 class="ms-4 mt-3">Categorías: {{implode(', ', $problema->categorias()->get()->pluck('nombre')->toArray())}}</h6>
-                            <h6 class="ms-4 mt-3">Lenguajes: {{implode(', ', $problema->lenguajes()->get()->pluck('abreviatura')->toArray())}}</h6>
+                            <p class="ms-4"> <strong>Puntos:</strong> {{$problema->casos_de_prueba()->sum('puntos')}}</p>
+                            <p class="ms-4 mt-1"><strong>Límite de Tiempo:</strong> {{$problema->tiempo_limite? $problema->tiempo_limite.' s' : 'No definido'}}</p>
+                            <p class="ms-4 mt-1"><strong>Límite de Memoria:</strong> {{$problema->memoria_limite? $problema->memoria_limite.' KB' : 'No definido'}}</p>
+                            <p class="ms-4 mt-1"><strong>Curso:</strong> {{implode(', ', $problema->cursos()->where('cursos.id','=', $id_curso)->pluck('nombre')->toArray())}}</p>
+                            <p class="ms-4 mt-1"><strong>Estado:</strong> <span class="badge {{$estado? 'text-bg-success' : 'text-bg-secondary'}}">{{$estado? 'Resuelto':'No Resuelto'}}</span></p>
+                            <p class="ms-4 mt-1"><strong>Categorías:</strong> {{implode(', ', $problema->categorias()->get()->pluck('nombre')->toArray())}}</p>
+                            <p class="ms-4 mt-1"><strong>Lenguajes:</strong> {{implode(', ', $problema->lenguajes()->get()->pluck('abreviatura')->toArray())}}</p>
                         </div>
                     </div>
                 </div>

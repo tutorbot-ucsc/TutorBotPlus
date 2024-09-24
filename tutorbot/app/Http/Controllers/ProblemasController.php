@@ -16,6 +16,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use PDF;
 
 class ProblemasController extends Controller
 {
@@ -235,7 +236,7 @@ class ProblemasController extends Controller
         } catch (\PDOException $e) {
             return redirect()->route('cursos.listado')->with('error', $e->getMessage());
         }
-        return view('plataforma.problemas.ver_editorial', compact('problema'));
+        return view('plataforma.problemas.ver_editorial', compact('problema'))->with('id_curso', $request->id_curso);
     }
 
     public function resolver_problema(Request $request)
@@ -276,5 +277,11 @@ class ProblemasController extends Controller
             return redirect()->route('cursos.listado')->with('error', $e->getMessage());
         }
         return view('plataforma.problemas.resolver_problema', compact('problema', 'lenguajes', 'jueces', 'codigo'))->with('id_curso', $request->id_curso);
+    }
+
+    public function pdf_enunciado(Request $request){
+        $problema = Problemas::with(['categorias', 'lenguajes'])->find($request->id_problema);
+        $pdf = PDF::loadView('plataforma.problemas.pdf_enunciado', compact('problema'));
+        return $pdf->download($problema->codigo.' - enunciado.pdf');
     }
 }

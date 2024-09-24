@@ -51,10 +51,14 @@ Route::group(['middleware'=>'auth'], function(){
 	Route::get('/cursos', function () {
 		return redirect()->route('cursos.listado');
 	});
+	Route::get('/home', function () {
+		return redirect()->route('cursos.listado');
+	});
 	Route::get('/cursos/{id}/problemas', [ProblemasController::class, 'listado_problemas'])->name('problemas.listado');
 	Route::get('/problema/{id_curso?}/{codigo}', [ProblemasController::class, 'ver_problema'])->name('problemas.ver');
-	Route::get('/problema/{codigo}/editorial', [ProblemasController::class, 'ver_editorial'])->name('problemas.ver_editorial');
+	Route::get('/editorial/problema/{codigo}', [ProblemasController::class, 'ver_editorial'])->name('problemas.ver_editorial');
 	Route::get('/problema/{id_curso?}/{codigo}/resolver', [ProblemasController::class, 'resolver_problema'])->name('problemas.resolver');
+	Route::get('/pdf/problema/{id_problema}', [ProblemasController::class, 'pdf_enunciado'])->name('problemas.pdf_enunciado');
 
 	Route::post('/problema/enviar', [EnvioSolucionProblemaController::class, 'enviar_solucion'])->name('problemas.enviar');
 	Route::get('/envios/{id_problema?}', [EnvioSolucionProblemaController::class, 'ver_envios'])->name('envios.listado');

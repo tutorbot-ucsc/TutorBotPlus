@@ -1,6 +1,5 @@
-
-let table = new DataTable('#table', {
-    language : {
+var indexLastColumn = $("#table").find('tr')[0].cells.length-2; //busca la penultima columna de la tabla, la penultima columna es siempre la fecha de creación.
+const espaniol = JSON.stringify({
         "aria": {
             "sortAscending": ": orden ascendente",
             "sortDescending": ": orden descendente"
@@ -244,6 +243,9 @@ let table = new DataTable('#table', {
             "renameLabel": "Nombre nuevo para %s:",
             "renameTitle": "Renombrar Estado"
         }
-    } ,
+    })
+new DataTable('#table', {
+    language :  espaniol,
     responsive: true,
+    order: [[indexLastColumn, 'desc']]
 });

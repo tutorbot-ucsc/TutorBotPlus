@@ -11,15 +11,18 @@ class JuecesVirtuales extends Model
     use HasFactory;
 
     public static function generateHeaderRequest(JuecesVirtuales $juez){
-        if($juez->autenticacion == "x-auth-token"){
-            return [
-                
-            ];
-        }else{
+        if(!isset($juez->autenticacion)){
+            return [];
+        }
+        if($juez->autenticacion == "x-rapidapi-key"){
             return [
                 'x-rapidapi-host' => $juez->host,
                 'x-rapidapi-key' => $juez->api_token
                 ];
+        }else{
+            return [
+                $juez->autenticacion => $juez->api_token,
+            ];
         }
     }
 

@@ -13,7 +13,7 @@
                     <a href="{{route('problemas.listado', ["id"=>$curso->id])}}"  style="text-decoration: none;">
                         <div class="card rounded mb-3 ms-5 me-4">
                             <div class="row g-0">
-                                <div class="col-md-2">
+                                <div class="col-sm-3">
                                     <div class="curso_image rounded"></div>
                                 </div>
                                 <div class="col-md-8">

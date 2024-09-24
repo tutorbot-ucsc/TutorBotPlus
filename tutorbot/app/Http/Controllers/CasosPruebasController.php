@@ -57,7 +57,7 @@ class CasosPruebasController extends Controller
             DB::rollback();
             return redirect()->back()->with('error', $e->getMessage());
         }
-        return redirect()->route('casos_pruebas.assign', ["id"=>$caso->id_problema])->with('success', 'El caso de prueba '.$caso->id.' ha sido modificado');
+        return redirect()->route('casos_pruebas.assign', ["id"=>$caso->id_problema])->with('success', 'El caso de prueba ha sido modificado');
     }
     public function add_caso(Request $request){
 

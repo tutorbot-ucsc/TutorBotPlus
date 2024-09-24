@@ -23,12 +23,17 @@ class EnvioSolucionProblemaController extends Controller
         ->join('cursos', 'cursos.id', '=', 'envio_solucion_problemas.id_curso')
         ->whereNull('id_certamen')
         ->where('id_usuario', '=', auth()->user()->id)
-        ->select('problemas.nombre as nombre_problema', 'problemas.codigo as codigo_problema','envio_solucion_problemas.id as id_envio', 'envio_solucion_problemas.created_at','envio_solucion_problemas.token', 'lenguajes_programaciones.abreviatura as nombre_lenguaje', 'envio_solucion_problemas.solucionado', 'envio_solucion_problemas.inicio', 'envio_solucion_problemas.termino', 'cursos.nombre as nombre_curso', 'cursos.id as id_curso')
+        ->select('problemas.nombre as nombre_problema', 'problemas.codigo as codigo_problema','envio_solucion_problemas.id as id_envio', 'envio_solucion_problemas.created_at','envio_solucion_problemas.token', 'lenguajes_programaciones.nombre as nombre_lenguaje', 'envio_solucion_problemas.solucionado', 'envio_solucion_problemas.inicio', 'envio_solucion_problemas.termino', 'cursos.nombre as nombre_curso', 'cursos.id as id_curso')
         ->orderBy('envio_solucion_problemas.created_at', 'DESC');
         if(isset($request->id_problema)){
             $envios_query = $envios_query->where('problemas.id', '=', $request->id_problema);
         }
-        $envios = $envios_query->get();
+        $envios = $envios_query->get()->map(function ($envio){
+            $envio->inicio = Carbon::parse($envio->inicio)->format('F Y h:i:s A');
+            $envio->termino = Carbon::parse($envio->termino)->format('F Y h:i:s A');
+            $envio->created_at = Carbon::parse($envio->inicio)->format('F Y h:i:s A');
+            return $envio;
+        });
         return view('plataforma.envios.index', compact('envios'));
     }
 
