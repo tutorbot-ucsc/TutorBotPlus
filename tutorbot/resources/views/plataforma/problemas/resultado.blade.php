@@ -16,19 +16,21 @@
                                     <h2 class="accordion-header">
                                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                             data-bs-target="#resultados_{{ $i }}" aria-expanded="false"
-                                            aria-controls="resultados_{{ $i }}">Caso de Prueba
-                                            #{{ $i + 1 }}:<span
-                                                class="mx-2 badge {{ $evaluaciones[$i]->estado == 'Aceptado' ? 'text-bg-success' : 'text-bg-danger' }}">{{ $evaluaciones[$i]->resultado }}</span>
+                                            aria-controls="resultados_{{ $i }}">
+                                            @if($evaluaciones[$i]->estado=="En Proceso") 
+                                            Caso de Prueba #{{ $i + 1 }}: <span class="mx-2 badge text-bg-warning">In Process</span> 
+                                            @else Caso de Prueba #{{ $i + 1 }}:<span class="mx-2 badge {{ $evaluaciones[$i]->estado == 'Aceptado' ? 'text-bg-success' : 'text-bg-danger' }}">{{ $evaluaciones[$i]->resultado }}</span>
                                             - Tiempo: {{ $evaluaciones[$i]->tiempo ? $evaluaciones[$i]->tiempo : '0' }}
                                             segundos - Memoria:
                                             {{ $evaluaciones[$i]->memoria ? $evaluaciones[$i]->memoria : '0' }} KB
+                                            @endif
                                         </button>
                                     </h2>
                                     <div id="resultados_{{ $i }}" class="accordion-collapse collapse"
                                         data-bs-parent="#resultados_accord">
                                         <div class="accordion-body">
                                             <div class="d-flex flex-row mb-3">
-                                                @if (isset($evaluaciones[$i]->casos_pruebas->entradas))
+                                                @if (isset($evaluaciones[$i]->casos_pruebas->entradas) && $evaluaciones[$i]->casos_pruebas->ejemplo == true)
                                                     <div class="card">
                                                         <div class="card-body">
                                                             <h5 class="card-title">Entradas</h5>
@@ -37,7 +39,7 @@
                                                         </div>
                                                     </div>
                                                 @endif
-                                                @if (isset($evaluaciones[$i]->casos_pruebas->salidas))
+                                                @if (isset($evaluaciones[$i]->casos_pruebas->salidas) && $evaluaciones[$i]->casos_pruebas->ejemplo == true)
                                                     <div class="card mx-2">
                                                         <div class="card-body">
                                                             <h5 class="card-title">Salidas Esperadas</h5>
@@ -77,20 +79,20 @@
                     <div class="card-body px-5">
                         <h6 class="text-center">Tiempo en Total:</h6>
                         <h5 id="tiempo" class="text-center"></h5>
-                        @if ($envio->solucionado == false && $tieneRetroalimentacion == false)
+                        @if (!$evaluaciones->contains('estado', '=', 'En Proceso') && $envio->solucionado == false && $tieneRetroalimentacion == false)
                             <div class="row px-5">
                                 <a class="btn btn-primary btn-block {{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? '' : 'disabled' }}"
                                     href="{{ route('envios.generar_retroalimentacion', ['token' => $envio->token]) }}"
                                     role="button">{{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? 'Solicitar Retroalimentacion (Cantidad Disponible: ' . $cant_retroalimentacion . ')' : 'Retroalimentación no disponible' }}</a>
                             </div>
-                        @elseif($tieneRetroalimentacion == true)
+                        @elseif(!$evaluaciones->contains('estado', '=', 'En Proceso') && $tieneRetroalimentacion == true)
                             <div class="row px-5">
                                 <a class="btn btn-primary text-nowrap btn-block"
                                     href="{{ route('envios.retroalimentacion', ['token' => $envio->token]) }}"
                                     role="button">Ver Retroalimentación</a>
                             </div>
                         @endif
-                        @if ($envio->solucionado == false)
+                        @if (!$evaluaciones->contains('estado', '=', 'En Proceso') && $envio->solucionado == false)
                             <div class="row px-5 mt-2">
                                 <a class="btn btn-outline-secondary text-nowrap btn-block"
                                     href="{{ route('problemas.resolver', ['codigo' => $envio->problema->codigo]) }}"

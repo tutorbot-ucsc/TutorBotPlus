@@ -67,9 +67,14 @@ class CasosPruebasController extends Controller
             $problema = Problemas::find( $request->id );
 
             $caso = new Casos_Pruebas;
+            if(isset($request->puntos)){
+                $caso->puntos = $request->input("puntos");
+            }
             $caso->entradas = $request->input("entradas");
             $caso->salidas = $request->input("salidas");
-            $caso->puntos = $request->input("puntos");
+            if(!isset($request->ejemplo)){
+                $caso->ejemplo = true;
+            }
             $problema->casos_de_prueba()->save($caso);
             $problema->puntaje_total = $problema->puntaje_total + $caso->puntos;
             $problema->refresh();

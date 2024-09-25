@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_problema')->nullable();
             $table->text('entradas')->nullable();
             $table->text('salidas')->nullable();
+            $table->boolean('ejemplo')->default(false);
             $table->integer('puntos')->default(0);
 
             $table->foreign('id_problema')->references('id')->on('problemas')->onDelete('cascade')->onUpdate('cascade');
