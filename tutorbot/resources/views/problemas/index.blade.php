@@ -145,7 +145,7 @@
                                         </td>
                                         <td class="align-middle text-center text-sm">
                                             <p class="text-sm font-weight-bold mb-0">
-                                                {{ $problema->fecha ? $problema->fecha : 'Desconocido' }}</p>
+                                                {{ $problema->created_at ? $problema->creado : 'Desconocido' }}</p>
                                         </td>
                                         @canany(['editar problemas', 'editar problemas'])
                                             <td class="align-middle text-end">

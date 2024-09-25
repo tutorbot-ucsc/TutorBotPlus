@@ -14,7 +14,7 @@ class JuecesVirtuales extends Model
         if(!isset($juez->autenticacion)){
             return [];
         }
-        if($juez->autenticacion == "x-rapidapi-key"){
+        if($juez->autenticacion == "x-rapid-key"){
             return [
                 'x-rapidapi-host' => $juez->host,
                 'x-rapidapi-key' => $juez->api_token

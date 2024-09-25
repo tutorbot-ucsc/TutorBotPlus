@@ -6,7 +6,7 @@
         @include('components.alert')
     </div>
     <div class="container-fluid py-4">
-        <form method="POST" action='{{ route('problemas.store') }}' id="problema_form" enctype="multipart/form-data" onsubmit="event.preventDefault();submitFormCrear()" id="crearForm">
+        <form method="POST" action='{{ route('problemas.store') }}' enctype="multipart/form-data" onsubmit="event.preventDefault();submitFormCrear()" id="crearForm">
             @csrf
             <div class="card">
                 <div class="card-body">
@@ -25,6 +25,11 @@
         const checkbox = document.getElementById('sql')
         const lenguajes = document.getElementById("lenguajes");
         const sql_file = document.getElementById("sql_file");
+        const archivos_adicionales = document.getElementById("archivos_adicionales")
+        const fecha_inicio = flatpickr("#fecha_inicio", {enableTime: true,
+            dateFormat: "d-m-Y H:i"}); // flatpickr
+        const fecha_termino = flatpickr("#fecha_termino", {enableTime: true,
+            dateFormat: "d-m-Y H:i",}); // flatpickr
         const editor = new Editor({
             el: document.querySelector('#editor'),
             height: '600px',
@@ -32,10 +37,8 @@
             placeholder: 'Ingrese el enunciado del problema',
             initialValue: `{{ isset($problema) ? old('body_problema', $problema->body_problema) : old('body_problema') }}`,
         })
-        document.querySelector('#problema_form').addEventListener('submit', e => {
-            e.preventDefault();
+        document.querySelector('#crearForm').addEventListener('submit', e => {
             document.querySelector('#body_problema').value = editor.getMarkdown();
-            e.target.submit();
         });
 
         checkbox.addEventListener('change', (event) => {
@@ -44,6 +47,7 @@
                 sql_file.classList.remove("d-none");
             } else {
                 sql_file.classList.add("d-none");
+                archivos_adicionales.value = ""
                 lenguajes.disabled = false;
             }
         })

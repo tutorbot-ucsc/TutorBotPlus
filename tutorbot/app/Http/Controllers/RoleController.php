@@ -14,7 +14,7 @@ class RoleController extends Controller
     public function index(Request $request)
     {
         $roles = Role::all()->map(function($role){
-            $role->fecha = carbon::parse($role->created_at)->toFormattedDateString();
+            $role->fecha = carbon::parse($role->created_at)->locale('es_ES')->isoFormat('lll');
             return $role;
         });
         return view('roles.index', compact('roles'));

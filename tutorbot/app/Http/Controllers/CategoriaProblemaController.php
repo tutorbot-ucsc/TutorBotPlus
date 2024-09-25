@@ -12,7 +12,7 @@ class CategoriaProblemaController extends Controller
     public function index(Request $request)
     {
         $categorias = Categoria_Problema::all()->map(function($categoria){
-            $categoria->fecha = carbon::parse($categoria->created_at)->toFormattedDateString();
+            $categoria->fecha = carbon::parse($categoria->created_at)->locale('es_ES')->isoFormat('lll');
             return $categoria;
         });
         return view('categoria_problemas.index', compact('categorias'));

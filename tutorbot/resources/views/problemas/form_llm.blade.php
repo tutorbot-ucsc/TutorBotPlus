@@ -2,7 +2,7 @@
 <div class="row d-flex justify-content-start align-items-center">
     <div class="col">
         <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" id="habilitar_llm" name="habilitar_llm" value="{{true}}" @if(isset($problema) && $problema->habilitar_llm==true)checked @endif>
+            <input class="form-check-input" type="checkbox" id="habilitar_llm" name="habilitar_llm" value="{{true}}" @if(isset($problema) && $problema->habilitar_llm==true)checked @elseif(old('habilitar_llm')) checked @endif>
             <label class="form-check-label" for="habilitar_llm">Habilitar Large Language Model</label>
         </div>
     </div>

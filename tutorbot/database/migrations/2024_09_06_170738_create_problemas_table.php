@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('memoria_limite')->default('5000');
             $table->string('archivo_adicional')->nullable();
             $table->string('tiempo_limite')->nullable();
-            $table->date('fecha_inicio')->nullable();
-            $table->date('fecha_termino')->nullable();
+            $table->dateTime('fecha_inicio')->nullable();
+            $table->dateTime('fecha_termino')->nullable();
             $table->boolean('visible')->default(true);
             $table->boolean('habilitar_llm')->default(false);
             $table->integer('limite_llm')->default(0);

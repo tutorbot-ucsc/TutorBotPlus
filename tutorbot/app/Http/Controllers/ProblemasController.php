@@ -25,7 +25,10 @@ class ProblemasController extends Controller
         $problemas = Problemas::whereHas('cursos', function (Builder $query) {
             $cursos = auth()->user()->cursos()->select('cursos.id')->pluck('id')->toArray();
             $query->whereIn('cursos.id', $cursos);
-        })->get();
+        })->get()->map(function($item){
+            $item->creado = Carbon::parse($item->created_at)->locale('es_ES')->isoFormat('lll');
+            return $item;
+        });
         return view('problemas.index', compact('problemas'));
     }
 
@@ -40,6 +43,7 @@ class ProblemasController extends Controller
     public function editar(Request $request)
     {
         $problema = Problemas::find($request->id);
+        $problema->sql = $problema->lenguajes()->where('lenguajes_programaciones.nombre', 'LIKE', '%sql%')->exists();
         $categorias = Categoria_Problema::all();
         $cursos = Cursos::all();
         $lenguajes = LenguajesProgramaciones::where('abreviatura', 'NOT LIKE', '%sql%')->get();
@@ -72,7 +76,7 @@ class ProblemasController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate(Problemas::$createRules);
+        $validated = $request->validate(Problemas::createRules(isset($request->fecha_inicio), isset($request->fecha_termino), null,$request->sql));
         try {
             db::beginTransaction();
             $problema = new Problemas;
@@ -87,8 +91,8 @@ class ProblemasController extends Controller
     private static function problemaModificacion(Problemas $problema, Request $request){
             $problema->nombre = $request->input('nombre');
             $problema->codigo = $request->input('codigo');
-            $problema->fecha_inicio = $request->input('fecha_inicio');
-            $problema->fecha_termino = $request->input('fecha_termino');
+            $problema->fecha_inicio = Carbon::parse( $request->input('fecha_inicio'));
+            $problema->fecha_termino = Carbon::parse( $request->input('fecha_termino'));
             $problema->memoria_limite = $request->input('memoria_limite');
             $problema->tiempo_limite = $request->input('tiempo_limite');
             $problema->body_problema = $request->input('body_problema');
@@ -122,13 +126,17 @@ class ProblemasController extends Controller
                 $problema->lenguajes()->sync(LenguajesProgramaciones::where('abreviatura', '=', 'sql')->get()->pluck('id'));
             }else{
                 $problema->lenguajes()->sync($request->input('lenguajes'));
+                if(isset($problema->archivo_adicional)){
+                    Storage::delete('public/archivos_adicionales/'.$problema->archivo_adicional);
+                    $problema->archivo_adicional = null;
+                }
             }
             $problema->categorias()->sync($request->input('categorias'));
     }
     public function update(Request $request)
     {
 
-        $validated = $request->validate(Problemas::updateRules($request->codigo));
+        $validated = $request->validate(Problemas::createRules(isset($request->fecha_inicio),isset($request->fecha_termino),$request->codigo, $request->sql, true));
         try {
             db::beginTransaction();
             $problema = Problemas::find($request->id);
@@ -185,11 +193,13 @@ class ProblemasController extends Controller
                 return redirect()->route('cursos.listados')->with('error', 'No tienes acceso al curso que estas tratando de acceder');
             }
             $curso = Cursos::find($request->id);
-            $problemas = $curso->problemas()->where('visible', '=', true)->orderBy('created_at', 'DESC')->get()->map(function ($problema) {
+            $fecha_ahora = Carbon::now();
+            $problemas = $curso->problemas()->where('visible', '=', true)->get()->map(function ($problema) {
                 $problema->puntaje_total = $problema->casos_de_prueba()->get()->pluck('puntos')->sum();
-                $problema->categorias = implode(',', $problema->categorias()->get()->pluck('nombre')->toArray());
+                $problema->categorias = implode(',', array: $problema->categorias()->get()->pluck('nombre')->toArray());
+                $problema->creado = Carbon::parse($problema->created_at)->locale('es_ES')->isoFormat('lll');
                 return $problema;
-            });
+            })->unique();
         } catch (\PDOException $e) {
             DB::rollBack();
             return redirect()->route('cursos.listado')->with('error', $e->getMessage());
@@ -206,13 +216,21 @@ class ProblemasController extends Controller
                 return redirect()->route('cursos.listado')->with('error', 'No tienes acceso al problema ' . $problema->nombre);
             }
             $problema->disponible = true;
+            $now = Carbon::now();
+            if(isset($problema->fecha_inicio)){
+            $fecha_inicio = Carbon::parse($problema->fecha_inicio);
+                if ($now->lt($fecha_inicio)) {
+                    $problema->disponible = false;
+                }
+            $problema->fecha_inicio = $fecha_inicio->locale('es_ES')->isoFormat('lll');
+            }
             if (isset($problema->fecha_termino)) {
-                $now = Carbon::now();
                 $fecha_termino = Carbon::parse($problema->fecha_termino);
                 if ($now->gt($fecha_termino)) {
                     $problema->disponible = false;
                 }
-            }
+            $problema->fecha_termino = $fecha_termino->locale('es_ES')->isoFormat('lll');
+        }
         } catch (\PDOException $e) {
             return redirect()->route('cursos.listado')->with('error', $e->getMessage());
         }

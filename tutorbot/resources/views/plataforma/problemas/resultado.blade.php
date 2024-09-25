@@ -92,13 +92,13 @@
                         @endif
                         @if ($envio->solucionado == false)
                             <div class="row px-5 mt-2">
-                                <a class="btn btn-outline-primary text-nowrap btn-block"
+                                <a class="btn btn-outline-secondary text-nowrap btn-block"
                                     href="{{ route('problemas.resolver', ['codigo' => $envio->problema->codigo]) }}"
                                     role="button">Volver al intento</a>
                             </div>
                         @endif
                         <div class="row px-5 mt-2">
-                            <a class="btn btn-outline-primary text-nowrap btn-sm btn-block"
+                            <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block"
                                 href="{{ route('problemas.ver', ['codigo' => $problema->codigo, 'id_curso' => $envio->id_curso]) }}"
                                 role="button">Volver al
                                 Enunciado</a>

@@ -5,12 +5,12 @@
 @section('content')
     <div class="container-fluid py-3 px-4">
             <div class="row">
-                <div class="col">
+                <div class="col-8">
                     <div class="card border-danger" style="height:100%">
                         <div class="card-header">
                             Enunciado
                         </div>
-                        <div class="card-body">
+                        <div class="card-body p-4 text-wrap" id="body_markdown">
                             {!! Str::markdown($problema->body_problema, [
                                 'html_input' => 'strip',
                                 'allow_unsafe_links' => false
@@ -44,9 +44,31 @@
                             <p class="ms-4 mt-1"><strong>Estado:</strong> <span class="badge {{$estado? 'text-bg-success' : 'text-bg-secondary'}}">{{$estado? 'Resuelto':'No Resuelto'}}</span></p>
                             <p class="ms-4 mt-1"><strong>Categorías:</strong> {{implode(', ', $problema->categorias()->get()->pluck('nombre')->toArray())}}</p>
                             <p class="ms-4 mt-1"><strong>Lenguajes:</strong> {{implode(', ', $problema->lenguajes()->get()->pluck('abreviatura')->toArray())}}</p>
+                            @if(isset($problema->fecha_inicio))
+                                <p class="ms-4 mt-1"><strong>Fecha de Inicio:</strong> {{$problema->fecha_inicio}}</p>
+                            @endif
+                            @if(isset($problema->fecha_termino))
+                                <p class="ms-4 mt-1"><strong>Fecha de Termino:</strong> {{$problema->fecha_termino}}</p>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>     
     </div>
 @endsection
+
+@push('js')
+    
+<script>
+    var table = document.querySelector("#body_markdown table")
+    if(table != null){
+        var table_body = table.querySelector("tbody")
+        table.classList.add("table")
+        table.classList.add("table-bordered")
+        table.classList.add("table-hover")
+        table.classList.add("mt-3") 
+        table.style.width = "auto"
+        table_body.classList.add("table-group-divider")
+    }
+</script>
+@endpush

@@ -13,7 +13,7 @@ class CursosController extends Controller
     public function index(Request $request)
     {
         $cursos = Cursos::all()->map(function($curso){
-            $curso->fecha = carbon::parse($curso->created_at)->toFormattedDateString();
+            $curso->fecha = carbon::parse($curso->created_at)->locale('es_ES')->isoFormat('lll');
             return $curso;
         });
         return view('cursos.index', compact('cursos'));

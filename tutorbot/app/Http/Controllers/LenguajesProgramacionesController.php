@@ -11,7 +11,7 @@ class LenguajesProgramacionesController extends Controller
     public function index(Request $request)
     {
         $lenguajes = LenguajesProgramaciones::all()->map(function($item){
-            $item->fecha = Carbon::parse($item->created_at)->toFormattedDateString();
+            $item->fecha = Carbon::parse($item->created_at)->locale('es_ES')->isoFormat('lll');
             return $item;
         });
         return view('lenguaje_programacion.index', compact('lenguajes'));
