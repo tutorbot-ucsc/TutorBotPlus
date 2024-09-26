@@ -11,6 +11,8 @@
                             <th>Lenguaje</th>
                             <th>Curso</th>
                             <th>Estado</th>
+                            <th>Casos Resueltos</th>
+                            <th>Puntaje</th>
                             <th>Inicio</th>
                             <th>Termino</th>
                             <th>Accion</th>
@@ -23,7 +25,9 @@
                                 <td><a href="{{route('problemas.ver', ['codigo'=>$envio->codigo_problema, 'id_curso'=>$envio->id_curso])}}">{{$envio->nombre_problema}}</a></td>
                                 <td>{{$envio->nombre_lenguaje}}</td>
                                 <td><a href="{{route('problemas.listado', ["id"=>$envio->id_curso])}}">{{$envio->nombre_curso}}</a></td>
-                                <td><span class="badge @if($envio->solucionado) text-bg-success @elseif($envio->estado == "Error" || $envio->estado == "Rechazado") text-bg-danger @else text-bg-warning @endif">{{$envio->solucionado == true? 'Accepted' : ($envio->estado=="Rechazado"? $envio->resultado : "In Process")}}</span></td>
+                                <td><span class="badge @if($envio->solucionado==true) text-bg-success @elseif($envio->estado == "Error" || $envio->estado == "Rechazado") text-bg-danger @else text-bg-warning @endif">{{$envio->solucionado == true? 'Accepted' : ($envio->estado=="Rechazado" || $envio->estado=="Error"? $envio->resultado : "In Process")}}</span></td>
+                                <td>{{$envio->cant_casos_resuelto}} de {{$envio->total_casos}}</td>
+                                <td>{{$envio->puntaje}}</td>
                                 <td>{{$envio->inicio}}</td>
                                 <td>{{$envio->termino}}</td>
                                 <td><a href="{{route('envios.ver', ['token'=>$envio->token])}}">Ver</a></td>

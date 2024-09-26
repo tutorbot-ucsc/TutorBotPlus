@@ -35,7 +35,7 @@ class ProblemasController extends Controller
     public function crear()
     {
         $categorias = Categoria_Problema::all();
-        $cursos = Cursos::all();
+        $cursos = auth()->user()->cursos()->get();
         $lenguajes = LenguajesProgramaciones::where('abreviatura', 'NOT LIKE', '%sql%')->get();
         return view('problemas.crear', compact('categorias', 'cursos', 'lenguajes'))->with('accion', "crear");;
     }
@@ -47,7 +47,7 @@ class ProblemasController extends Controller
         $problema->fecha_inicio = Carbon::parse($problema->fecha_inicio)->toDateTimeString();
         $problema->fecha_termino = Carbon::parse($problema->fecha_termino)->toDateTimeString();
         $categorias = Categoria_Problema::all();
-        $cursos = Cursos::all();
+        $cursos = auth()->user()->cursos()->get();
         $lenguajes = LenguajesProgramaciones::where('abreviatura', 'NOT LIKE', '%sql%')->get();
         return view('problemas.editar', compact('problema', 'categorias', 'lenguajes', 'cursos'))->with('accion', "editar");
     }

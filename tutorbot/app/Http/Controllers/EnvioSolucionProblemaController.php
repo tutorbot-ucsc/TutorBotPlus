@@ -19,15 +19,16 @@ class EnvioSolucionProblemaController extends Controller
 
     public function ver_envios(Request $request){
         $ultima_evaluacion = DB::table('evaluacion_solucions')
-        ->select('resultado', 'id_caso', 'id_envio', 'estado')
+        ->select('resultado', 'id_envio', 'estado')
         ->where('estado', '=', 'Rechazado')
         ->orWhere('estado', '=', 'En Proceso')
         ->orWhere('estado', '=', 'Error')
         ->orderBy('id_caso','DESC')
-        ->limit(1);
+        ->groupBy('id_envio', 'resultado', 'estado');
 
         $envios_query = DB::table('envio_solucion_problemas')
         ->join('problemas', 'problemas.id', '=', 'envio_solucion_problemas.id_problema')
+        ->join('casos__pruebas', 'casos__pruebas.id_problema', '=', 'problemas.id')
         ->join('lenguajes_programaciones', 'lenguajes_programaciones.id', '=', 'envio_solucion_problemas.id_lenguaje')
         ->join('cursos', 'cursos.id', '=', 'envio_solucion_problemas.id_curso')
         ->leftJoinSub($ultima_evaluacion, 'ultima_evaluacion', function (JoinClause $join){
@@ -35,8 +36,10 @@ class EnvioSolucionProblemaController extends Controller
         })
         ->whereNull('id_certamen')
         ->where('id_usuario', '=', auth()->user()->id)
-        ->select('problemas.nombre as nombre_problema', 'problemas.codigo as codigo_problema','envio_solucion_problemas.id as id_envio', 'envio_solucion_problemas.created_at','envio_solucion_problemas.token', 'lenguajes_programaciones.nombre as nombre_lenguaje', 'envio_solucion_problemas.solucionado', 'envio_solucion_problemas.inicio', 'envio_solucion_problemas.termino', 'cursos.nombre as nombre_curso', 'cursos.id as id_curso', 'ultima_evaluacion.resultado', 'ultima_evaluacion.id_caso', 'ultima_evaluacion.estado')
+        ->select('problemas.nombre as nombre_problema', 'problemas.codigo as codigo_problema','envio_solucion_problemas.id as id_envio', 'envio_solucion_problemas.created_at','envio_solucion_problemas.token', 'envio_solucion_problemas.cant_casos_resuelto','envio_solucion_problemas.puntaje', 'lenguajes_programaciones.nombre as nombre_lenguaje', 'envio_solucion_problemas.solucionado', 'envio_solucion_problemas.inicio', 'envio_solucion_problemas.termino', 'cursos.nombre as nombre_curso', 'cursos.id as id_curso', 'ultima_evaluacion.resultado', 'ultima_evaluacion.estado', DB::raw('count(casos__pruebas.id) as total_casos'))
+        ->groupBy('problemas.nombre', 'problemas.codigo','envio_solucion_problemas.id', 'envio_solucion_problemas.created_at','envio_solucion_problemas.token', 'envio_solucion_problemas.cant_casos_resuelto','envio_solucion_problemas.puntaje', 'lenguajes_programaciones.nombre', 'envio_solucion_problemas.solucionado', 'envio_solucion_problemas.inicio', 'envio_solucion_problemas.termino', 'cursos.nombre', 'cursos.id', 'ultima_evaluacion.resultado', 'ultima_evaluacion.estado')
         ->orderBy('envio_solucion_problemas.created_at', 'DESC');
+
         if(isset($request->id_problema)){
             $envios_query = $envios_query->where('problemas.id', '=', $request->id_problema);
         }
@@ -46,6 +49,7 @@ class EnvioSolucionProblemaController extends Controller
             $envio->termino = Carbon::parse($envio->termino)->locale('es_ES')->isoFormat('lll');
             return $envio;
         });
+
         return view('plataforma.envios.index', compact('envios'));
     }
 

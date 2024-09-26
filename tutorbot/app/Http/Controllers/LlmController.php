@@ -33,10 +33,15 @@ class LlmController extends Controller
         $codigo = $evaluacion->codigo;
 
        if($evaluacion->estado == "Error"){
+            if(isset($evaluacion->error_compilacion)){
+                $prompt = SolicitudRaLlm::promptError   (base64_decode($evaluacion->error_compilacion), $evaluacion->nombre_lenguaje);
+            }else{
+                $prompt = SolicitudRaLlm::promptError   (null, $evaluacion->nombre_lenguaje,$evaluacion->resultado);
+            }
             $result = OpenAI::chat()->create([
                 'model' => 'gpt-4o-mini',
                 'messages' => [
-                    ['role' => 'system', 'content' => SolicitudRaLlm::promptErrorCompilacion(base64_decode($evaluacion->error_compilacion), $evaluacion->nombre_lenguaje)],
+                    ['role' => 'system', 'content' => $prompt],
                     ['role' => 'user', 'content' => $codigo],
                 ],
             ]);

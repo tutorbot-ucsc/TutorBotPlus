@@ -164,7 +164,7 @@
                                                     @endcan
                                                     @can('eliminar problemas')
                                                         <form action="{{ route('problemas.eliminar', ['id' => $problema->id]) }}"
-                                                            method="POST" onsubmit="event.preventDefault();submitFormEliminar('{{'el problema '.$problema->nombre}}')" id="eliminarForm">
+                                                            method="POST" onsubmit="event.preventDefault();submitFormEliminar('{{'el problema '.$problema->nombre}}', {{$problema->id}})" id="eliminarForm_{{$problema->id}}">
                                                             @csrf
                                                             <button type="submit" class="btn btn-outline-danger"><i
                                                                     class="fa fa-fw fa-trash"></i></button>

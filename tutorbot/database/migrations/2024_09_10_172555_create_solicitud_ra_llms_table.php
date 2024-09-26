@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->text('retroalimentacion');
             $table->unsignedBigInteger('id_envio');
+            $table->unsignedBigInteger('id_prompt')->nullable();
+            $table->unsignedBigInteger('id_llm')->nullable();
             $table->timestamps();
 
             $table->foreign('id_envio')->references('id')->on('envio_solucion_problemas')->onDelete('cascade')->onUpdate('cascade');

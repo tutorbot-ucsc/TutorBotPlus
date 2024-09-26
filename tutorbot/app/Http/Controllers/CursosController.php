@@ -75,7 +75,13 @@ class CursosController extends Controller
     }
 
     public function listado_cursos(Request $request){
-        $cursos = auth()->user()->cursos()->paginate(5);
-        return view('plataforma.cursos.index', compact('cursos'));
+        $cursos = auth()->user()->cursos();
+        $busqueda = $request->buscar_curso;
+        if(isset($busqueda)){
+            $cursos = $cursos->where('nombre', 'LIKE', '%'.$busqueda.'%');
+        }
+        
+        $cursos = $cursos->paginate(5);
+        return view('plataforma.cursos.index', compact('cursos'))->with('busqueda', $busqueda);
     }
 }

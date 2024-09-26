@@ -72,7 +72,7 @@
                                                     @endcan
                                                     @can('eliminar curso')
                                                         <form action="{{ route('cursos.eliminar', ['id' => $curso->id]) }}"
-                                                            method="POST" onsubmit="submitFormEliminar('{{'el curso '.$curso->nombre}})'">
+                                                            method="POST" onsubmit="event.preventDefault();submitFormEliminar('{{'el curso '.$curso->nombre}}', {{$curso->id}})" id="eliminarForm_{{$curso->id}}">
                                                             @csrf
                                                             <button type="submit" class="btn btn-outline-danger"><i
                                                                     class="fa fa-fw fa-trash"></i></button>
@@ -99,5 +99,5 @@
     <script src="{{ asset('assets/js/DataTables/datatables.min.js') }}"></script>
 
     <script src="{{ asset('assets/js/DataTables/gestion_initialize_es_cl.js') }}"></script>
-    <script src="{{ asset('assets/js/alertas_administracion') }}"></script>
+    <script src="{{ asset('assets/js/alertas_administracion.js') }}"></script> 
 @endpush
