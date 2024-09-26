@@ -22,10 +22,10 @@ class LlmController extends Controller
         ->join('problemas', 'problemas.id', '=', 'envio_solucion_problemas.id_problema')
         ->select('evaluacion_solucions.*' ,'envio_solucion_problemas.codigo', 'envio_solucion_problemas.token','envio_solucion_problemas.id_lenguaje', 'lenguajes_programaciones.nombre as nombre_lenguaje','envio_solucion_problemas.id_problema', 'problemas.limite_llm', 'casos__pruebas.entradas', 'casos__pruebas.salidas')
         ->where('envio_solucion_problemas.token', '=', $request->token)
-        ->where('estado', '=', 'Rechazado')
-        ->orWhere('estado', '=', 'Error')
+        ->where(function ($query){
+            $query->where('estado', '=', 'Rechazado')->orWhere('estado', '=', 'Error');
+        })
         ->orderBy('estado', 'ASC')->first();
-
         $cant_retroalimentacion = $evaluacion->limite_llm - DB::table('solicitud_ra_llms')->leftJoin('envio_solucion_problemas', 'solicitud_ra_llms.id_envio', '=', 'envio_solucion_problemas.id')->where('envio_solucion_problemas.id_problema', '=', $evaluacion->id_problema)->where('id_usuario','=', auth()->user()->id)->count();
         if($cant_retroalimentacion == 0){
             return redirect()->route('envios.ver', ['token'=>$request->token])->with('error', 'Has superado el límite de uso de la LLM');

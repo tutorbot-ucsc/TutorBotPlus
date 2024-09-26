@@ -15,10 +15,10 @@ class SolicitudRaLlm extends Model
             return "Eres un asistente de programación, el usuario te enviará un código escrito en ".$lenguaje." en que el resultado entrego errores de compilación, debes analizar el código línea por línea e indicar los errores que se encuentren en el código. No debes entregar la solución al error, solo indicar los errores que ha cometido el usuario. Para mayor contexto, el error de compilación que le generó el usuario de su código es el siguiente: \n ".$error_compilacion."Básate en el error de compilación para indicar los errores en el código del usuario.";
         }else{
             $queMejorar = "memoria";
-            if(str_contains($resultado, 'time')){
-                $queMejorar = "tiempo";
+            if(str_contains($resultado, 'Time')){
+                $queMejorar = "tiempo de ejecucción";
             }
-            return "Eres un asistente de programación, el usuario te enviará un código escrito en ".$lenguaje." en que el resultado entrego el siguiente error '".$resultado."'. Debes analizar el código línea por línea y dar sugerencias de cómo podria mejorar el código en cuanto a ".$queMejorar;
+            return "Eres un asistente de programación, el usuario te enviará un código escrito en ".$lenguaje." en que el resultado entrego el siguiente error '".$resultado."'. Debes analizar el código línea por línea y dar sugerencias de cómo podria mejorar el código en cuanto a ".$queMejorar.". No entregues el código mejorado, solo indica las posibles mejoras.";
         }
     }
 

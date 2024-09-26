@@ -95,7 +95,7 @@
                         @if (!$evaluaciones->contains('estado', '=', 'En Proceso') && $envio->solucionado == false)
                             <div class="row px-5 mt-2">
                                 <a class="btn btn-outline-secondary text-nowrap btn-block"
-                                    href="{{ route('problemas.resolver', ['codigo' => $envio->problema->codigo]) }}"
+                                    href="{{ route('problemas.resolver', ['codigo' => $envio->problema->codigo, 'id_curso' => $envio->id_curso]) }}"
                                     role="button">Volver al intento</a>
                             </div>
                         @endif

@@ -78,6 +78,7 @@ class ProblemasController extends Controller
 
     public function store(Request $request)
     {
+        dd($request->all());
         $validated = $request->validate(Problemas::createRules(isset($request->fecha_inicio), isset($request->fecha_termino), null,$request->sql));
         try {
             db::beginTransaction();
