@@ -31,8 +31,7 @@
             <p class="opacity-25"><small>Indica la disponibilidad del problema, en caso de no ingresar estará disponible
                     de manera
                     inmediata.</small></p>
-            <input class="form-control" type="date" name="fecha_inicio" id="fecha_inicio"
-                value="{{ isset($problema) ? old('fecha_inicio', $problema->fecha_inicio) : old('fecha_inicio') }}">
+            <input class="form-control" type="date" name="fecha_inicio" id="fecha_inicio">
             @error('fecha_inicio')
                 <p class="text-danger text-xs pt-1"> {{ $message }} </p>
             @enderror
@@ -44,8 +43,7 @@
             <p class="opacity-25"><small>Indica hasta que fecha estara disponible el problema, en caso de no ingresar
                     estara disponible hasta que el usuario desee editarlo, eliminarlo o ocultarlo.</small></p>
             <input class="form-control @error('fecha_termino') is-invalid @enderror" type="date" name="fecha_termino"
-                id="fecha_termino"
-                value="{{ isset($problema) ? old('fecha_termino', $problema->fecha_termino) : old('fecha_termino') }}">
+                id="fecha_termino">
             @error('fecha_termino')
                 <p class="text-danger text-xs pt-1"> {{ $message }} </p>
             @enderror

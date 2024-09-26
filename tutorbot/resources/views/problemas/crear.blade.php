@@ -1,5 +1,4 @@
 @extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100', 'title_url' => 'Crear Problema'])
-
 @section('content')
     @include('layouts.navbars.auth.topnav', ['title' => 'Crear Problema'])
     <div id="alert">
@@ -30,6 +29,8 @@
             dateFormat: "d-m-Y H:i"}); // flatpickr
         const fecha_termino = flatpickr("#fecha_termino", {enableTime: true,
             dateFormat: "d-m-Y H:i",}); // flatpickr
+            fecha_inicio.setDate(Date.parse("{{old('fecha_inicio')}}"))
+            fecha_termino.setDate(Date.parse("{{old('fecha_termino')}}"))
         const editor = new Editor({
             el: document.querySelector('#editor'),
             height: '600px',

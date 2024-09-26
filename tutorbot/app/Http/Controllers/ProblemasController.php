@@ -44,6 +44,8 @@ class ProblemasController extends Controller
     {
         $problema = Problemas::find($request->id);
         $problema->sql = $problema->lenguajes()->where('lenguajes_programaciones.nombre', 'LIKE', '%sql%')->exists();
+        $problema->fecha_inicio = Carbon::parse($problema->fecha_inicio)->toDateTimeString();
+        $problema->fecha_termino = Carbon::parse($problema->fecha_termino)->toDateTimeString();
         $categorias = Categoria_Problema::all();
         $cursos = Cursos::all();
         $lenguajes = LenguajesProgramaciones::where('abreviatura', 'NOT LIKE', '%sql%')->get();
@@ -145,7 +147,7 @@ class ProblemasController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('problemas.index')->with('error', $e->getMessage());
         }
-        return redirect()->route('problemas.index')->with('success', 'El problema ha sido modificado');
+        return redirect()->route('problemas.index')->with('success', 'El problema ha "'.$problema->nombre.'" sido modificado');
     }
     public function eliminar(Request $request)
     {

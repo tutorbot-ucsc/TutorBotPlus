@@ -25,7 +25,6 @@ class JuecesVirtuales extends Model
             ];
         }
     }
-
     public function envios(): HasMany
     {
         return $this->hasMany(EnvioSolucionProblema::class, 'id_juez');

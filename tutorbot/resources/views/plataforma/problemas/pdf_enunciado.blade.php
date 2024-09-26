@@ -24,7 +24,9 @@
         td {
             border: 1px solid black;
             border-collapse: collapse;
-            padding: 10px;
+            padding-left: 10px;
+            padding-top: 3px;
+            padding-bottom: 3px;
         }
 
         td {
@@ -40,11 +42,6 @@
             font-size: 12px;
         }
 
-        #table_informacion {
-            margin-left: auto;
-            margin-right: auto;
-        }
-
         hr {
             margin-top: 8px;
             margin-bottom: 8px;
@@ -53,11 +50,8 @@
 </head>
 
 <body>
-    <h2>{{ $problema->nombre }} - Enunciado</h2>
-    {!! Str::markdown($problema->body_problema) !!}
-    <hr>
-    <h4>Información:</h4>
-    <div style="c">
+    <h3>Problema - {{ $problema->nombre }}</h3>
+    <div>
         <table id="table_informacion">
             <tr>
                 <td id="td_nombre">
@@ -97,6 +91,9 @@
             </tr>
         </table>
     </div>
+    <hr style="margin-top: 5px; margin-bottom:5px;">
+    <h3>Enunciado</h3>
+    {!! Str::markdown($problema->body_problema) !!}
 </body>
 
 </html>

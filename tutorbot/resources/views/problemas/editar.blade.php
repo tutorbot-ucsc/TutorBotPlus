@@ -28,6 +28,12 @@
         const lenguajes = document.getElementById("lenguajes");
         const sql_file = document.getElementById("sql_file");
         const archivos_adicionales = document.getElementById("archivos_adicionales")
+        const fecha_inicio = flatpickr("#fecha_inicio", {enableTime: true,
+            dateFormat: "d-m-Y H:i"}); 
+        const fecha_termino = flatpickr("#fecha_termino", {enableTime: true,
+            dateFormat: "d-m-Y H:i",}); 
+        fecha_inicio.setDate(Date.parse("{{old('fecha_inicio', $problema->fecha_inicio)}}"))
+        fecha_termino.setDate(Date.parse("{{old('fecha_termino', $problema->fecha_termino)}}"))
         const editor = new Editor({
             el: document.querySelector('#editor'),
             height: '600px',
