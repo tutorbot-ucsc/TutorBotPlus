@@ -21,16 +21,22 @@
                 <div class="card border-danger" style="height:100%;">
                     <div class="card-body px-5">
                         <form
+                            action="{{ route('problemas.guardar_codigo', ['codigo_problema' => $problema->codigo, 'id_curso' => $id_curso, 'id_problema' => $problema->id]) }}"
+                            method="POST" id="guardarForm">
+                            @csrf
+                            <div class="row px-5 mb-2">
+
+                                <input type="hidden" id="codigo_save" name="codigo_save">
+                                <button class="btn btn-outline-primary btn-sm" type="submit">Guardar y Volver</button>
+
+                            </div>
+                        </form>
+                        <form
                             action="{{ route('problemas.enviar', ['id_problema' => $problema->id, 'id_curso' => $id_curso]) }}"
                             method="POST" id="evaluacion_form">
                             @csrf
                             <div class="row px-5">
                                 <button class="btn btn-primary" type="submit">Enviar Solución</button>
-                            </div>
-                            <div class="row px-5 mt-2">
-                                <a class="btn btn-outline-primary btn-sm "
-                                    href="{{ route('problemas.ver', ['codigo' => $problema->codigo, 'id_curso'=> $id_curso]) }}"
-                                    role="button">Volver</a>
                             </div>
                             <h6 class="text-center mt-4">Lenguaje de Programación</h6>
                             <select class="form-select mb-3" id="lenguaje" name="lenguaje"
@@ -57,9 +63,10 @@
 @endsection
 @push('js')
     <script src="{{ asset('assets/js/ace-builds/src-min/ace.js') }}" type="text/javascript" charset="utf-8"></script>
-    <script src="{{ asset('assets/js/alertas_plataforma.js') }}"></script> 
+    <script src="{{ asset('assets/js/alertas_plataforma.js') }}"></script>
     <script>
         var editor = ace.edit("editor");
+        var formSubmited = false
         const lenguajes = {
             48: 'c_cpp',
             52: 'c_cpp',
@@ -80,14 +87,27 @@
         editor.setOptions({
             fontSize: "10pt"
         })
-        
+
 
         function change_language(item) {
             editor.session.setMode("ace/mode/" + lenguajes[item.value]);
         }
         document.querySelector('#evaluacion_form').addEventListener('submit', e => {
             e.preventDefault();
+            formSubmited = true
             submitCodigo()
+        });
+        document.querySelector('#guardarForm').addEventListener('submit', e => {
+            document.querySelector('#codigo_save').value = editor.getValue();
+            formSubmited = true
+            document.getElementById('guardarForm').submit();
+        });
+        window.addEventListener("beforeunload", function (e) {
+            if(!formSubmited){
+                e.preventDefault();
+                e.returnValue = '';
+            }
+            
         });
     </script>
 @endpush

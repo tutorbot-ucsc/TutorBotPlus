@@ -21,7 +21,7 @@
                         <div class="row px-5">
                             <a class="btn btn-primary btn-block {{ $retroalimentacion->habilitar_llm == true && $cant_retroalimentacion > 0 ? '' : 'disabled' }}"
                                 href="{{ route('envios.generar_retroalimentacion', ['token' => $token]) }}"
-                                role="button">{{ $retroalimentacion->habilitar_llm == true && $cant_retroalimentacion > 0 ? 'Generar Nueva Retroalimentacion (Cantidad Disponible: ' . $cant_retroalimentacion . ')' : 'Retroalimentación no disponible' }}</a>
+                                role="button" onclick="solicitarRetroalimentacion(event)">{{ $retroalimentacion->habilitar_llm == true && $cant_retroalimentacion > 0 ? 'Generar Nueva Retroalimentacion (Cantidad Disponible: ' . $cant_retroalimentacion . ')' : 'Retroalimentación no disponible' }}</a>
                         </div>
                         <div class="row px-5 mt-2">
                             <a class="btn btn-outline-primary text-nowrap btn-sm btn-block"
@@ -48,6 +48,7 @@
     <link rel="stylesheet" href="{{ asset('assets/js/highlightjs/styles/dark.css') }}">
 @endsection
 @push('js')
+    <script src="{{ asset('assets/js/alertas_plataforma.js') }}"></script>
     <script src="{{ asset('assets/js/highlightjs/highlight.min.js') }}" type="text/javascript"></script>
     <script>
         hljs.highlightAll();

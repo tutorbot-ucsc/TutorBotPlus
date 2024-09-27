@@ -18,3 +18,5 @@ mix.js('resources/js/app.js', 'public/js', 'public/assets/js/argon-dashboard.js'
     .sass('resources/scss/argon-dashboard.scss', 'public/assets/css/argon-dashboard.css', [
         //
     ]);
+
+mix.js('resources/js/plataforma.js', 'public/js').sass('resources/scss/plataforma.scss', 'css/plataforma.css',[]);

@@ -4,6 +4,7 @@
 @endphp
 @section('content')
     <div class="container-fluid py-3 px-4">
+        @include('components.alert')
             <div class="row">
                 <div class="col-8">
                     <div class="card border-danger" style="height:100%">

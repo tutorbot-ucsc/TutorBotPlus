@@ -305,4 +305,18 @@ class ProblemasController extends Controller
         $pdf = PDF::loadView('plataforma.problemas.pdf_enunciado', compact('problema'));
         return $pdf->download($problema->codigo.' - enunciado.pdf');
     }
+
+    public function guardar_codigo(Request $request){
+        try{
+            DB::beginTransaction();
+            $last_envio = auth()->user()->envios()->where('id_problema', '=', $request->id_problema)->where('id_curso', '=', $request->id_curso)->orderBy('created_at', 'DESC')->first();
+            $last_envio->codigo = $request->codigo_save;
+            $last_envio->save();
+            DB::commit();
+        }catch(\PDOException $e){
+            DB::rollBack();
+            return redirect()->route('problemas.resolver', ['codigo'=>$request->codigo_problema, 'id_curso'=>$request->id_curso]);
+        }
+        return redirect()->route('problemas.ver', ['codigo'=>$request->codigo_problema, 'id_curso'=>$request->id_curso])->with('succes', 'El código desarrollado ha sido almacenado');
+    }
 }
