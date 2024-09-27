@@ -18,6 +18,9 @@ class EvaluacionSolucionController extends Controller
     public function ver_evaluacion(Request $request)
     {
         $envio = EnvioSolucionProblema::where("token", "=", $request->token)->first();
+        if(!isset($envio)){
+            return redirect()->route('envios.listado')->with('error', 'El envio no se encuentra disponible');
+        }
         $problema = $envio->problema()->first();
         $highlightjs_choice = EnvioSolucionProblema::$higlightjs_language[strtolower($envio->lenguaje->abreviatura)];
         $juez = $envio->juez_virtual;

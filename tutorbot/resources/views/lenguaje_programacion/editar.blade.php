@@ -12,6 +12,7 @@
                 <div class="card-body">
                     @include('lenguaje_programacion.form')
                     <input type="submit" class="btn btn-primary" value="Editar">
+                    <a href="{{route('lenguaje_programacion.index')}}" class="btn btn-outline-primary">Volver</a>
                 </div>
             </div>
         </form>

@@ -38,7 +38,7 @@ class RolesAndPermission extends Seeder
         //Permisos adicionales
         
         //Permisos de Configuración de Large Language Model
-        $permisosLLM = ['configurar llm', 'limitar llm', 'activación de LLM'];
+        $permisosLLM = ['configurar llm', 'limitar llm', 'activación de LLM', 'acceso al panel de administración'];
         //Permisos de Problemas
         $permisosProblemas = ['resolver problemas', 'ver listado de problemas', 'ver envios'];
         //Permisos de Certamenes

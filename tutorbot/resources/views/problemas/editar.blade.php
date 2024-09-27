@@ -6,13 +6,14 @@
         @include('components.alert')
     </div>
     <div class="container-fluid py-4">
-        <form role="form" method="POST" id="problema_form" action="{{ route('problemas.update', ['id' => $problema->id]) }}"
+        <form role="form" method="POST" action="{{ route('problemas.update', ['id' => $problema->id]) }}"
             enctype="multipart/form-data" onsubmit="event.preventDefault();submitFormEditar('{{'el problema '.$problema->nombre}}')" id="editarForm">
             @csrf
             <div class="card">
                 <div class="card-body">
                     @include('problemas.form')
                     <input type="submit" class="btn btn-primary" value="Editar">
+                    <a href="{{route('problemas.index')}}" class="btn btn-outline-primary">Volver</a>
                 </div>
             </div>
         </form>
@@ -27,6 +28,13 @@
         const checkbox = document.getElementById('sql')
         const lenguajes = document.getElementById("lenguajes");
         const sql_file = document.getElementById("sql_file");
+        const archivos_adicionales = document.getElementById("archivos_adicionales")
+        const fecha_inicio = flatpickr("#fecha_inicio", {enableTime: true,
+            dateFormat: "d-m-Y H:i"}); 
+        const fecha_termino = flatpickr("#fecha_termino", {enableTime: true,
+            dateFormat: "d-m-Y H:i",}); 
+        fecha_inicio.setDate(Date.parse("{{old('fecha_inicio', $problema->fecha_inicio)}}"))
+        fecha_termino.setDate(Date.parse("{{old('fecha_termino', $problema->fecha_termino)}}"))
         const editor = new Editor({
             el: document.querySelector('#editor'),
             height: '600px',
@@ -34,17 +42,17 @@
             placeholder: 'Ingrese el enunciado del problema',
             initialValue: `{{ isset($problema) ? old('body_problema', $problema->body_problema) : old('body_problema') }}`,
         })
-        document.querySelector('#problema_form').addEventListener('submit', e => {
-            e.preventDefault();
+        document.querySelector('#editarForm').addEventListener('submit', e => {
             document.querySelector('#body_problema').value = editor.getMarkdown();
-            e.target.submit();
         });
+
         checkbox.addEventListener('change', (event) => {
             if (event.currentTarget.checked) {
                 lenguajes.disabled = true;
                 sql_file.classList.remove("d-none");
             } else {
                 sql_file.classList.add("d-none");
+                archivos_adicionales.value = ""
                 lenguajes.disabled = false;
             }
         })

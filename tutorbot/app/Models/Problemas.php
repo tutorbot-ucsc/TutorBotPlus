@@ -44,28 +44,45 @@ class Problemas extends Model
         "limite_llm" => ["nullable","numeric"],
         "archivo_adicional" => ["mimes:zip"]
     ];
+    public static function createRules(bool $boolFechaInicio, bool $boolFechaTermino, $codigo=null, $sql=false, $update=false){
+        $rules = [
+            "nombre" => ['required','max:255','string'],
+            "memoria_limite" => ["nullable","numeric"],
+            "cursos" => ["required","array","min:1"],
+            "tiempo_limite" => ["nullable", "numeric"],
+            "visible" => ["required", "boolean"],
+            "body_problema" => ["required", "string", "min:50"],
+            "body_problema_resumido" => ["string", 'nullable'],
+            "habilitar_llm" => ["boolean"],
+            "limite_llm" => ["nullable","numeric"],
+        ];
+        if(!$sql){
+            $rules["lenguajes"] = ['required', 'array', 'min:1'];
+        }else if($sql && !$update){
+            $rules["archivos_adicionales"] = ['required', 'mimes:zip'];
+        }
+        
+        if($boolFechaInicio && $boolFechaTermino){
+            $rules["fecha_inicio"] = ['date', 'nullable', 'before_or_equal:fecha_termino'];
+            $rules["fecha_termino"] = ['date', 'nullable', 'after_or_equal:fecha_inicio'];
+
+        }else{
+            $rules["fecha_inicio"] = ['date', 'nullable'];
+            $rules["fecha_termino"] = ['date', 'nullable'];
+        }
+
+        if(isset($codigo)){
+            $rules["codigo"] = ['required', 'string', 'max:100', Rule::unique('problemas')->ignore($codigo, "codigo")]; 
+        }else{
+            $rules["codigo"] = ['required', 'string', 'max:100', Rule::unique('problemas')];
+        }
+        return $rules;
+    }
     public static $llm_config_rules = [
         "habilitar_llm" => ["boolean"],
         "limite_llm" => ["nullable","numeric"],
         "body_problema_resumido" => ["string", 'nullable'],
     ];
-    public static function updateRules($codigo){
-        return 
-        [
-            "nombre" => ['required','max:255','string'],
-            "codigo" => ['required', 'string', 'max:100', Rule::unique('problemas')->ignore($codigo, "codigo")], 
-            "fecha_inicio" => ['date', 'nullable'],
-            "fecha_termino" => ['date', 'nullable'],
-            "memoria_limite" => ["nullable","numeric"],
-            "tiempo_limite" => ["nullable", "numeric"],
-            "visible" => ["required", "boolean"],
-            "body_problema" => ["required", "string", "min:50"],
-            "body_problema_resumido" => ["string" ,'nullable'],
-            "habilitar_llm" => ["boolean"],
-            "limite_llm" => ["nullable","numeric"],
-            "archivo_adicional" => ["mimes:zip"]
-        ];
-    }
     public function categorias(): BelongsToMany
     {
         return $this->belongsToMany(Categoria_Problema::class, 'pertenece', 'id_problema', 'id_categoria');

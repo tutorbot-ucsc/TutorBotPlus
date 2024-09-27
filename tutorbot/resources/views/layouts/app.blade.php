@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="icon" type="image/png" href="{{asset('img/favicon.png')}}">
+    <link rel="icon" type="image/png" href="{{asset('img/favicon.ico')}}">
     <title>
         @if(isset($title_url)){{$title_url}} - @endif TutorBot+
     </title>
@@ -18,7 +18,6 @@
     <link href="{{asset('assets/css/nucleo-svg.css')}}" rel="stylesheet" />
     <!-- CSS Files -->
     <link href="{{asset('assets/vendor/@fortawesome/fontawesome-free/css/all.min.css')}}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ mix('css/app.css') }}">
     <script src="{{ mix('js/app.js') }}" defer></script>
     <link rel="stylesheet" href="{{ mix('assets/css/argon-dashboard.css') }}">
 

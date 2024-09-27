@@ -1,4 +1,4 @@
-function submitFormEliminar(item) {
+function submitFormEliminar(item, id) {
     Swal.fire({
         title: "¿Estás seguro que quieres eliminar "+item+"?",
         icon: "warning",
@@ -7,7 +7,7 @@ function submitFormEliminar(item) {
         denyButtonText: `No`
     }).then((result) => {
         if (result.isConfirmed) {
-            document.getElementById('eliminarForm').submit();
+            document.getElementById('eliminarForm_'+id).submit();
         }
     });
 }

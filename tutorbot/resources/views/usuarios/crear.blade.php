@@ -12,11 +12,11 @@
                 <div class="card-body">
                     @include('usuarios.form')
                     <input type="submit" class="btn btn-primary" value="Crear">
+                    <a href="{{route('usuarios.index')}}" class="btn btn-outline-primary">Volver</a>
                 </div>
             </div>            
         </form>
         @include('layouts.footers.auth.footer')
-
     </div>
 @endsection
 @push('js')

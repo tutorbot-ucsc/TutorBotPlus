@@ -33,17 +33,25 @@ use App\Http\Controllers\ProblemasController;
 use App\Http\Controllers\CasosPruebasController;
 use App\Http\Controllers\EnvioSolucionProblemaController;
 use App\Http\Controllers\EvaluacionSolucionController;
+use App\Http\Controllers\InformeController;
 use App\Http\Controllers\LlmController;
-Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');
-	Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
-	Route::post('/register', [RegisterController::class, 'store'])->middleware('guest')->name('register.perform');
-	Route::get('/login', [LoginController::class, 'show'])->middleware('guest')->name('login');
-	Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login.perform');
-	Route::get('/reset-password', [ResetPassword::class, 'show'])->middleware('guest')->name('reset-password');
-	Route::post('/reset-password', [ResetPassword::class, 'send'])->middleware('guest')->name('reset.perform');
-	Route::get('/change-password', [ChangePassword::class, 'show'])->middleware('guest')->name('change-password');
-	Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
-	Route::get('/dashboard', [HomeController::class, 'index'])->name('home')->middleware('auth');
+
+if (env('APP_ENV') === 'production') {
+    \URL::forceScheme('https');
+}
+//Autenticación
+Route::get('/', function () {return redirect('/inicio');})->middleware('auth');
+Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
+Route::post('/register', [RegisterController::class, 'store'])->middleware('guest')->name('register.perform');
+Route::get('/login', [LoginController::class, 'show'])->middleware('guest')->name('login');
+Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login.perform');
+Route::get('/reset-password', [ResetPassword::class, 'show'])->middleware('guest')->name('reset-password');
+Route::post('/reset-password', [ResetPassword::class, 'send'])->middleware('guest')->name('reset.perform');
+Route::get('/change-password', [ChangePassword::class, 'show'])->middleware('guest')->name('change-password');
+Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
+Route::get('/inicio', function(){
+	return view('pages.inicio');
+})->name('home')->middleware('auth');
 
 //Plataforma de Juez Online
 Route::group(['middleware'=>'auth'], function(){
@@ -51,10 +59,15 @@ Route::group(['middleware'=>'auth'], function(){
 	Route::get('/cursos', function () {
 		return redirect()->route('cursos.listado');
 	});
+	Route::get('/home', function () {
+		return redirect()->route('cursos.listado');
+	});
 	Route::get('/cursos/{id}/problemas', [ProblemasController::class, 'listado_problemas'])->name('problemas.listado');
 	Route::get('/problema/{id_curso?}/{codigo}', [ProblemasController::class, 'ver_problema'])->name('problemas.ver');
-	Route::get('/problema/{codigo}/editorial', [ProblemasController::class, 'ver_editorial'])->name('problemas.ver_editorial');
+	Route::post('/problema/guardar_codigo', [ProblemasController::class, 'guardar_codigo'])->name('problemas.guardar_codigo');
+	Route::get('/editorial/problema/{codigo}', [ProblemasController::class, 'ver_editorial'])->name('problemas.ver_editorial');
 	Route::get('/problema/{id_curso?}/{codigo}/resolver', [ProblemasController::class, 'resolver_problema'])->name('problemas.resolver');
+	Route::get('/pdf/problema/{id_problema}', [ProblemasController::class, 'pdf_enunciado'])->name('problemas.pdf_enunciado');
 
 	Route::post('/problema/enviar', [EnvioSolucionProblemaController::class, 'enviar_solucion'])->name('problemas.enviar');
 	Route::get('/envios/{id_problema?}', [EnvioSolucionProblemaController::class, 'ver_envios'])->name('envios.listado');
@@ -65,7 +78,7 @@ Route::group(['middleware'=>'auth'], function(){
 
 
 });
-//Administración
+//Panel de Administración
 Route::group(['middleware' => 'auth'], function () {
 	Route::get('/profile', [UserProfileController::class, 'show'])->name('profile');
 	Route::post('/profile', [UserProfileController::class, 'update'])->name('profile.update');
@@ -129,5 +142,11 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/casos/eliminar', [CasosPruebasController::class, 'eliminar_caso'])->name('casos_pruebas.eliminar')->middleware('can:editar problemas'); 
 		Route::post('/casos/add', [CasosPruebasController::class, 'add_caso'])->name('casos_pruebas.add')->middleware('can:editar problemas'); 
 		Route::post('/casos/sql', [CasosPruebasController::class, 'caso_sql'])->name('casos_pruebas.set_sql')->middleware('can:editar problemas'); 
+	});
+
+	Route::prefix('informes')->group(function () {
+		Route::get('/problemas/{id}/index', [InformeController::class, 'index_problema'])->name('informes.problemas.index')->middleware('can:ver informe del problema'); 
+		Route::get('/problemas/envios/{id_curso}/{id_problema}', [InformeController::class, 'ver_informe_problema'])->name('informe.problema')->middleware('can:ver informe del problema'); 
+
 	});
 });

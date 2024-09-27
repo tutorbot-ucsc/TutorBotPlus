@@ -15,9 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->string('direccion');
-            $table->string('api_token');
+            $table->string('api_token')->nullable();
+            $table->string('authorize')->nullable();
             $table->string('host');
-            $table->enum('autenticacion', ['x-rapid-key', 'x-auth-token']);
+            $table->string('autenticacion')->nullable();
             $table->timestamps();
         });
     }

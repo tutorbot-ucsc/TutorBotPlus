@@ -47,6 +47,7 @@ class CasosPruebasController extends Controller
             if(!isset($caso)){
                 $caso = new Casos_Pruebas;
             }
+            $caso->ejemplo = true;
             $caso->salidas = $request->salidas;
             $caso->puntos = $request->puntos;
             $problema->casos_de_prueba()->save($caso);
@@ -57,7 +58,7 @@ class CasosPruebasController extends Controller
             DB::rollback();
             return redirect()->back()->with('error', $e->getMessage());
         }
-        return redirect()->route('casos_pruebas.assign', ["id"=>$caso->id_problema])->with('success', 'El caso de prueba '.$caso->id.' ha sido modificado');
+        return redirect()->route('casos_pruebas.assign', ["id"=>$caso->id_problema])->with('success', 'El caso de prueba ha sido modificado');
     }
     public function add_caso(Request $request){
 
@@ -67,9 +68,14 @@ class CasosPruebasController extends Controller
             $problema = Problemas::find( $request->id );
 
             $caso = new Casos_Pruebas;
+            if(isset($request->puntos)){
+                $caso->puntos = $request->input("puntos");
+            }
             $caso->entradas = $request->input("entradas");
             $caso->salidas = $request->input("salidas");
-            $caso->puntos = $request->input("puntos");
+            if(!isset($request->ejemplo)){
+                $caso->ejemplo = true;
+            }
             $problema->casos_de_prueba()->save($caso);
             $problema->puntaje_total = $problema->puntaje_total + $caso->puntos;
             $problema->refresh();

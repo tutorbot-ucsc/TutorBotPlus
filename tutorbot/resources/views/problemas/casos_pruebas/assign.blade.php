@@ -23,12 +23,12 @@
                             {{ session('success') }}
                         </div>
                     @endif
-                    
-                    <form action="{{route('casos_pruebas.add', ['id'=>$problema->id])}}" method="POST">
+
+                    <form action="{{ route('casos_pruebas.add', ['id' => $problema->id]) }}" method="POST">
                         @csrf
                         @include('problemas.casos_pruebas.form')
                     </form>
-                                
+                    
                     <div class="table-responsive p-0">
                         <table class="table align-items-center mb-0" id="table">
                             <thead>
@@ -43,6 +43,9 @@
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                         Puntos
                                     </th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Ejemplo
+                                    </th>
                                     @canany(['editar problemas'])
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
@@ -54,35 +57,24 @@
                                 @foreach ($casos as $item)
                                     <tr>
                                         <td>
-                                            <div class="d-flex px-3 py-1">
-                                                <div class="d-flex flex-column justify-content-center">
-                                                    <h6 class="mb-0 text-sm">{{ $item->id }}
-                                                    </h6>
-                                                </div>
-                                            </div>
+                                            <h6 class="mb-0 text-sm">{{ $item->id }}
+                                            </h6>
                                         </td>
                                         <td>
-                                            <div class="d-flex px-3 py-1">
-                                                <div class="d-flex flex-column justify-content-center">
-                                                    <h6 class="mb-0 text-sm" style="white-space: pre;">{{ $item->entradas }}
-                                                    </h6>
-                                                </div>
-                                            </div>
+                                            <h6 class="mb-0 text-sm">{{ $item->entradas }}
+                                            </h6>
                                         </td>
                                         <td>
-                                            <div class="d-flex px-3 py-1">
-                                                <div class="d-flex flex-column justify-content-center">
-                                                    <h6 class="mb-0 text-sm" style="white-space: pre;">{{ $item->salidas }}
-                                                    </h6>
-                                                </div>
-                                            </div>
+                                            <h6 class="mb-0 text-sm">{{ $item->salidas }}
+                                            </h6>
                                         </td>
                                         <td>
-                                            <div class="d-flex px-3 py-1">
-                                                <div class="d-flex flex-column justify-content-center">
-                                                    <h6 class="mb-0 text-sm" style="white-space: pre;">{{ $item->puntos }}</h6>
-                                                </div>
-                                            </div>
+                                            <h6 class="mb-0 text-sm">{{ $item->puntos }}</h6>
+
+                                        </td>
+                                        <td>
+                                            <h6 class="mb-0 text-sm">
+                                                {{ $item->ejemplo ? 'Si' : 'No' }}</h6>
                                         </td>
                                         <td class="align-middle text-end">
                                             <div class="d-flex px-3 py-1 justify-content-center align-items-center">
@@ -105,7 +97,7 @@
             </div>
         </div>
     </div>
-@include('problemas.casos_pruebas.ejemplo')
+    @include('problemas.casos_pruebas.ejemplo')
 @endsection
 @push('js')
     <link href="{{ asset('assets/js/DataTables/datatables.min.css') }}" rel="stylesheet">

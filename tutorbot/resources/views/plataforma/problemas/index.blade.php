@@ -20,7 +20,7 @@
                                 <td>{{$problema->puntaje_total}}</td>
                                 <td>{{$problema->categorias}}</td>
                                 <td>{{auth()->user()->envios()->where('id_problema', '=', $problema->id)->where('solucionado', '=', true)->exists()? 'Si':'No'}}</td>
-                                <td>{{$problema->created_at}}</td>
+                                <td>{{$problema->creado}}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -34,4 +34,5 @@
     <script src="{{ asset('assets/js/DataTables/datatables.min.js') }}"></script>
 
     <script src="{{ asset('assets/js/DataTables/gestion_initialize_es_cl.js') }}"></script>
+    
 @endpush

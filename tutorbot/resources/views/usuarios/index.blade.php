@@ -99,7 +99,7 @@
                                                     @can('eliminar usuario')
                                                         @if (auth()->user()->id != $user->id)
                                                             <form action="{{ route('usuarios.eliminar', ['id' => $user->id]) }}"
-                                                                method="POST" onsubmit="event.preventDefault();submitFormEliminar('{{'el usuario '.$user->nombre}}')" id="eliminarForm">
+                                                                method="POST" onsubmit="event.preventDefault();submitFormEliminar('{{'el usuario '.$user->nombre}}', {{$user->id}})" id="eliminarForm_{{$user->id}}">
                                                                 @csrf
                                                                 <button type="submit" class="btn btn-outline-danger"><i
                                                                         class="fa fa-fw fa-trash"></i></button>

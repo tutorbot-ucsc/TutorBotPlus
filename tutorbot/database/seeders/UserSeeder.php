@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Cursos;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\App;
 
 class UserSeeder extends Seeder
 {
@@ -24,35 +25,36 @@ class UserSeeder extends Seeder
             'email' => 'admin@tutorbot.com',
             'password' => 'admin'
         ]);
-        $estudiante = User::create([
-            'username' => 'estudiante',
-            'rut' => '22222222-2',
-            'fecha_nacimiento' => Carbon::parse('07-09-2001')->toDate(),
-            'firstname' => 'Estudiante',
-            'lastname' => 'Estudiante',
-            'email' => 'estudiante@tutorbot.com',
-            'password' => 'estudiante'
-        ]);
-        $profesor = User::create([
-            'username' => 'profesor',
-            'rut' => '33333333-3',
-            'fecha_nacimiento' => Carbon::parse('07-09-2002')->toDate(),
-            'firstname' => 'Profesor',
-            'lastname' => 'Profesor',
-            'email' => 'profesor@tutorbot.com',
-            'password' => 'profesor'
-        ]);
         $administrador->assignRole('administrador');
-        $profesor->assignRole('profesor');
-        $estudiante->assignRole('estudiante');
 
         $cursos = Cursos::all();
         foreach($cursos as $curso){
             $administrador->cursos()->save($curso);
         }
-        $curso_1 = Cursos::first();
-        $profesor->cursos()->save($curso_1);
-        $estudiante->cursos()->save($curso_1);
-
+        if(App::environment()=="local"){
+            $estudiante = User::create([
+                'username' => 'estudiante',
+                'rut' => '22222222-2',
+                'fecha_nacimiento' => Carbon::parse('07-09-2001')->toDate(),
+                'firstname' => 'Estudiante',
+                'lastname' => 'Estudiante',
+                'email' => 'estudiante@tutorbot.com',
+                'password' => 'estudiante'
+            ]);
+            $profesor = User::create([
+                'username' => 'profesor',
+                'rut' => '33333333-3',
+                'fecha_nacimiento' => Carbon::parse('07-09-2002')->toDate(),
+                'firstname' => 'Profesor',
+                'lastname' => 'Profesor',
+                'email' => 'profesor@tutorbot.com',
+                'password' => 'profesor'
+            ]);
+            $profesor->assignRole('profesor');
+            $estudiante->assignRole('estudiante');
+            $curso_1 = Cursos::first();
+            $profesor->cursos()->save($curso_1);
+            $estudiante->cursos()->save($curso_1);
+        }
     }
 }

@@ -14,7 +14,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $users = User::all()->map(function($user){
-            $user->fecha = Carbon::parse($user->created_at)->toFormattedDateString();
+            $user->fecha = Carbon::parse($user->created_at)->locale('es_ES')->isoFormat('lll');
             return $user;
         });
         return view('usuarios.index', compact('users'));

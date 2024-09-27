@@ -145,11 +145,15 @@
                                         </td>
                                         <td class="align-middle text-center text-sm">
                                             <p class="text-sm font-weight-bold mb-0">
-                                                {{ $problema->fecha ? $problema->fecha : 'Desconocido' }}</p>
+                                                {{ $problema->created_at ? $problema->creado : 'Desconocido' }}</p>
                                         </td>
                                         @canany(['editar problemas', 'editar problemas'])
                                             <td class="align-middle text-end">
                                                 <div class="d-flex px-3 py-1 justify-content-center align-items-center">
+                                                    @can('ver informe del problema')
+                                                        <a class="btn btn-outline-warning"
+                                                        href="{{ route('informes.problemas.index', ['id' => $problema->id]) }}">Informe</a>
+                                                    @endcan
                                                     @can('editar problemas')
                                                         <a class="btn btn-outline-warning"
                                                             href="{{ route('problemas.editar_config_llm', ['id' => $problema->id]) }}">LLM</a>
@@ -164,7 +168,7 @@
                                                     @endcan
                                                     @can('eliminar problemas')
                                                         <form action="{{ route('problemas.eliminar', ['id' => $problema->id]) }}"
-                                                            method="POST" onsubmit="event.preventDefault();submitFormEliminar('{{'el problema '.$problema->nombre}}')" id="eliminarForm">
+                                                            method="POST" onsubmit="event.preventDefault();submitFormEliminar('{{'el problema '.$problema->nombre}}', {{$problema->id}})" id="eliminarForm_{{$problema->id}}">
                                                             @csrf
                                                             <button type="submit" class="btn btn-outline-danger"><i
                                                                     class="fa fa-fw fa-trash"></i></button>

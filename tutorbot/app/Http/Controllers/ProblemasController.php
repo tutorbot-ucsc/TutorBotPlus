@@ -16,6 +16,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use PDF;
 
 class ProblemasController extends Controller
 {
@@ -24,14 +25,17 @@ class ProblemasController extends Controller
         $problemas = Problemas::whereHas('cursos', function (Builder $query) {
             $cursos = auth()->user()->cursos()->select('cursos.id')->pluck('id')->toArray();
             $query->whereIn('cursos.id', $cursos);
-        })->get();
+        })->get()->map(function($item){
+            $item->creado = Carbon::parse($item->created_at)->locale('es_ES')->isoFormat('lll');
+            return $item;
+        });
         return view('problemas.index', compact('problemas'));
     }
 
     public function crear()
     {
         $categorias = Categoria_Problema::all();
-        $cursos = Cursos::all();
+        $cursos = auth()->user()->cursos()->get();
         $lenguajes = LenguajesProgramaciones::where('abreviatura', 'NOT LIKE', '%sql%')->get();
         return view('problemas.crear', compact('categorias', 'cursos', 'lenguajes'))->with('accion', "crear");;
     }
@@ -39,8 +43,11 @@ class ProblemasController extends Controller
     public function editar(Request $request)
     {
         $problema = Problemas::find($request->id);
+        $problema->sql = $problema->lenguajes()->where('lenguajes_programaciones.nombre', 'LIKE', '%sql%')->exists();
+        $problema->fecha_inicio = Carbon::parse($problema->fecha_inicio)->toDateTimeString();
+        $problema->fecha_termino = Carbon::parse($problema->fecha_termino)->toDateTimeString();
         $categorias = Categoria_Problema::all();
-        $cursos = Cursos::all();
+        $cursos = auth()->user()->cursos()->get();
         $lenguajes = LenguajesProgramaciones::where('abreviatura', 'NOT LIKE', '%sql%')->get();
         return view('problemas.editar', compact('problema', 'categorias', 'lenguajes', 'cursos'))->with('accion', "editar");
     }
@@ -61,6 +68,7 @@ class ProblemasController extends Controller
                 $problema->habilitar_llm = false;
             }
             $problema->limite_llm = $request->input('limite_llm');
+            $problema->body_problema_resumido = $request->input('body_problema_resumido');
             $problema->save();
         } catch (\PDOException $e) {
             DB::rollBack();
@@ -71,7 +79,7 @@ class ProblemasController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate(Problemas::$createRules);
+        $validated = $request->validate(Problemas::createRules(isset($request->fecha_inicio), isset($request->fecha_termino), null,$request->sql));
         try {
             db::beginTransaction();
             $problema = new Problemas;
@@ -86,8 +94,8 @@ class ProblemasController extends Controller
     private static function problemaModificacion(Problemas $problema, Request $request){
             $problema->nombre = $request->input('nombre');
             $problema->codigo = $request->input('codigo');
-            $problema->fecha_inicio = $request->input('fecha_inicio');
-            $problema->fecha_termino = $request->input('fecha_termino');
+            $problema->fecha_inicio = Carbon::parse( $request->input('fecha_inicio'));
+            $problema->fecha_termino = Carbon::parse( $request->input('fecha_termino'));
             $problema->memoria_limite = $request->input('memoria_limite');
             $problema->tiempo_limite = $request->input('tiempo_limite');
             $problema->body_problema = $request->input('body_problema');
@@ -121,13 +129,17 @@ class ProblemasController extends Controller
                 $problema->lenguajes()->sync(LenguajesProgramaciones::where('abreviatura', '=', 'sql')->get()->pluck('id'));
             }else{
                 $problema->lenguajes()->sync($request->input('lenguajes'));
+                if(isset($problema->archivo_adicional)){
+                    Storage::delete('public/archivos_adicionales/'.$problema->archivo_adicional);
+                    $problema->archivo_adicional = null;
+                }
             }
             $problema->categorias()->sync($request->input('categorias'));
     }
     public function update(Request $request)
     {
 
-        $validated = $request->validate(Problemas::updateRules($request->codigo));
+        $validated = $request->validate(Problemas::createRules(isset($request->fecha_inicio),isset($request->fecha_termino),$request->codigo, $request->sql, true));
         try {
             db::beginTransaction();
             $problema = Problemas::find($request->id);
@@ -136,7 +148,7 @@ class ProblemasController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('problemas.index')->with('error', $e->getMessage());
         }
-        return redirect()->route('problemas.index')->with('success', 'El problema ha sido modificado');
+        return redirect()->route('problemas.index')->with('success', 'El problema ha "'.$problema->nombre.'" sido modificado');
     }
     public function eliminar(Request $request)
     {
@@ -184,11 +196,13 @@ class ProblemasController extends Controller
                 return redirect()->route('cursos.listados')->with('error', 'No tienes acceso al curso que estas tratando de acceder');
             }
             $curso = Cursos::find($request->id);
-            $problemas = $curso->problemas()->where('visible', '=', true)->orderBy('created_at', 'DESC')->get()->map(function ($problema) {
+            $fecha_ahora = Carbon::now();
+            $problemas = $curso->problemas()->where('visible', '=', true)->get()->map(function ($problema) {
                 $problema->puntaje_total = $problema->casos_de_prueba()->get()->pluck('puntos')->sum();
-                $problema->categorias = implode(',', $problema->categorias()->get()->pluck('nombre')->toArray());
+                $problema->categorias = implode(',', array: $problema->categorias()->get()->pluck('nombre')->toArray());
+                $problema->creado = Carbon::parse($problema->created_at)->locale('es_ES')->isoFormat('lll');
                 return $problema;
-            });
+            })->unique();
         } catch (\PDOException $e) {
             DB::rollBack();
             return redirect()->route('cursos.listado')->with('error', $e->getMessage());
@@ -205,13 +219,21 @@ class ProblemasController extends Controller
                 return redirect()->route('cursos.listado')->with('error', 'No tienes acceso al problema ' . $problema->nombre);
             }
             $problema->disponible = true;
+            $now = Carbon::now();
+            if(isset($problema->fecha_inicio)){
+            $fecha_inicio = Carbon::parse($problema->fecha_inicio);
+                if ($now->lt($fecha_inicio)) {
+                    $problema->disponible = false;
+                }
+            $problema->fecha_inicio = $fecha_inicio->locale('es_ES')->isoFormat('lll');
+            }
             if (isset($problema->fecha_termino)) {
-                $now = Carbon::now();
                 $fecha_termino = Carbon::parse($problema->fecha_termino);
                 if ($now->gt($fecha_termino)) {
                     $problema->disponible = false;
                 }
-            }
+            $problema->fecha_termino = $fecha_termino->locale('es_ES')->isoFormat('lll');
+        }
         } catch (\PDOException $e) {
             return redirect()->route('cursos.listado')->with('error', $e->getMessage());
         }
@@ -235,7 +257,7 @@ class ProblemasController extends Controller
         } catch (\PDOException $e) {
             return redirect()->route('cursos.listado')->with('error', $e->getMessage());
         }
-        return view('plataforma.problemas.ver_editorial', compact('problema'));
+        return view('plataforma.problemas.ver_editorial', compact('problema'))->with('id_curso', $request->id_curso);
     }
 
     public function resolver_problema(Request $request)
@@ -276,5 +298,25 @@ class ProblemasController extends Controller
             return redirect()->route('cursos.listado')->with('error', $e->getMessage());
         }
         return view('plataforma.problemas.resolver_problema', compact('problema', 'lenguajes', 'jueces', 'codigo'))->with('id_curso', $request->id_curso);
+    }
+
+    public function pdf_enunciado(Request $request){
+        $problema = Problemas::with(['categorias', 'lenguajes'])->find($request->id_problema);
+        $pdf = PDF::loadView('plataforma.problemas.pdf_enunciado', compact('problema'));
+        return $pdf->download($problema->codigo.' - enunciado.pdf');
+    }
+
+    public function guardar_codigo(Request $request){
+        try{
+            DB::beginTransaction();
+            $last_envio = auth()->user()->envios()->where('id_problema', '=', $request->id_problema)->where('id_curso', '=', $request->id_curso)->orderBy('created_at', 'DESC')->first();
+            $last_envio->codigo = $request->codigo_save;
+            $last_envio->save();
+            DB::commit();
+        }catch(\PDOException $e){
+            DB::rollBack();
+            return redirect()->route('problemas.resolver', ['codigo'=>$request->codigo_problema, 'id_curso'=>$request->id_curso]);
+        }
+        return redirect()->route('problemas.ver', ['codigo'=>$request->codigo_problema, 'id_curso'=>$request->id_curso])->with('succes', 'El código desarrollado ha sido almacenado');
     }
 }

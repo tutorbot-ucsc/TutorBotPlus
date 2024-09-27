@@ -90,7 +90,7 @@
                                                     @endcan
                                                     @can('eliminar lenguaje de programación')
                                                         <form action="{{ route('lenguaje_programacion.eliminar', ['id' => $item->id]) }}"
-                                                            method="POST" onsubmit="event.preventDefault();submitFormEliminar('{{'el lenguaje '.$item->nombre}}')" id="eliminarForm">
+                                                            method="POST" onsubmit="event.preventDefault();submitFormEliminar('{{'el lenguaje '.$item->nombre}}', {{$item->id}})" id="eliminarForm_{{$item->id}}">
                                                             @csrf
                                                             <button type="submit" class="btn btn-outline-danger"><i
                                                                 class="fa fa-fw fa-trash"></i></button>
