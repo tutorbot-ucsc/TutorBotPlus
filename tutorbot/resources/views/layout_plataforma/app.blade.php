@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{{ $title_html ? $title_html . ' - ' : '' }}Tutorbot+</title>
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-    <link rel="icon" type="image/x-icon" href="{{ asset('img/favicon.png') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('img/favicon.ico') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/plataforma.css') }}" rel="stylesheet">
     <script src="{{ mix('js/plataforma.js') }}" defer></script>
     <link rel="stylesheet" href="{{ mix('css/plataforma.css') }}">

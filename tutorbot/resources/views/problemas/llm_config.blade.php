@@ -12,6 +12,7 @@
                 <div class="card-body">
                     @include('problemas.form_llm')
                     <input type="submit" class="btn btn-primary" value="Configurar">
+                    <a href="{{route('problemas.index')}}" class="btn btn-outline-primary">Volver</a>
                 </div>
             </div>
         </form>

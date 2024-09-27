@@ -12,6 +12,7 @@
                 <div class="card-body">
                     @include('cursos.form')
                     <input type="submit" class="btn btn-primary" value="Crear">
+                    <a href="{{route('cursos.index')}}" class="btn btn-outline-primary">Volver</a>
                 </div>
             </div>            
         </form>

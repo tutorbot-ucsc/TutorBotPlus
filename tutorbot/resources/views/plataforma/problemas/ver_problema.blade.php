@@ -38,6 +38,13 @@
                             <div class="row px-5 mt-2">
                                 <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block" href="{{route('envios.listado', ['id_problema'=>$problema->id])}}" role="button">Ver Mis Envios</a></div>
                             </div>
+                            @can('ver informe del problema')
+                            <div class="row px-5 mt-2 mb-2">
+                                <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block"
+                                    href="{{ route('informe.problema', ['id_curso' => $id_curso, 'id_problema' => $problema->id]) }}"
+                                    role="button">Ver Informe del Problema</a>
+                            </div>
+                            @endcan
                             <p class="ms-4"> <strong>Puntos:</strong> {{$problema->casos_de_prueba()->sum('puntos')}}</p>
                             <p class="ms-4 mt-1"><strong>Límite de Tiempo:</strong> {{$problema->tiempo_limite? $problema->tiempo_limite.' s' : 'No definido'}}</p>
                             <p class="ms-4 mt-1"><strong>Límite de Memoria:</strong> {{$problema->memoria_limite? $problema->memoria_limite.' KB' : 'No definido'}}</p>

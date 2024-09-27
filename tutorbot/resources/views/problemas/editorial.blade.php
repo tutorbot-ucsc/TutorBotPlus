@@ -19,6 +19,7 @@
                         <div id="editor" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></div>
                     </div>
                     <input type="submit" class="btn btn-primary mt-3" value="Editar">
+                    <a href="{{route('problemas.index')}}" class="btn btn-outline-primary">Volver</a>
 
         </form>
         @include('layouts.footers.auth.footer')

@@ -33,9 +33,14 @@ use App\Http\Controllers\ProblemasController;
 use App\Http\Controllers\CasosPruebasController;
 use App\Http\Controllers\EnvioSolucionProblemaController;
 use App\Http\Controllers\EvaluacionSolucionController;
+use App\Http\Controllers\InformeController;
 use App\Http\Controllers\LlmController;
+
+if (env('APP_ENV') === 'production') {
+    \URL::forceScheme('https');
+}
 //Autenticación
-Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');
+Route::get('/', function () {return redirect('/inicio');})->middleware('auth');
 Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
 Route::post('/register', [RegisterController::class, 'store'])->middleware('guest')->name('register.perform');
 Route::get('/login', [LoginController::class, 'show'])->middleware('guest')->name('login');
@@ -44,7 +49,9 @@ Route::get('/reset-password', [ResetPassword::class, 'show'])->middleware('guest
 Route::post('/reset-password', [ResetPassword::class, 'send'])->middleware('guest')->name('reset.perform');
 Route::get('/change-password', [ChangePassword::class, 'show'])->middleware('guest')->name('change-password');
 Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
-Route::get('/dashboard', [HomeController::class, 'index'])->name('home')->middleware('auth');
+Route::get('/inicio', function(){
+	return view('pages.inicio');
+})->name('home')->middleware('auth');
 
 //Plataforma de Juez Online
 Route::group(['middleware'=>'auth'], function(){
@@ -135,5 +142,11 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/casos/eliminar', [CasosPruebasController::class, 'eliminar_caso'])->name('casos_pruebas.eliminar')->middleware('can:editar problemas'); 
 		Route::post('/casos/add', [CasosPruebasController::class, 'add_caso'])->name('casos_pruebas.add')->middleware('can:editar problemas'); 
 		Route::post('/casos/sql', [CasosPruebasController::class, 'caso_sql'])->name('casos_pruebas.set_sql')->middleware('can:editar problemas'); 
+	});
+
+	Route::prefix('informes')->group(function () {
+		Route::get('/problemas/{id}/index', [InformeController::class, 'index_problema'])->name('informes.problemas.index')->middleware('can:ver informe del problema'); 
+		Route::get('/problemas/envios/{id_curso}/{id_problema}', [InformeController::class, 'ver_informe_problema'])->name('informe.problema')->middleware('can:ver informe del problema'); 
+
 	});
 });

@@ -1,6 +1,6 @@
 @extends('layout_plataforma.app', ['title_html' => $problema->nombre, 'title' => 'Problema - ' . $problema->nombre . ' - Resolver'])
 @section('content')
-    <div class="container-fluid px-4">
+    <div class="container-fluid px-4 pb-4">
         @include('components.alert')
         <div class="row">
             <div class="col">

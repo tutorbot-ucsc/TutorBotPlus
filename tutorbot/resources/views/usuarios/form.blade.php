@@ -88,7 +88,7 @@
             @foreach ($roles as $role)  
                 <div class="form-check form-check-inline" id="roles">
                     <input class="form-check-input" type="checkbox" id="rol_{{ $role->id }}"
-                        name="roles[]" value="{{ $role->name }}" @if(isset($user) && $user->hasRole($role->name)) checked @endif>
+                        name="roles[]" value="{{ $role->name }}" @if(isset($user) && $user->hasRole($role->name)) checked @endif @if(isset($user) && $role->name=="administrador" && $user->id == auth()->user()->id) disabled @endif>
                     <label class="form-check-label" for="rol_{{ $role->id }}">{{ ucFirst($role->name) }}</label>
                 </div>
             @endforeach

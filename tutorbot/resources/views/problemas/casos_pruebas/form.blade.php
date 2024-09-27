@@ -33,5 +33,6 @@
         <button type="button" class="btn bg-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#ejemplo_modal">
             Ver Ejemplo
         </button>
+        <a href="{{route('problemas.index')}}" class="btn bg-outline-primary mt-2">Volver</a>
     </div>
 </div>

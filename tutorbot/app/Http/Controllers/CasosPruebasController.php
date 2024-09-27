@@ -47,6 +47,7 @@ class CasosPruebasController extends Controller
             if(!isset($caso)){
                 $caso = new Casos_Pruebas;
             }
+            $caso->ejemplo = true;
             $caso->salidas = $request->salidas;
             $caso->puntos = $request->puntos;
             $problema->casos_de_prueba()->save($caso);
