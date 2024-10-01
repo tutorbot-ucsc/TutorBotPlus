@@ -12,7 +12,7 @@
                 <div class="card-body">
                     <p>Para insertar usuarios de manera masiva, debe subir un archivo .csv con la información personal de los usuarios, cursos y roles.
                         <br><strong>Debe seguir el siguiente orden:</strong> 
-                        <br><strong>Nombre de Usuario, Nombre, Apellido, Correo, los códigos de los cursos en un array, los nombres de los roles en un array.</strong>
+                        <br><strong>Nombre de Usuario, Nombre, Apellido, Correo, Rut, Fecha de Nacimiento, los códigos de los cursos en un array, los nombres de los roles en un array.</strong>
                        <br><a href="{{asset('examples/ejemplo_bulk_usuarios.csv')}}" style="color: blue;" download>Haga click aquí</a> para descargar el archivo ejemplo de csv.
                     </p>
                     <p>La contraseña se asigna de manera automática y es el rut del usuario.</p>

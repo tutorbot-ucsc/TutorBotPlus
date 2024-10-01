@@ -40,6 +40,7 @@ class InformeController extends Controller
         ->select("envio_solucion_problemas.token","envio_solucion_problemas.id_curso", "envio_solucion_problemas.id_problema","users.firstname", "users.lastname", "users.rut", 'envio_solucion_problemas.token', 'envio_solucion_problemas.cant_casos_resuelto','envio_solucion_problemas.puntaje','lenguajes_programaciones.nombre as nombre_lenguaje', 'envio_solucion_problemas.solucionado', 'envio_solucion_problemas.inicio', 'envio_solucion_problemas.termino', 'ultima_evaluacion.resultado', 'ultima_evaluacion.estado', DB::raw('count(casos__pruebas.id) as total_casos'))
         ->where("envio_solucion_problemas.id_curso", "=", $request->id_curso)
         ->where("envio_solucion_problemas.id_problema", "=", $request->id_problema)
+        ->whereNotNull("termino")
         ->groupBy("envio_solucion_problemas.token","envio_solucion_problemas.id_curso", "envio_solucion_problemas.id_problema","users.firstname", "users.lastname", "users.rut", 'envio_solucion_problemas.token', 'envio_solucion_problemas.cant_casos_resuelto','envio_solucion_problemas.puntaje','lenguajes_programaciones.nombre', 'envio_solucion_problemas.solucionado', 'envio_solucion_problemas.inicio', 'envio_solucion_problemas.termino', 'ultima_evaluacion.resultado', 'ultima_evaluacion.estado')
         ->orderBy("envio_solucion_problemas.created_at", "DESC")
         ->orderBy("users.firstname", "ASC");
