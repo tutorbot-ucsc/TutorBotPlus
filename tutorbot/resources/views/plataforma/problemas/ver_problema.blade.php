@@ -33,7 +33,7 @@
                             <div class="row px-5 mt-2">
                                 <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block {{ isset($problema->body_editorial) ? '' : 'disabled' }}"
                                     href="{{route('problemas.ver_editorial', ['codigo'=>$problema->codigo, 'id_curso'=>$id_curso])}}"
-                                    role="button">{{ isset($problema->body_editorial) ? 'Ver Editorial' : 'Editorial No Disponible' }}</a>
+                                    role="button">{{ isset($problema->body_editorial) ? 'Ver Pistas' : 'Pistas No Disponible' }}</a>
                             </div>
                             <div class="row px-5 mt-2">
                                 <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block" href="{{route('envios.listado', ['id_problema'=>$problema->id])}}" role="button">Ver Mis Envios</a></div>

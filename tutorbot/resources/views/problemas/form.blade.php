@@ -24,6 +24,7 @@
             @enderror
         </div>
     </div>
+    
     <div class="col-md-6">
         <div class="form-group has-danger">
             <label for="fecha_inicio" class="form-control-label @error('fecha_inicio') is-invalid @enderror">Fecha de
@@ -160,7 +161,7 @@
 </div>
 <div id="sql_file" class="@if ((isset($problema) && $problema->sql == false ) || (!isset($problema)) && old('sql', false)==false)) d-none @endif">
     <p class="text-uppercase text-sm">Base de Datos (Solo para problemas de SQL)</p>
-    <p class="text-sm">En caso de que sea un problema de SQL, suba el archivo de la base de datos comprimido en .zip
+    <p class="text-sm">En caso de que sea un problema de SQL, suba el archivo de la base de datos en .sqlite comprimido en .zip
         que se utilizara para realizar las consultas.</p>
     <div class="mb-3">
         <input class="form-control form-control-sm" id="archivos_adicionales" name="archivos_adicionales"

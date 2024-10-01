@@ -27,9 +27,9 @@
         const sql_file = document.getElementById("sql_file");
         const archivos_adicionales = document.getElementById("archivos_adicionales")
         const fecha_inicio = flatpickr("#fecha_inicio", {enableTime: true,
-            dateFormat: "d-m-Y H:i",defaultDate:'null'}); // flatpickr
+            dateFormat: "d-m-Y H:i",defaultDate:'null', minDate: new Date(),}); // flatpickr
         const fecha_termino = flatpickr("#fecha_termino", {enableTime: true,
-            dateFormat: "d-m-Y H:i",defaultDate:'null'}); // flatpickr
+            dateFormat: "d-m-Y H:i",defaultDate:'null', minDate: new Date(),}); // flatpickr
             fecha_inicio.setDate(Date.parse("{{old('fecha_inicio')}}"))
             fecha_termino.setDate(Date.parse("{{old('fecha_termino')}}"))
         const editor = new Editor({

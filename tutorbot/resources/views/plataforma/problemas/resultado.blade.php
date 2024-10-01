@@ -108,8 +108,8 @@
                         @can('ver informe del problema')
                         <div class="row px-5 mt-2">
                             <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block"
-                                href="{{ route('informe.problema', ['id_curso' => $envio->id_curso, 'id_problema' => $envio->id_problema]) }}"
-                                role="button">Volver al Informe del problema</a>
+                                href="{{ route('informe.envios.problema', ['id_curso' => $envio->id_curso, 'id_problema' => $envio->id_problema]) }}"
+                                role="button">Volver a los envios del problema</a>
                         </div>
                         @endcan
                     </div>

@@ -27,6 +27,8 @@ class ProblemasController extends Controller
             $query->whereIn('cursos.id', $cursos);
         })->get()->map(function($item){
             $item->creado = Carbon::parse($item->created_at)->locale('es_ES')->isoFormat('lll');
+            $item->fecha_inicio = Carbon::parse($item->fecha_inicio)->locale('es_ES')->isoFormat('lll');
+            $item->fecha_termino = Carbon::parse($item->fecha_termino)->locale('es_ES')->isoFormat('lll');
             return $item;
         });
         return view('problemas.index', compact('problemas'));

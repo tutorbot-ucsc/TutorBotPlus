@@ -78,7 +78,6 @@ class EnvioSolucionProblemaController extends Controller
         if ($resultado["estado"]) {
             return redirect()->route('envios.ver', ["token" => $envio->token]);
         } else {
-            $envio->delete();
             return back()->with('error', $resultado["mensaje"])->with("codigo", $request->codigo);
         }
     }
@@ -138,8 +137,9 @@ class EnvioSolucionProblemaController extends Controller
             return ["estado" => false, "mensaje" => $e->getMessage()];
         }
         try {
+            DB::beginTransaction();
             for ($i = 0; $i < sizeof($batch_submissions); $i++) {
-                DB::beginTransaction();
+                
                 $evaluacion = new EvaluacionSolucion;
                 $evaluacion->token = $data[$i]['token'];
                 $evaluacion->envio()->associate($envio);
@@ -147,8 +147,8 @@ class EnvioSolucionProblemaController extends Controller
                     $evaluacion->casos_pruebas()->associate($casos[$i]);
                 }
                 $evaluacion->save();
-                DB::commit();
             }
+            DB::commit();
         } catch (\PDOException $e) {
             DB::rollBack();
             return ["estado" => false, "mensaje" => "Error en el ingreso de evaluaciones a la base de datos"];

@@ -21,9 +21,8 @@ class LenguajesProgramacionesSeeder extends Seeder
             "C (GCC 9.2.0)" => ["50", ".c", "C"],
             "C++ (GCC 9.2.0)" => ["54", ".cpp", "C++"],
             "C# (Mono 6.6.0.161)" => ["51", ".cs", "C#"],
-            "Java (JDK 17.0.6)" => ["91", ".java", "Java"],
+            "Java (OpenJDK 13.0.1)" => ["62", ".java", "Java"],
             "Python (2.7.17)" => ["70", ".py", "py"],
-            "Python (3.11.2)" => ["92", ".py", "py"],
             "Python (3.8.1)" => ["71", ".py", "py"],
             "SQL (SQLite 3.27.2)" => ["82", ".sql", "sql"],
         ];

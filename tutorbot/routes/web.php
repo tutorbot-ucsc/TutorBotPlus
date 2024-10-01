@@ -88,6 +88,9 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::prefix('usuarios')->group(function () {
 		Route::get('/index', [UserController::class, 'index'])->name('usuarios.index')->middleware('can:ver usuario'); 
 		Route::get('/crear', [UserController::class, 'crear'])->name('usuarios.crear')->middleware('can:crear usuario'); 
+		Route::get('/bulk_insert', [UserController::class, 'bulk_insertion_form'])->name('usuarios.bulk')->middleware('can:crear usuario'); 
+		Route::get('/bulk_insert/ejemplo', [UserController::class, 'bulk_insertion_example'])->name('usuarios.bulk_ejemplo')->middleware('can:crear usuario'); 
+		Route::post('/bulk_insert/store', [UserController::class, 'bulk_insertion'])->name('usuarios.bulk_store')->middleware('can:crear usuario'); 
 		Route::get('/editar', [UserController::class, 'editar'])->name('usuarios.editar')->middleware('can:editar usuario'); 
 		Route::post('/eliminar', [UserController::class, 'eliminar'])->name('usuarios.eliminar')->middleware('can:eliminar usuario'); 
 		Route::post('/store', [UserController::class, 'store'])->name('usuarios.store')->middleware('can:crear usuario'); 
@@ -146,7 +149,8 @@ Route::group(['middleware' => 'auth'], function () {
 
 	Route::prefix('informes')->group(function () {
 		Route::get('/problemas/{id}/index', [InformeController::class, 'index_problema'])->name('informes.problemas.index')->middleware('can:ver informe del problema'); 
-		Route::get('/problemas/envios/{id_curso}/{id_problema}', [InformeController::class, 'ver_informe_problema'])->name('informe.problema')->middleware('can:ver informe del problema'); 
+		Route::get('/problemas/envios/{id_curso}/{id_problema}/{id_usuario?}', [InformeController::class, 'ver_envios_problema'])->name('informe.envios.problema')->middleware('can:ver informe del problema'); 
+		Route::get('/problemas/informe/{id_curso}/{id_problema}', [InformeController::class, 'ver_informe_problema'])->name('informe.problema')->middleware('can:ver informe del problema'); 
 
 	});
 });

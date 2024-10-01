@@ -1,16 +1,14 @@
-@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100', 'title_url' => 'Informe de Problemas'])
+@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100', 'title_url' => 'Envios del Problema'])
 
 @section('content')
-    @include('layouts.navbars.auth.topnav', [
-        'title' => 'Informe del Problema "' . $problema->nombre . '"',
-    ])
+    @include('layouts.navbars.auth.topnav', ['title' => 'Envios del Problema "'.$problema->nombre.'"'])
     <div class="row mt-4 mx-4">
         <div class="col-12">
             <div class="card mb-4">
                 <div class="card-header pb-0">
                     <div class="d-flex justify-content-between">
-                        <h6>Cursos asociados al problema</h6>
-                        <a href="{{route('problemas.index')}}" class="btn btn-outline-primary">Volver</a>
+                        <h6>Envios</h6>
+                        <a href="{{route('informes.problemas.index', ['id'=>$problema->id])}}" class="btn btn-outline-primary">Volver</a>
                     </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
@@ -28,16 +26,22 @@
                         <table class="table align-items-center mb-0" id="table">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre Completo
                                     </th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Código
+                                        Rut
                                     </th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Cantidad de Intentos
+                                        Lenguaje
                                     </th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Cantidad de Resueltos
+                                        Estado
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Casos Resueltos
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Puntaje
                                     </th>
                                     @canany(['ver informe del problema'])
                                         <th
@@ -47,28 +51,38 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($cursos as $curso)
+                                @foreach ($envios as $envio)
                                     <tr>
                                         <td>
-                                            <h6 class="mb-0 text-sm">{{ $curso->nombre }}</h6>
+                                            <div class="d-flex px-3 py-1">
+                                                <div class="d-flex flex-column justify-content-center">
+                                                    <h6 class="mb-0 text-sm">{{ $envio->firstname }} {{$envio->lastname}}</h6>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td>
-                                            <h6 class="mb-0 text-sm">{{ $curso->codigo }}</h6>
+                                            <div class="d-flex px-3 py-1">
+                                                <div class="d-flex flex-column justify-content-center">
+                                                    <h6 class="mb-0 text-sm">{{ $envio->rut }}</h6>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td>
-                                            <h6 class="mb-0 text-sm">{{ $curso->cantidad_intentos }}</h6>
+                                            <div class="d-flex px-3 py-1">
+                                                <div class="d-flex flex-column justify-content-center">
+                                                    <h6 class="mb-0 text-sm">{{ $envio->nombre_lenguaje }}</h6>
+                                                </div>
+                                            </div>
                                         </td>
-                                        <td>
-                                            <h6 class="mb-0 text-sm">{{ $curso->cantidad_resueltos }}</h6>
-                                        </td>
+                                        <td><span class="badge @if($envio->solucionado==true) bg-gradient-success @elseif($envio->estado == "Error" || $envio->estado == "Rechazado") bg-gradient-danger @else bg-gradient-warning @endif">{{$envio->solucionado == true? 'Accepted' : ($envio->estado=="Rechazado" || $envio->estado=="Error"? $envio->resultado : "In Process")}}</span></td>
+                                        <td>{{$envio->cant_casos_resuelto}} de {{$envio->total_casos}}</td>
+                                        <td>{{$envio->puntaje}}</td>
                                         @canany(['ver informe del problema'])
                                             <td class="align-middle text-end">
                                                 <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                     @can('ver informe del problema')
                                                         <a class="btn btn-outline-warning"
-                                                            href="{{ route('informe.envios.problema', ['id_curso' => $curso->id_curso, 'id_problema' => $problema->id]) }}">Envios</a>
-                                                            <a class="btn btn-outline-warning"
-                                                            href="{{ route('informe.problema', ['id_curso' => $curso->id_curso, 'id_problema' => $problema->id]) }}">Informe</a>
+                                                        href="{{ route('envios.ver', ['token' => $envio->token]) }}">Ver</a>
                                                     @endcan
                                                 </div>
                                             </td>
