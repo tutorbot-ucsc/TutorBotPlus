@@ -45,7 +45,9 @@ class UserController extends Controller
             'csvFile' => 'required|mimes:csv,txt',
         ]);
         $contenido = file_get_contents($request->file('csvFile')->getRealPath());
+        //remover caracteres especiales
         $contenido = str_replace("\u{FEFF}", "", $contenido);
+        //dividir el contenido por el separador de break space. Lo que transforma en un array de strings, donde cada elemento es un usuario.
         $string_arrays = explode("\r\n", $contenido);
         try {
             DB::beginTransaction();

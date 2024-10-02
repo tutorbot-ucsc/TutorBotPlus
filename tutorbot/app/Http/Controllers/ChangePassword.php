@@ -39,7 +39,7 @@ class ChangePassword extends Controller
             ]);
             return redirect('login');
         } else {
-            return back()->with('error', 'Your email does not match the email who requested the password change');
+            return back()->with('error', 'Su correo electrónico no coincide con el correo electrónico que solicitó el cambio de contraseña.');
         }
     }
 }
