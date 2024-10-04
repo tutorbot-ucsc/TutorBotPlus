@@ -1,4 +1,3 @@
-
 <p class="text-uppercase text-sm">Información del Problema</p>
 <p class="text-sm text-danger">* Obligatorio</p>
 <div class="row">
@@ -24,15 +23,19 @@
             @enderror
         </div>
     </div>
-    
+
     <div class="col-md-6">
         <div class="form-group has-danger">
             <label for="fecha_inicio" class="form-control-label @error('fecha_inicio') is-invalid @enderror">Fecha de
                 Inicio</label>
-            <p class="opacity-25"><small>Indica la disponibilidad del problema, en caso de no ingresar estará disponible
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="set_fecha_inicio" name="set_fecha_inicio" value="1" @if(isset($problema->fecha_inicio) || old('set_fecha_inicio', false) == true) checked @endif>
+                <label class="form-check-label" for="set_fecha_inicio">Establecer Fecha de Inicio</label>
+            </div>
+            <p class="opacity-25 fecha_inicio_class @if(!isset($problema->fecha_inicio) && old('set_fecha_inicio', false) == false) d-none @endif"><small>Indica la disponibilidad del problema, en caso de no ingresar estará disponible
                     de manera
                     inmediata.</small></p>
-            <input class="form-control" type="date" name="fecha_inicio" id="fecha_inicio">
+            <input class="form-control fecha_inicio_class @if(!isset($problema->fecha_inicio) && old('set_fecha_inicio', false) == false) d-none @endif" type="date" name="fecha_inicio" id="fecha_inicio" @if(!isset($problema->fecha_inicio) && old('set_fecha_inicio', false) == false) disabled @endif value="{{isset($problema)? old('fecha_inicio', $problema->fecha_inicio) : old('fecha_inicio')}}">
             @error('fecha_inicio')
                 <p class="text-danger text-xs pt-1"> {{ $message }} </p>
             @enderror
@@ -41,10 +44,14 @@
     <div class="col-md-6">
         <div class="form-group has-danger">
             <label for="fecha_termino" class="form-control-label">Fecha de Termino</label>
-            <p class="opacity-25"><small>Indica hasta que fecha estara disponible el problema, en caso de no ingresar
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="set_fecha_termino" name="set_fecha_termino" value="1" @if(isset($problema->fecha_termino) || old('set_fecha_termino', false) == true) checked @endif>
+                <label class="form-check-label" for="set_fecha_termino">Establecer Fecha de Termino</label>
+            </div>
+            <p class="opacity-25 fecha_termino_class @if(!isset($problema->fecha_termino) && old('set_fecha_termino', false) == false) d-none @endif"><small>Indica hasta que fecha estara disponible el problema, en caso de no ingresar
                     estara disponible hasta que el usuario desee editarlo, eliminarlo o ocultarlo.</small></p>
-            <input class="form-control @error('fecha_termino') is-invalid @enderror" type="date" name="fecha_termino"
-                id="fecha_termino">
+            <input class="form-control fecha_termino_class @if(!isset($problema->fecha_termino) && old('set_fecha_termino', false) == false) d-none @endif  @error('fecha_termino') is-invalid @enderror" type="date" name="fecha_termino"
+                id="fecha_termino" @if(!isset($problema->fecha_termino) && old('set_fecha_termino', false) == false) disabled @endif value="{{isset($problema)? old('fecha_termino', $problema->fecha_termino) : old('fecha_termino')}}">
             @error('fecha_termino')
                 <p class="text-danger text-xs pt-1"> {{ $message }} </p>
             @enderror
@@ -111,8 +118,10 @@
         <label for="cursos">(Mantenga pulsado CTRL o CMD para seleccionar más de un curso)</label>
         <select multiple class="form-control" id="cursos" name="cursos[]">
             @foreach ($cursos as $curso)
-                <option value="{{ $curso->id }}" @if ((isset($problema) &&
-                        $problema->cursos()->get()->contains($curso->id)) || (old('cursos') && in_array($curso->id, old('cursos')))) selected @endif>
+                <option value="{{ $curso->id }}" @if (
+                    (isset($problema) &&
+                        $problema->cursos()->get()->contains($curso->id)) ||
+                        (old('cursos') && in_array($curso->id, old('cursos')))) selected @endif>
                     {{ $curso->nombre }}</option>
             @endforeach
         </select>
@@ -128,8 +137,10 @@
         <label for="categorias">(Mantenga pulsado CTRL o CMD para seleccionar más de un curso)</label>
         <select multiple class="form-control" id="categorias" name="categorias[]">
             @foreach ($categorias as $categoria)
-                <option value="{{ $categoria->id }}" @if ((isset($problema) &&
-                        $problema->categorias()->get()->contains($categoria->id)) || (old('categorias') && in_array($categoria->id, old('categorias')))) selected @endif>
+                <option value="{{ $categoria->id }}" @if (
+                    (isset($problema) &&
+                        $problema->categorias()->get()->contains($categoria->id)) ||
+                        (old('categorias') && in_array($categoria->id, old('categorias')))) selected @endif>
                     {{ $categoria->nombre }}</option>
             @endforeach
         </select>
@@ -149,8 +160,10 @@
         <select multiple class="form-control" id="lenguajes" name="lenguajes[]"
             @if ((isset($problema) && $problema->sql) || old('sql')) disabled @endif>
             @foreach ($lenguajes as $lenguaje)
-                <option value="{{ $lenguaje->id }}" @if ((isset($problema) &&
-                        $problema->lenguajes()->get()->contains($lenguaje->id))|| (old('lenguajes') && in_array($lenguaje->id, old('lenguajes'))) ) selected @endif>
+                <option value="{{ $lenguaje->id }}" @if (
+                    (isset($problema) &&
+                        $problema->lenguajes()->get()->contains($lenguaje->id)) ||
+                        (old('lenguajes') && in_array($lenguaje->id, old('lenguajes')))) selected @endif>
                     {{ $lenguaje->nombre }}</option>
             @endforeach
         </select>
@@ -159,9 +172,10 @@
         <p class="text-danger text-xs pt-1"> {{ $message }} </p>
     @enderror
 </div>
-<div id="sql_file" class="@if ((isset($problema) && $problema->sql == false ) || (!isset($problema)) && old('sql', false)==false)) d-none @endif">
+<div id="sql_file" class="@if ((isset($problema) && $problema->sql == false) || (!isset($problema) && old('sql', false) == false)) ) d-none @endif">
     <p class="text-uppercase text-sm">Base de Datos (Solo para problemas de SQL)</p>
-    <p class="text-sm">En caso de que sea un problema de SQL, suba el archivo de la base de datos en .sqlite comprimido en .zip
+    <p class="text-sm">En caso de que sea un problema de SQL, suba el archivo de la base de datos en .sqlite comprimido
+        en .zip
         que se utilizara para realizar las consultas.</p>
     <div class="mb-3">
         <input class="form-control form-control-sm" id="archivos_adicionales" name="archivos_adicionales"

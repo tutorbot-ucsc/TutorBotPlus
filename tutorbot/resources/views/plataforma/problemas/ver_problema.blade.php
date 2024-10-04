@@ -5,9 +5,9 @@
 @section('content')
     <div class="container-fluid py-3 px-4">
         @include('components.alert')
-            <div class="row">
+            <div class="row mb-3">
                 <div class="col-8">
-                    <div class="card border-danger" style="height:100%">
+                    <div class="card border-danger overflow-auto" style="height:40rem">
                         <div class="card-header">
                             Enunciado
                         </div>
@@ -20,7 +20,7 @@
                     </div>
                 </div>
                 <div class="col-4 col-sm-4">
-                    <div class="card border-danger" style="height:100%">
+                    <div class="card border-danger" style="height:40rem">
                         <div class="card-body px-5">
                             <div class="row px-5">
                                 <a class="btn btn-primary text-nowrap btn-block {{ $problema->disponible? '' : 'disabled' }}" @if(isset($id_curso))href="{{route('problemas.resolver', ['codigo'=>$problema->codigo, 'id_curso'=>$id_curso])}}"@endif

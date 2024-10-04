@@ -23,6 +23,8 @@
 <script src="{{ asset('assets/js/alertas_administracion.js') }}"></script> 
     <script type="module">
         const checkbox = document.getElementById('sql')
+        const checkbox_fecha_inicio = document.getElementById('set_fecha_inicio')
+        const checkbox_fecha_termino = document.getElementById('set_fecha_termino')
         const lenguajes = document.getElementById("lenguajes");
         const sql_file = document.getElementById("sql_file");
         const archivos_adicionales = document.getElementById("archivos_adicionales")
@@ -51,6 +53,38 @@
                 sql_file.classList.add("d-none");
                 archivos_adicionales.value = ""
                 lenguajes.disabled = false;
+            }
+        })
+
+        checkbox_fecha_inicio.addEventListener('change', (event) => {
+            if (event.currentTarget.checked) {
+                document.getElementById('fecha_inicio').disabled = false;
+                let elementos = document.querySelectorAll('.fecha_inicio_class')
+                for (var i = 0; i < elementos.length; ++i) {
+                    elementos[i].classList.remove('d-none');
+                }
+            } else {
+                let elementos = document.querySelectorAll('.fecha_inicio_class')
+                for (var i = 0; i < elementos.length; ++i) {
+                    elementos[i].classList.add('d-none');
+                }
+                document.getElementById('fecha_inicio').disabled = true;
+            }
+        })
+
+        checkbox_fecha_termino.addEventListener('change', (event) => {
+            if (event.currentTarget.checked) {
+                document.getElementById('fecha_termino').disabled = false;
+                let elementos = document.querySelectorAll('.fecha_termino_class')
+                for (var i = 0; i < elementos.length; ++i) {
+                    elementos[i].classList.remove('d-none');
+                }
+            } else {
+                document.getElementById('fecha_termino').disabled = true;
+                let elementos = document.querySelectorAll('.fecha_termino_class')
+                for (var i = 0; i < elementos.length; ++i) {
+                    elementos[i].classList.add('d-none');
+                }
             }
         })
     </script>

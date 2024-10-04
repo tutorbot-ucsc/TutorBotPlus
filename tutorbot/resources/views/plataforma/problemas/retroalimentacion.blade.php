@@ -3,7 +3,7 @@
     <div class="container-fluid py-3 px-4">
         <div class="row">
             <div class="col">
-                <div class="card border-danger" style="height:100%">
+                <div class="card border-danger overflow-auto" style="height: 30rem;">
                     <div class="card-header">
                         Retroalimentación
                     </div>
@@ -34,12 +34,12 @@
     </div>
     <div class="row mt-3 mx-2">
         <div class="col">
-            <div class="card border-danger" style="height:100%">
+            <div class="card border-danger overflow-auto mb-5" style="height: 25rem;">
                 <div class="card-header">
                     Código Fuente
                 </div>
                 <div class="card-body">
-                    <pre><code class="{{ $highlightjs_choice }}-html">{{ $envios->codigo }}</code></pre>
+                    <pre style="height: 100%"><code class="{{ $highlightjs_choice }}-html" >{{ $envios->codigo }}</code></pre>
                 </div>
             </div>
         </div>
