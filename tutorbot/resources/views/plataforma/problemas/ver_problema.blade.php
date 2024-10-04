@@ -35,9 +35,6 @@
                                     href="{{route('problemas.ver_editorial', ['codigo'=>$problema->codigo, 'id_curso'=>$id_curso])}}"
                                     role="button">{{ isset($problema->body_editorial) ? 'Ver Pistas' : 'Pistas No Disponible' }}</a>
                             </div>
-                            <div class="row px-5 mt-2">
-                                <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block" href="{{route('envios.listado', ['id_problema'=>$problema->id])}}" role="button">Ver Mis Envios</a></div>
-                            </div>
                             @can('ver informe del problema')
                             <div class="row px-5 mt-2 mb-2">
                                 <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block"
@@ -45,6 +42,9 @@
                                     role="button">Ver Informe del Problema</a>
                             </div>
                             @endcan
+                            <div class="row px-5 mt-2">
+                                <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block" href="{{route('envios.listado', ['id_problema'=>$problema->id])}}" role="button">Ver Mis Envios</a></div>
+                            </div>
                             <p class="ms-4"> <strong>Puntos:</strong> {{$problema->casos_de_prueba()->sum('puntos')}}</p>
                             <p class="ms-4 mt-1"><strong>Límite de Tiempo:</strong> {{$problema->tiempo_limite? $problema->tiempo_limite.' s' : 'No definido'}}</p>
                             <p class="ms-4 mt-1"><strong>Límite de Memoria:</strong> {{$problema->memoria_limite? $problema->memoria_limite.' KB' : 'No definido'}}</p>

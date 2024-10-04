@@ -249,14 +249,14 @@ class ProblemasController extends Controller
                 if ($now->lt($fecha_inicio)) {
                     $problema->disponible = false;
                 }
-            $problema->fecha_inicio = $fecha_inicio->locale('es_ES')->isoFormat('lll');
+            $problema->fecha_inicio = isset($problema->fecha_inicio)? $fecha_inicio->locale('es_ES')->isoFormat('lll') : "No Definido";
             }
             if (isset($problema->fecha_termino)) {
                 $fecha_termino = Carbon::parse($problema->fecha_termino);
                 if ($now->gt($fecha_termino)) {
                     $problema->disponible = false;
                 }
-            $problema->fecha_termino = $fecha_termino->locale('es_ES')->isoFormat('lll');
+            $problema->fecha_termino = isset($problema->fecha_termino)? $fecha_termino->locale('es_ES')->isoFormat('lll') : "No Definido";
         }
         } catch (\PDOException $e) {
             return redirect()->route('cursos.listado')->with('error', $e->getMessage());
