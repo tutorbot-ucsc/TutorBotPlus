@@ -41,8 +41,8 @@ if (env('APP_ENV') === 'production') {
 }
 //Autenticación
 Route::get('/', function () {return redirect('/inicio');})->middleware('auth');
-Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
-Route::post('/register', [RegisterController::class, 'store'])->middleware('guest')->name('register.perform');
+//Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
+//Route::post('/register', [RegisterController::class, 'store'])->middleware('guest')->name('register.perform');
 Route::get('/login', [LoginController::class, 'show'])->middleware('guest')->name('login');
 Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login.perform');
 Route::get('/reset-password', [ResetPassword::class, 'show'])->middleware('guest')->name('reset-password');
@@ -51,7 +51,7 @@ Route::get('/change-password', [ChangePassword::class, 'show'])->middleware('gue
 Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
 Route::get('/inicio', function(){
 	return view('pages.inicio');
-})->name('home')->middleware('auth');
+})->name('home')->middleware(['auth', 'can:acceso al panel de administración']);
 
 //Plataforma de Juez Online
 Route::group(['middleware'=>'auth'], function(){
@@ -76,7 +76,8 @@ Route::group(['middleware'=>'auth'], function(){
 	Route::get('/envio/{token}/retroalimentacion', [LlmController::class, 'ver_retroalimentacion'])->name('envios.retroalimentacion');
 	Route::get('/retroalimentacion/generar', [LlmController::class, 'generar_retroalimentacion'])->name('envios.generar_retroalimentacion');
 
-
+	Route::get('/perfil', [UserController::class, "ver_mi_perfil"])->name('ver.perfil');
+	Route::post('/perfil/update', [UserController::class, "actualizar_informacion"])->name('perfil.update');
 });
 //Panel de Administración
 Route::group(['middleware' => 'auth'], function () {

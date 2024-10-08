@@ -19,7 +19,7 @@
                 </li>-->
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('envios.*') ? 'active fw-bold' : '' }}"
-                        href="{{ route('envios.listado') }}">Envios</a>
+                        href="{{ route('envios.listado') }}">Envíos</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
@@ -36,6 +36,8 @@
                             <hr class="dropdown-divider">
                         </li>-->
                         @auth
+                            <li><a class="dropdown-item" href="{{ route('ver.perfil') }}">Mi Perfil</a>
+                            </li>
                             <form role="form" method="post" action="{{ route('logout') }}" id="logout-form">
                                 @csrf
                                 <li><a class="dropdown-item"

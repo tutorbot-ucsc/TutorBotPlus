@@ -1,15 +1,14 @@
-@extends('layout_plataforma.app', ['title_html' => 'Resultados - ' . $envio->problema->nombre, 'title' => ' Envio #' . $envio->id . ' - Problema ' . $envio->problema->nombre])
+@extends('layout_plataforma.app', ['title_html' => 'Resultados - ' . $envio->problema->nombre, 'title' => ' Envio #' . $envio->id . ' - Problema ' . $envio->problema->nombre, "breadcrumbs"=>[["nombre"=>"Envios", "route"=>route("envios.listado")], ["nombre"=>"Envio #".$envio->id]]])
 @section('content')
     <div class="container-fluid py-3 px-4">
         @include('components.alert')
         <div class="row">
-            <div class="col">
+            <div class="col-sm col-xs-12">
                 <div class="card border-danger" style="height:100%">
                     <div class="card-header">
                         Resultados
                     </div>
                     <div class="card-body">
-
                         <div class="accordion accordion-flush" id="resultados_accord">
                             @for ($i = 0; $i < count($evaluaciones); $i++)
                                 <div class="accordion-item">
@@ -74,7 +73,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-4 col-sm-4">
+            <div class="col-sm-4 col-xs-12 mt-xs-2">
                 <div class="card border-danger">
                     <div class="card-body px-5">
                         <h6 class="text-center">Tiempo en Total:</h6>
@@ -107,9 +106,9 @@
                         </div>
                         @can('ver informe del problema')
                         <div class="row px-5 mt-2">
-                            <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block"
+                            <a class="btn btn-outline-secondary btn-sm btn-block"
                                 href="{{ route('informe.envios.problema', ['id_curso' => $envio->id_curso, 'id_problema' => $envio->id_problema]) }}"
-                                role="button">Volver a los envios del problema</a>
+                                role="button">Volver al informe de envios del problema</a>
                         </div>
                         @endcan
                     </div>

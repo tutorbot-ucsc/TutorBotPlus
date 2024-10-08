@@ -10,8 +10,8 @@
             <div class="modal-body">
                 <p>
                     Las entradas y salidas de los problemas se deben añadir de la siguiente manera: <br>
-                    Si el código debe recibir uno o más entradas y tambien debe entregar uno o más salidas, entonces cada entrada y salida que se ingrese debe tener un salto de linea entre ellos.
-                    <h6>Ejemplo: <br>
+                    Si el código debe recibir más de una entrada y tambien debe entregar más de una salida, entonces cada entrada y salida que se ingrese debe tener un salto de linea entre ellos.
+                    <h6>Ejemplo: </h6>
                     El código debe realizar dos operaciones de suma de dos números<br>
                     Entradas: <br>
                     <textarea class="form-control" rows="3" disabled>2
@@ -21,7 +21,8 @@
                     <br> Salidas: <br>
                     <textarea class="form-control" rows="3" disabled>6
 10</textarea>
-                    
+                    <br>Esto es siempre dependiendo del problema subido la cantidad de entradas que debe recibir y la salidas que debe entregar el código.
+                    <br> <strong class="text-warning">Importante: Los casos de pruebas se añaden de a uno, no debe ingresar todos los casos de pruebas en uno solo, ya que entregara errores de respuesta erronea.</strong>
                 </p>
             </div>
             <div class="modal-footer">

@@ -31,6 +31,9 @@
                                     Puntaje
                                 </th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                    Tiempo
+                                </th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                     ¿Solucionado?
                                 </th>
                                 @canany(['ver informe del problema'])
@@ -75,6 +78,7 @@
                                     <td>{{ $envio->max_casos_resueltos }} de {{ $problema_estadistica->total_casos }}
                                     </td>
                                     <td>{{ $envio->max_puntaje }} de {{ $problema_estadistica->puntaje_total }}</td>
+                                    <td>{{isset($envio->diferencia)? $envio->diferencia : 0}}</td>
                                     <td><span
                                             class="badge @if ($envio->solucionado == true) bg-gradient-success @else bg-gradient-secondary @endif">{{ $envio->solucionado == true ? 'Si' : 'No' }}</span>
                                     </td>

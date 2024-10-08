@@ -1,4 +1,4 @@
-@extends('layout_plataforma.app', ['title' => '¡Hola, ' . auth()->user()->firstname . ' ' . auth()->user()->lastname . '! 👋', 'title_html' => 'Cursos'])
+@extends('layout_plataforma.app', ['title' => '¡Hola, ' . auth()->user()->firstname . ' ' . auth()->user()->lastname . '! 👋', 'title_html' => 'Cursos', 'breadcrumbs'=>[["nombre"=>"Cursos"]]])
 @section('content')
     @include('components.alert')
     <div class="container-fluid px-4">

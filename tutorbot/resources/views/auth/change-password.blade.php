@@ -9,6 +9,10 @@
                         <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column mx-lg-0 mx-auto">
                             <div class="card card-plain">
                                 <div class="card-header pb-0 text-start">
+                                    <div class="d-flex justify-content-center">
+                                        <img class="position-relative align-self-center mb-3"
+                                        src="{{ asset('img/ico_tutorbot.png') }}" alt="" style="width:150px" id="mobileIcon">
+                                    </div>
                                     <h4 class="font-weight-bolder"></h4>
                                     <p class="mb-0">Restauración de tu contraseña</p>
                                 </div>

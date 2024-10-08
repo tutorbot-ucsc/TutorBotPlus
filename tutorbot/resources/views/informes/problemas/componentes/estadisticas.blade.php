@@ -1,5 +1,5 @@
 <div class="row mx-3">
-    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+    <div class="col-xl-2 col-sm-5 mb-xl-0 mb-4">
         <div class="card">
             <div class="card-body p-3">
                 <div class="row">
@@ -15,7 +15,7 @@
             </div>
         </div>
     </div>
-    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+    <div class="col-xl-2 col-sm-5 mb-xl-0 mb-4">
         <div class="card">
             <div class="card-body p-3">
                 <div class="row">
@@ -47,7 +47,7 @@
             </div>
         </div>
     </div>
-    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+    <div class="col-xl-2 col-sm-5 mb-xl-0 mb-4">
         <div class="card">
             <div class="card-body p-3">
                 <div class="row">
@@ -58,9 +58,23 @@
                                 @if($problema_estadistica->cantidad_intentos==0)
                                 0
                                 @else
-                                {{($problema_estadistica->cantidad_resueltos/$problema_estadistica->cantidad_intentos)*100}}%
+                                {{round(($problema_estadistica->cantidad_resueltos/$problema_estadistica->cantidad_intentos)*100)}}%
                                 @endif
                             </h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="card">
+            <div class="card-body p-3">
+                <div class="row">
+                    <div class="col-8">
+                        <div class="numbers">
+                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Tiempo Promedio</p>
+                            <h5 class="font-weight-bolder">{{$problema_estadistica->tiempo_promedio}}</h5>
                         </div>
                     </div>
                 </div>

@@ -9,6 +9,10 @@
                         <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column mx-lg-0 mx-auto">
                             <div class="card card-plain">
                                 <div class="card-header pb-0 text-start">
+                                    <div class="d-flex justify-content-center">
+                                        <img class="position-relative align-self-center mb-3"
+                                        src="{{ asset('img/ico_tutorbot.png') }}" alt="" style="width:150px" id="mobileIcon">
+                                    </div>
                                     <h4 class="font-weight-bolder">Recupera tu Contraseña</h4>
                                     <p class="mb-0">Ingresa tu correo electronico</p>
                                 </div>
@@ -22,6 +26,9 @@
                                         </div>
                                         <div class="text-center">
                                             <button type="submit" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Recuperar de Contraseña</button>
+                                        </div>
+                                        <div class="text-center">
+                                            <a class="btn btn-lg btn-outline-primary btn-lg w-100 mt-2 mb-0" href="{{route('login')}}">Volver</a>
                                         </div>
                                     </form>
                                 </div>

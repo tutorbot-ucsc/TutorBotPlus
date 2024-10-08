@@ -4,8 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\EnvioSolucionProblema;
+use App\Observers\LlmObserver;
+
+#[ObservedBy([LlmObserver::class])]
 class SolicitudRaLlm extends Model
 {
     use HasFactory;

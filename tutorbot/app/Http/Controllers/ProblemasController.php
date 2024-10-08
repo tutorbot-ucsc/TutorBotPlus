@@ -217,7 +217,7 @@ class ProblemasController extends Controller
     {
         try {
             if (!auth()->user()->cursos()->get()->contains($request->id)) {
-                return redirect()->route('cursos.listados')->with('error', 'No tienes acceso al curso que estas tratando de acceder');
+                return redirect()->route('cursos.listado')->with('error', 'No tienes acceso al curso al que estás tratando de acceder');
             }
             $curso = Cursos::find($request->id);
             $fecha_ahora = Carbon::now();

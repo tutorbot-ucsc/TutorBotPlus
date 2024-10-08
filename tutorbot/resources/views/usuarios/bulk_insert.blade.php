@@ -11,8 +11,6 @@
             <div class="card">
                 <div class="card-body">
                     <p>Para insertar usuarios de manera masiva, debe subir un archivo .csv con la información personal de los usuarios, cursos y roles.
-                        <br><strong>Debe seguir el siguiente orden:</strong> 
-                        <br><strong>Nombre de Usuario, Nombre, Apellido, Correo, Rut, Fecha de Nacimiento, los códigos de los cursos en un array, los nombres de los roles en un array.</strong>
                        <br><a href="{{asset('examples/ejemplo_bulk_usuarios.csv')}}" style="color: blue;" download>Haga click aquí</a> para descargar el archivo ejemplo de csv.
                     </p>
                     <p>La contraseña se asigna de manera automática y es el rut del usuario.</p>
@@ -22,7 +20,17 @@
                     </div>
                     @error('csvFile')
                         <p class="text-danger text-xs pt-1"> {{ $message }} </p>
-                    @enderror                 
+                    @enderror
+                    <br><strong> <span class="text-warning">Importante:</span> Debe seguir el siguiente orden.</strong> <br>
+                        <ul class="list-group list-group-numbered mb-4">
+                            <li class="list-group-item"><strong>Nombre de Usuario</strong></li>
+                            <li class="list-group-item"><strong>Nombre</strong></li>
+                            <li class="list-group-item"><strong>Apellido</strong></li>
+                            <li class="list-group-item"><strong>Correo</strong></li>
+                            <li class="list-group-item"><strong>Rut</strong></li>
+                            <li class="list-group-item"><strong>Códigos de los cursos en un Array</strong></li>
+                            <li class="list-group-item"><strong>Nombres de los roles en un array</strong></li>
+                        </ul>
                     <input type="submit" class="btn btn-primary" value="Insertar">
                     <a href="{{route('usuarios.index')}}" class="btn btn-outline-primary">Volver</a>
                 </div>

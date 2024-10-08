@@ -28,7 +28,7 @@ function submitFormCrear() {
 
 function submitFormEditar(item) {
     Swal.fire({
-        title: "¿Estás seguro que quieres editar "+item+"?",
+        title: "¿Estás seguro que quieres editar el item "+item+"?",
         icon: "warning",
         showDenyButton: true,
         confirmButtonText: "Si",

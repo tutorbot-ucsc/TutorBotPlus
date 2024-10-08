@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cursos;
+use App\Notifications\UsuarioCreado;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,7 @@ use Exception;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
     public function index(Request $request)
@@ -24,6 +26,10 @@ class UserController extends Controller
         return view('usuarios.index', compact('users'));
     }
 
+    public function ver_mi_perfil(Request $request){
+        $info = auth()->user();
+        return view('plataforma.mi_perfil', compact('info'));
+    }
     public function crear()
     {
         $roles = Role::all();
@@ -41,6 +47,37 @@ class UserController extends Controller
         dd(Storage::exists('public/examples/ejemplo_bulk_usuarios.csv'));
         return Storage::download("public/examples/ejemplo_bulk_usuarios.csv");
     }
+    
+    public function actualizar_informacion(Request $request){
+        $validated = $request->validate([
+            'username' => ['required','string', 'max:255'],
+            'rut' => ['required', 'string', Rule::unique('users')->ignore($request->rut, "rut")],
+            'email' => ['required', 'email', Rule::unique('users')->ignore($request->email, "email")],
+            'firstname' => ['required', 'string'],
+            'lastname' => ['required', 'string'],
+            'password_actual' => ['nullable','required_with:password,password_confirmation', 'min:8'],
+            'password' => ['nullable','min:8', 'required_with:password_confirmation,password_actual', 'same:password_confirmation'],
+            'password_confirmation' => ['nullable','min:8'],
+        ]);
+        try{
+        $user = User::find(auth()->user()->id);
+        if(isset($request->password_actual,$request->password) && !Hash::check($request->password_actual, $user->password)){
+            return back()->withInput()->with("error", "Contraseña actual incorrecta");
+        }else if(isset($request->password_actual,$request->password)){
+            $user->password = $request->password;
+        }
+        $user->username = $request->input("username");
+        $user->firstname = $request->input("firstname");
+        $user->lastname = $request->input("lastname");
+        $user->email = $request->input("email");
+        $user->rut = $request->input("rut");
+        $user->save();
+        }catch(\PDOException $e){
+            return back()->withInput()->with("error", $e->getMessage());
+        }
+        return redirect()->route("ver.perfil")->with("succes", "Se ha modificado tu perfil de manera correcta.");
+    }
+
     public function bulk_insertion(Request $request)
     {
         $validated = $request->validate([
@@ -51,7 +88,8 @@ class UserController extends Controller
         $contenido = str_replace("\u{FEFF}", "", $contenido);
         //dividir el contenido por el separador de break space. Lo que transforma en un array de strings, donde cada elemento es un usuario.
         $string_arrays = explode("\r\n", $contenido);
-        $keys_array = array('username', 'firstname', 'lastname', 'email', 'rut','fecha_nacimiento', 'cursos', 'roles');
+        $keys_array = array('username', 'firstname', 'lastname', 'email', 'rut', 'cursos', 'roles');
+        $users = [];
         try {
             DB::beginTransaction();
             foreach ($string_arrays as $key=>$string_info) {
@@ -60,7 +98,7 @@ class UserController extends Controller
                 }
                 $usuario_data = array_filter(explode(";", $string_info));
 
-                if(sizeof($usuario_data)<8){
+                if(sizeof($usuario_data)<7){
                     throw new \Exception("Faltan datos en el usuario de la columna ".($key+1).": [".$string_info."]. Ingrese nuevamente el archivo corregido y asegurese de que todos los datos necesarios estén presentes.");
                 }
                 $usuario_data = array_combine($keys_array, $usuario_data);
@@ -72,7 +110,6 @@ class UserController extends Controller
                     'email' => 'required|email|unique:App\Models\User,email',
                     'firstname' => 'required|string',
                     'lastname' => 'required|string',
-                    'fecha_nacimiento' => 'date',
                     'cursos'=> "array|min:1",
                     'roles' => 'array|min:1',
                 ]);
@@ -85,7 +122,6 @@ class UserController extends Controller
                 $usuario_nuevo->lastname = $usuario_data["lastname"];
                 $usuario_nuevo->email = $usuario_data["email"];
                 $usuario_nuevo->rut = $usuario_data["rut"];
-                $usuario_nuevo->fecha_nacimiento = Carbon::parse($usuario_data["fecha_nacimiento"])->toDateTimeString();
                 $usuario_nuevo->password = str_replace("-", "", $usuario_data["rut"]);
                 $usuario_nuevo->save();
                 $cursos_modelos = Cursos::whereIn("codigo", $usuario_data["cursos"])->get();
@@ -93,6 +129,7 @@ class UserController extends Controller
                 $usuario_nuevo->cursos()->sync($cursos_modelos);
                 $usuario_nuevo->roles()->sync($roles_modelos);
                 $usuario_nuevo->save();
+                array_push($users, $usuario_nuevo);
             }
             DB::commit();
         } catch (\PDOException $e) {
@@ -102,6 +139,11 @@ class UserController extends Controller
             DB::rollBack();
             return back()->with("error", $e->getMessage());
         }
+
+        foreach($users as $user){
+            $user->notify(new UsuarioCreado());
+        }
+
         return redirect()->route('usuarios.index')->with("success", "Los usuarios han sido creado de manera correcta.");
     }
     public function editar(Request $request)

@@ -62,7 +62,7 @@
             <label for="memoria_limite" class="form-control-label">Memoria Límite</label>
             <div class="input-group mb-3">
                 <input type="number" class="form-control  @error('memoria_limite') is-invalid @enderror"
-                    name="memoria_limite" id="memoria_limite" placeholder="Ej. 5000 (5MB)"
+                    name="memoria_limite" id="memoria_limite" placeholder="Ej. 5000 (5MB)" min="0"
                     value="{{ isset($problema) ? old('memoria_limite', $problema->memoria_limite) : old('memoria_limite') }}">
                 <span class="input-group-text" id="basic-addon1">KB</span>
             </div>
@@ -77,7 +77,7 @@
             <div class="input-group mb-3">
 
                 <input type="number" class="form-control @error('tiempo_limite') is-invalid @enderror"
-                    name="tiempo_limite" id="tiempo_limite" placeholder="Ej. 5"
+                    name="tiempo_limite" id="tiempo_limite" placeholder="Ej. 5" min="0"
                     value="{{ isset($problema) ? old('tiempo_limite', $problema->tiempo_limite) : old('tiempo_limite') }}">
                 <span class="input-group-text" id="basic-addon1">Segundos</span>
             </div>

@@ -47,7 +47,7 @@
         <div class="form-group has-danger">
             <label for="rut" class="form-control-label @error('rut') is-invalid @enderror">Rut</label>
             <input class="form-control" type="text" name="rut" placeholder="Ej. 12345678-9"
-                value="{{ isset($user) ? old('rut', $user->rut) : old('rut') }}">
+                value="{{ isset($user) ? old('rut', $user->rut) : old('rut') }}" maxlength="10" oninput="checkRut(this)">
             @error('rut')
                 <p class="text-danger text-xs pt-1"> {{ $message }} </p>
             @enderror

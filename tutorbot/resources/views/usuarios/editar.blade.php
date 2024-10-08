@@ -22,4 +22,5 @@
 @endsection
 @push('js')
     <script src="{{ asset('assets/js/alertas_administracion.js') }}"></script> 
+    <script src="{{asset('assets/js/rutFormatting.js')}}"></script>
 @endpush

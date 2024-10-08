@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\EvaluacionSolucion;
 use App\Models\LenguajesProgramaciones;
 use App\Models\EnvioSolucionProblema;
+use Illuminate\Database\Query\Builder;
+use Carbon\Carbon;
 class InformeController extends Controller
 {
     public function index_problema(Request $request){
@@ -53,25 +55,33 @@ class InformeController extends Controller
 
     public function ver_informe_problema(Request $request){
         $estadistica_estados = EvaluacionSolucion::join('envio_solucion_problemas', 'envio_solucion_problemas.id', '=', 'evaluacion_solucions.id_envio')->select('resultado')->where('envio_solucion_problemas.id_problema', '=', $request->id_problema)->where('envio_solucion_problemas.id_curso', '=', $request->id_curso)->get()->countBy('resultado')->toArray();
+        $cantidad_solucionados = EnvioSolucionProblema::where("id_problema", "=", $request->id_problema)->where('id_curso', '=', $request->id_curso)->where('solucionado', '=', true)->count();
         $info_usuarios_envios = DB::table('envio_solucion_problemas')
-        ->select(DB::raw('max(envio_solucion_problemas.cant_casos_resuelto) as max_casos_resueltos'), DB::raw('max(envio_solucion_problemas.puntaje) as max_puntaje'), 'envio_solucion_problemas.id_usuario',  DB::raw('max(envio_solucion_problemas.solucionado) as solucionado'))
+        ->select(DB::raw('max(envio_solucion_problemas.cant_casos_resuelto) as max_casos_resueltos'), DB::raw('max(envio_solucion_problemas.puntaje) as max_puntaje'), 'envio_solucion_problemas.id_usuario', DB::raw('max(envio_solucion_problemas.solucionado) as solucionado'), DB::raw('count(envio_solucion_problemas.id) as cant_intentos'), DB::raw('count(solicitud_ra_llms.id) as cant_retroalimentacion'), DB::raw('max(envio_solucion_problemas.created_at) as fecha_maxima'))
+        ->leftJoin('solicitud_ra_llms', 'solicitud_ra_llms.id_envio', '=', 'envio_solucion_problemas.id')
         ->where('id_problema', '=', $request->id_problema)
         ->where('id_curso', '=', $request->id_curso)
         ->whereNotNull('envio_solucion_problemas.termino')
         ->groupBy('id_usuario');
         $envios = DB::table('users')
         ->join('envio_solucion_problemas', 'envio_solucion_problemas.id_usuario', '=', 'users.id')
-        ->leftJoin('solicitud_ra_llms', 'solicitud_ra_llms.id_envio', '=', 'envio_solucion_problemas.id')
-        ->leftJoinSub($info_usuarios_envios, 'info_usuario_envios', function (JoinClause $join){
-            $join->on('info_usuario_envios.id_usuario','=','users.id');
+        ->joinSub($info_usuarios_envios, 'info_usuario_envios', function (JoinClause $join){
+            $join->on('info_usuario_envios.fecha_maxima', '=', 'envio_solucion_problemas.created_at');
         })
-        ->select('envio_solucion_problemas.id_curso','envio_solucion_problemas.id_problema', 'envio_solucion_problemas.id_usuario','users.rut', 'users.firstname', 'users.lastname', DB::raw('count(solicitud_ra_llms.id) as cant_retroalimentacion'), DB::raw('count(envio_solucion_problemas.id) as cant_intentos'),'info_usuario_envios.max_casos_resueltos', 'info_usuario_envios.max_puntaje' ,'info_usuario_envios.solucionado')
-        ->groupBy('envio_solucion_problemas.id_curso','envio_solucion_problemas.id_problema', 'envio_solucion_problemas.id_usuario','users.rut', 'users.firstname', 'users.lastname', 'info_usuario_envios.max_casos_resueltos', 'info_usuario_envios.max_puntaje' ,'info_usuario_envios.solucionado')
+        ->select('envio_solucion_problemas.id_curso','envio_solucion_problemas.id_problema', 'envio_solucion_problemas.inicio', 'envio_solucion_problemas.termino','envio_solucion_problemas.id_usuario','users.rut', 'users.firstname', 'users.lastname','info_usuario_envios.max_casos_resueltos', 'info_usuario_envios.max_puntaje' ,'info_usuario_envios.solucionado', 'info_usuario_envios.cant_intentos', 'info_usuario_envios.cant_retroalimentacion')
+        ->groupBy('envio_solucion_problemas.id_curso','envio_solucion_problemas.id_problema', 'envio_solucion_problemas.inicio', 'envio_solucion_problemas.termino','envio_solucion_problemas.id_usuario','users.rut', 'users.firstname', 'users.lastname', 'info_usuario_envios.max_casos_resueltos', 'info_usuario_envios.max_puntaje', 'info_usuario_envios.cant_intentos', 'info_usuario_envios.cant_retroalimentacion','info_usuario_envios.solucionado')
         ->where('envio_solucion_problemas.id_problema', '=', $request->id_problema)
         ->where('envio_solucion_problemas.id_curso', '=', $request->id_curso)
         ->whereNotNull('envio_solucion_problemas.termino')
         ->whereNull('id_certamen')
-        ->orderBy('envio_solucion_problemas.solucionado', 'DESC')->get();
+        ->orderBy('envio_solucion_problemas.solucionado', 'DESC')
+        ->get()->map(function ($envio){
+            if(isset($envio->termino)){
+                $envio->diferencia = Carbon::parse($envio->termino)->diffInSeconds(Carbon::parse($envio->inicio));
+                $envio->diferencia = gmdate('H:i:s', $envio->diferencia);
+            }
+            return $envio;
+        });
         $lenguajes_estadistica = DB::table('lenguajes_programaciones')
         ->join('envio_solucion_problemas', 'envio_solucion_problemas.id_lenguaje', '=', 'lenguajes_programaciones.id')
         ->select('lenguajes_programaciones.nombre')
@@ -87,7 +97,12 @@ class InformeController extends Controller
         ->where('disponible.id_curso', '=', $request->id_curso)
         ->groupBy('problemas.nombre','disponible.cantidad_resueltos', 'disponible.cantidad_intentos', 'disponible.tiempo_total', 'cant_retroalimentacion_solicitada')
         ->first();
-
-        return view('informes.problemas.informe', compact('estadistica_estados', 'envios', 'lenguajes_estadistica', 'problema_estadistica'))->with("id_problema", $request->id_problema);
+        if($cantidad_solucionados !=0){
+            $problema_estadistica->tiempo_promedio = $problema_estadistica->tiempo_total/$cantidad_solucionados;
+        }else{
+            $problema_estadistica->tiempo_promedio = 0;
+        }
+        $problema_estadistica->tiempo_promedio = gmdate('H:i:s', $problema_estadistica->tiempo_promedio);
+        return view('informes.problemas.informe', compact('estadistica_estados', 'envios', 'lenguajes_estadistica', 'problema_estadistica', 'cantidad_solucionados'))->with("id_problema", $request->id_problema);
     }
 }
