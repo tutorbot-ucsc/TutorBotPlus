@@ -6,30 +6,23 @@ use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use App\Models\User;
 use App\Notifications\ForgotPassword;
-
+use Illuminate\Support\Facades\Password;
 class ResetPassword extends Controller
 {
-    use Notifiable;
-
     public function show()
     {
-        return view('auth.reset-password');
-    }
-
-    public function routeNotificationForMail() {
-        return request()->email;
+        return view('auth.forgot-password');
     }
 
     public function send(Request $request)
     {
-        $email = $request->validate([
-            'email' => ['required']
-        ]);
-        $user = User::where('email', $email)->first();
-
-        if ($user) {
-            $this->notify(new ForgotPassword($user->id));
-            return back()->with('succes', 'Se envió un correo electrónico a su correo electrónico.');
-        }
+        $request->validate(['email' => 'required|email']);
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+     
+        return $status === Password::RESET_LINK_SENT
+                    ? back()->with(['status' => __($status)])
+                    : back()->withErrors(['email' => __($status)]);
     }
 }

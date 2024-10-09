@@ -13,10 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\UserController;
@@ -40,15 +36,18 @@ if (env('APP_ENV') === 'production') {
     \URL::forceScheme('https');
 }
 //Autenticación
+Route::get('/home', function () {
+	return redirect()->route('login');
+})->middleware('guest');
 Route::get('/', function () {return redirect('/inicio');})->middleware('auth');
 //Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
 //Route::post('/register', [RegisterController::class, 'store'])->middleware('guest')->name('register.perform');
 Route::get('/login', [LoginController::class, 'show'])->middleware('guest')->name('login');
 Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login.perform');
-Route::get('/reset-password', [ResetPassword::class, 'show'])->middleware('guest')->name('reset-password');
-Route::post('/reset-password', [ResetPassword::class, 'send'])->middleware('guest')->name('reset.perform');
-Route::get('/change-password', [ChangePassword::class, 'show'])->middleware('guest')->name('change-password');
-Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
+Route::get('/forgot-password', [ResetPassword::class, 'show'])->middleware('guest')->name('password.request');
+Route::post('/forgot-password', [ResetPassword::class, 'send'])->middleware('guest')->name('password.email');
+Route::get('/reset-password/{token}', [ChangePassword::class, 'show'])->middleware('guest')->name('password.reset');
+Route::post('/reset-password', [ChangePassword::class, 'update'])->middleware('guest')->name('password.update');
 Route::get('/inicio', function(){
 	return view('pages.inicio');
 })->name('home')->middleware(['auth', 'can:acceso al panel de administración']);
@@ -81,10 +80,10 @@ Route::group(['middleware'=>'auth'], function(){
 });
 //Panel de Administración
 Route::group(['middleware' => 'auth'], function () {
-	Route::get('/profile', [UserProfileController::class, 'show'])->name('profile');
-	Route::post('/profile', [UserProfileController::class, 'update'])->name('profile.update');
-	Route::get('/profile-static', [PageController::class, 'profile'])->name('profile-static'); 
-	Route::get('/{page}', [PageController::class, 'index'])->name('page');
+	//Route::get('/profile', [UserProfileController::class, 'show'])->name('profile');
+	//Route::post('/profile', [UserProfileController::class, 'update'])->name('profile.update');
+	//Route::get('/profile-static', [PageController::class, 'profile'])->name('profile-static'); 
+	//Route::get('/{page}', [PageController::class, 'index'])->name('page');
 	Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 	Route::prefix('usuarios')->group(function () {
 		Route::get('/index', [UserController::class, 'index'])->name('usuarios.index')->middleware('can:ver usuario'); 

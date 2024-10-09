@@ -85,9 +85,9 @@ class UserController extends Controller
         ]);
         $contenido = file_get_contents($request->file('csvFile')->getRealPath());
         //remover caracteres especiales
-        $contenido = str_replace("\u{FEFF}", "", $contenido);
+        $contenido = str_replace(["\u{FEFF}", "\r"], "", $contenido);
         //dividir el contenido por el separador de break space. Lo que transforma en un array de strings, donde cada elemento es un usuario.
-        $string_arrays = explode("\r\n", $contenido);
+        $string_arrays = explode("\n", $contenido);
         $keys_array = array('username', 'firstname', 'lastname', 'email', 'rut', 'cursos', 'roles');
         $users = [];
         try {
@@ -97,7 +97,6 @@ class UserController extends Controller
                     continue;
                 }
                 $usuario_data = array_filter(explode(";", $string_info));
-
                 if(sizeof($usuario_data)<7){
                     throw new \Exception("Faltan datos en el usuario de la columna ".($key+1).": [".$string_info."]. Ingrese nuevamente el archivo corregido y asegurese de que todos los datos necesarios estén presentes.");
                 }
@@ -139,12 +138,14 @@ class UserController extends Controller
             DB::rollBack();
             return back()->with("error", $e->getMessage());
         }
-
-        foreach($users as $user){
-            $user->notify(new UsuarioCreado());
+        try{
+            foreach($users as $user){
+                $user->notify(new UsuarioCreado());
+            }
+        }catch(\Exception $e){
+            return redirect()->route('usuarios.index')->with("success", "Advertencia: Usuarios creados pero ha ocurrido un error al enviar el correo de confirmación a los usuarios creados.");
         }
-
-        return redirect()->route('usuarios.index')->with("success", "Los usuarios han sido creado de manera correcta.");
+        return redirect()->route('usuarios.index')->with("success", "Los usuarios han sido creados de manera correcta.");
     }
     public function editar(Request $request)
     {
@@ -166,8 +167,7 @@ class UserController extends Controller
             'password' => 'required|min:8|required_with:password_confirmation|same:password_confirmation',
             'password_confirmation' => 'required|min:8',
         ]);
-
-        db::beginTransaction();
+        DB::beginTransaction();
         try {
             $usuario = new User;
             $usuario->username = $request->input('username');
@@ -179,7 +179,7 @@ class UserController extends Controller
             $usuario->password = $request->input('password');
             $usuario->save();
             $usuario->cursos()->sync($request->input('cursos'));
-            db::commit();
+            DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->route('usuarios.index')->with('error', $e->getMessage());
@@ -198,9 +198,10 @@ class UserController extends Controller
             'lastname' => ['string'],
             'fecha_nacimiento' => ['date'],
         ]);
+        $roles = isset($request->roles)? $request->roles : [];
         try {
             db::beginTransaction();
-            $usuario = User::find($request->id);
+            $usuario = User::with('roles')->find($request->id);
             $usuario->username = $request->input('username');
             $usuario->rut = $request->input('rut');
             $usuario->email = $request->input('email');
@@ -209,12 +210,16 @@ class UserController extends Controller
             $usuario->fecha_nacimiento = $request->input('fecha_nacimiento');
             $usuario->save();
             $usuario->cursos()->sync($request->input('cursos'));
+            $user = auth()->user();
+            if($user->id == $request->id && $user->getRoleNames()->contains("administrador")){
+                array_push($roles, "administrador");
+            }
+            $usuario->syncRoles($roles);
             db::commit();
         } catch (\Exception $e) {
             return redirect()->route('usuarios.index')->with('error', $e->getMessage());
         }
-        $usuario->syncRoles($request->roles);
-        return redirect()->route('usuarios.index')->with('success', 'El usuario ha sido modificado');
+        return redirect()->route('usuarios.index')->with('success', 'El usuario "'.$usuario->username.'"ha sido modificado');
     }
     public function eliminar(Request $request)
     {

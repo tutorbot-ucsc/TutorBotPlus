@@ -13,27 +13,21 @@
                                         <img class="position-relative align-self-center mb-3"
                                         src="{{ asset('img/ico_tutorbot.png') }}" alt="" style="width:150px" id="mobileIcon">
                                     </div>
-                                    <h4 class="font-weight-bolder"></h4>
-                                    <p class="mb-0">Restauración de tu contraseña</p>
+                                    <h4 class="font-weight-bolder">Recupera tu Contraseña</h4>
+                                    <p class="mb-0">Ingresa tu correo electronico</p>
                                 </div>
                                 <div class="card-body">
-                                    <form role="form" method="POST" action="{{ route('change.perform') }}">
+                                    <form method="POST" action="{{ route('password.email') }}">
                                         @csrf
-
                                         <div class="flex flex-col mb-3">
-                                            <input type="email" name="email" class="form-control form-control-lg" placeholder="Correo Electrónico" value="{{ old('email') }}" aria-label="Email">
+                                            <input type="email" name="email" class="form-control form-control-lg" placeholder="Ej. estudiante@tutorbot.com" value="{{ old('email') }}" aria-label="Email">
                                             @error('email') <p class="text-danger text-xs pt-1"> {{$message}} </p>@enderror
                                         </div>
-                                        <div class="flex flex-col mb-3">
-                                            <input type="password" name="password" class="form-control form-control-lg" placeholder="Contraseña" aria-label="Password" >
-                                            @error('password') <p class="text-danger text-xs pt-1"> {{$message}} </p>@enderror
-                                        </div>
-                                        <div class="flex flex-col mb-3">
-                                            <input type="password" name="confirm-password" class="form-control form-control-lg" placeholder="Repetir Contraseña" aria-label="Password"  >
-                                            @error('confirm-password') <p class="text-danger text-xs pt-1"> {{$message}} </p>@enderror
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Recuperar de Contraseña</button>
                                         </div>
                                         <div class="text-center">
-                                            <button type="submit" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Restaurar Contraseña</button>
+                                            <a class="btn btn-lg btn-outline-primary btn-lg w-100 mt-2 mb-0" href="{{route('login')}}">Volver</a>
                                         </div>
                                     </form>
                                 </div>
