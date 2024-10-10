@@ -1,8 +1,9 @@
 <p class="text-uppercase text-sm">Información del Rol</p>
+<p class="text-sm text-danger">* Obligatorio</p>
 <div class="row">
     <div class="col">
         <div class="form-group has-danger">
-            <label for="example-text-input" class="form-control-label @error('name') is-invalid @enderror">Nombre</label>
+            <label for="example-text-input" class="form-control-label @error('name') is-invalid @enderror">Nombre*</label>
             <input class="form-control" type="text" name="name" placeholder="Ej. Administrador"
                 value="{{ isset($rol) ? old('name', $rol->name) : old('name') }}">
             @error('name')
@@ -13,7 +14,7 @@
 </div>
 <div class="row">
     <div class="col">
-        <label class="form-control-label" for="permisos">Permisos</label>
+        <label class="form-control-label" for="permisos">Permisos* (Escoger al menos uno)</label>
         <div class="form-group has-danger">
             @foreach ($permisos as $permiso)  
                 <div class="form-check form-check-inline" id="permisos">
@@ -23,5 +24,8 @@
                 </div>
             @endforeach
         </div>
+        @error('permisos')
+                <p class="text-danger text-xs pt-1"> {{ $message }} </p>
+        @enderror
     </div>
 </div>

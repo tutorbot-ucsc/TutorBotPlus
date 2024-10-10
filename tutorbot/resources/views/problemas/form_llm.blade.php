@@ -11,7 +11,7 @@
             <label for="limite_llm" class="form-control-label">Límite de uso de LLM</label>
             <div class="input-group mb-3">
                 <input type="text" class="form-control @error('limite_llm') is-invalid @enderror"
-                    name="limite_llm" id="limite_llm" placeholder="Ej. 3" value="{{isset($problema)? old('limite_llm', $problema->limite_llm):old('limite_llm')}}">
+                    name="limite_llm" id="limite_llm" placeholder="Ej. 3" min="0" value="{{isset($problema)? old('limite_llm', $problema->limite_llm):old('limite_llm')}}">
                 <span class="input-group-text" id="basic-addon1">Usos</span>
             </div>
             @error('limite_llm')

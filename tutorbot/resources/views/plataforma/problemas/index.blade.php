@@ -1,4 +1,4 @@
-@extends('layout_plataforma.app', ['title_html' => 'Problemas', 'title'=>$curso->nombre.' - Problemas'])
+@extends('layout_plataforma.app', ['title_html' => 'Problemas', 'title'=>$curso->nombre.' - Problemas', 'breadcrumbs'=>[["nombre"=>"Cursos", "route"=>route("cursos.listado")],["nombre"=>"Problemas"]]])
 @section('content')
     <div class="container-fluid py-3 px-4">
         <div class="card border-danger">

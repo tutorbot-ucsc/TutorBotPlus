@@ -27,12 +27,14 @@
     <script type="module">
         const checkbox = document.getElementById('sql')
         const lenguajes = document.getElementById("lenguajes");
+        const checkbox_fecha_inicio = document.getElementById('set_fecha_inicio')
+        const checkbox_fecha_termino = document.getElementById('set_fecha_termino')
         const sql_file = document.getElementById("sql_file");
         const archivos_adicionales = document.getElementById("archivos_adicionales")
         const fecha_inicio = flatpickr("#fecha_inicio", {enableTime: true,
-            dateFormat: "d-m-Y H:i"}); 
+            dateFormat: "d-m-Y H:i",minDate: new Date(),}); 
         const fecha_termino = flatpickr("#fecha_termino", {enableTime: true,
-            dateFormat: "d-m-Y H:i",}); 
+            dateFormat: "d-m-Y H:i", minDate: new Date(),}); 
         fecha_inicio.setDate(Date.parse("{{old('fecha_inicio', $problema->fecha_inicio)}}"))
         fecha_termino.setDate(Date.parse("{{old('fecha_termino', $problema->fecha_termino)}}"))
         const editor = new Editor({
@@ -54,6 +56,38 @@
                 sql_file.classList.add("d-none");
                 archivos_adicionales.value = ""
                 lenguajes.disabled = false;
+            }
+        })
+
+        checkbox_fecha_inicio.addEventListener('change', (event) => {
+            if (event.currentTarget.checked) {
+                document.getElementById('fecha_inicio').disabled = false;
+                let elementos = document.querySelectorAll('.fecha_inicio_class')
+                for (var i = 0; i < elementos.length; ++i) {
+                    elementos[i].classList.remove('d-none');
+                }
+            } else {
+                let elementos = document.querySelectorAll('.fecha_inicio_class')
+                for (var i = 0; i < elementos.length; ++i) {
+                    elementos[i].classList.add('d-none');
+                }
+                document.getElementById('fecha_inicio').disabled = true;
+            }
+        })
+
+        checkbox_fecha_termino.addEventListener('change', (event) => {
+            if (event.currentTarget.checked) {
+                document.getElementById('fecha_termino').disabled = false;
+                let elementos = document.querySelectorAll('.fecha_termino_class')
+                for (var i = 0; i < elementos.length; ++i) {
+                    elementos[i].classList.remove('d-none');
+                }
+            } else {
+                document.getElementById('fecha_termino').disabled = true;
+                let elementos = document.querySelectorAll('.fecha_termino_class')
+                for (var i = 0; i < elementos.length; ++i) {
+                    elementos[i].classList.add('d-none');
+                }
             }
         })
     </script>

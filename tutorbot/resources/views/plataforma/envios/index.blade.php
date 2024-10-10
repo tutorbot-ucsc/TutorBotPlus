@@ -1,4 +1,4 @@
-@extends('layout_plataforma.app', ['title_html' => 'Envios', 'title'=>'Mis envios'])
+@extends('layout_plataforma.app', ['title_html' => 'Envios', 'title'=>'Mis envios', "breadcrumbs"=>[["nombre"=>"Envios"]]])
 @section('content')
     <div class="container-fluid py-3 px-4">
         <div class="card border-danger">

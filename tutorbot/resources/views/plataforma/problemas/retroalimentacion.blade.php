@@ -1,9 +1,9 @@
-@extends('layout_plataforma.app', ['title_html' => 'Retroalimentación para Envio #' . $retroalimentacion->id_envio, 'title' => 'Retroalimentación - Envio #' . $retroalimentacion->id_envio])
+@extends('layout_plataforma.app', ['title_html' => 'Retroalimentación para Envio #' . $retroalimentacion->id_envio, 'title' => 'Retroalimentación - Envio #' . $retroalimentacion->id_envio, "breadcrumbs"=>[["nombre"=>"Envios", "route"=>route("envios.listado")], ["nombre"=>"Envio #".$envios->id, "route"=>route('envios.ver', ['token'=>$envios->token])], ["nombre"=>"Retroalimentación"]]])
 @section('content')
     <div class="container-fluid py-3 px-4">
         <div class="row">
-            <div class="col">
-                <div class="card border-danger" style="height:100%">
+            <div class="col-sm col-xs-12">
+                <div class="card border-danger overflow-auto" style="height: 30rem;">
                     <div class="card-header">
                         Retroalimentación
                     </div>
@@ -12,7 +12,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-4 col-sm-4">
+            <div class="col-sm-4 col-xs-12">
                 <div class="card border-danger" style="height:100%">
                     <div class="card-body px-5">
                         <div class="row px-5">
@@ -34,12 +34,12 @@
     </div>
     <div class="row mt-3 mx-2">
         <div class="col">
-            <div class="card border-danger" style="height:100%">
+            <div class="card border-danger overflow-auto mb-5" style="height: 25rem;">
                 <div class="card-header">
                     Código Fuente
                 </div>
                 <div class="card-body">
-                    <pre><code class="{{ $highlightjs_choice }}-html">{{ $envios->codigo }}</code></pre>
+                    <pre style="height: 100%"><code class="{{ $highlightjs_choice }}-html" >{{ $envios->codigo }}</code></pre>
                 </div>
             </div>
         </div>

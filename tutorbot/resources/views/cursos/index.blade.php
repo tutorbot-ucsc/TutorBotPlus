@@ -34,7 +34,7 @@
                                     <th
                                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                         Creado</th>
-                                    @canany(['editar curso', 'editar curso'])
+                                    @canany(['editar curso', 'eliminar curso'])
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             Acción</th>
@@ -62,7 +62,7 @@
                                             <p class="text-sm font-weight-bold mb-0">
                                                 {{ $curso->fecha ? $curso->fecha : 'Desconocido' }}</p>
                                         </td>
-                                        @canany(['editar curso', 'editar curso'])
+                                        @canany(['editar curso', 'eliminar curso'])
                                             <td class="align-middle text-end">
                                                 <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                     @can('editar curso')

@@ -15,10 +15,10 @@
                 <div class="card-body">
                     <input type="hidden" name="body_editorial" id="body_editorial">
                     <label for="editor" class="text-gray-600 font-semibold">Editorial</label>
-                    <div class="flex flex-col space-y-2">
+                    <div class="flex flex-col space-y-2 mb-3">
                         <div id="editor" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></div>
                     </div>
-                    <input type="submit" class="btn btn-primary mt-3" value="Editar">
+                    <input type="submit" class="btn btn-primary" value="Editar">
                     <a href="{{route('problemas.index')}}" class="btn btn-outline-primary">Volver</a>
 
         </form>

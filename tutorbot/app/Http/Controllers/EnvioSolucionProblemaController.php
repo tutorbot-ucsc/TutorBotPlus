@@ -36,6 +36,7 @@ class EnvioSolucionProblemaController extends Controller
         })
         ->whereNull('id_certamen')
         ->where('id_usuario', '=', auth()->user()->id)
+        ->whereNotNull('termino')
         ->select('problemas.nombre as nombre_problema', 'problemas.codigo as codigo_problema','envio_solucion_problemas.id as id_envio', 'envio_solucion_problemas.created_at','envio_solucion_problemas.token', 'envio_solucion_problemas.cant_casos_resuelto','envio_solucion_problemas.puntaje', 'lenguajes_programaciones.nombre as nombre_lenguaje', 'envio_solucion_problemas.solucionado', 'envio_solucion_problemas.inicio', 'envio_solucion_problemas.termino', 'cursos.nombre as nombre_curso', 'cursos.id as id_curso', 'ultima_evaluacion.resultado', 'ultima_evaluacion.estado', DB::raw('count(casos__pruebas.id) as total_casos'))
         ->groupBy('problemas.nombre', 'problemas.codigo','envio_solucion_problemas.id', 'envio_solucion_problemas.created_at','envio_solucion_problemas.token', 'envio_solucion_problemas.cant_casos_resuelto','envio_solucion_problemas.puntaje', 'lenguajes_programaciones.nombre', 'envio_solucion_problemas.solucionado', 'envio_solucion_problemas.inicio', 'envio_solucion_problemas.termino', 'cursos.nombre', 'cursos.id', 'ultima_evaluacion.resultado', 'ultima_evaluacion.estado')
         ->orderBy('envio_solucion_problemas.created_at', 'DESC');
@@ -66,7 +67,6 @@ class EnvioSolucionProblemaController extends Controller
             $envio->codigo = $request->codigo;
             $envio->juez_virtual()->associate(JuecesVirtuales::find($request->juez_virtual));
             $envio->lenguaje()->associate(LenguajesProgramaciones::where("codigo", "=", $request->lenguaje)->first());
-            $envio->termino = Carbon::now();
             $envio->save();
             DB::commit();
         } catch (\PDOException $e) {
@@ -76,9 +76,10 @@ class EnvioSolucionProblemaController extends Controller
         
         $resultado = $this->enviar_api_juez($envio, $request->lenguaje);
         if ($resultado["estado"]) {
+            $envio->termino = Carbon::now();
+            $envio->save();
             return redirect()->route('envios.ver', ["token" => $envio->token]);
         } else {
-            $envio->delete();
             return back()->with('error', $resultado["mensaje"])->with("codigo", $request->codigo);
         }
     }
@@ -138,8 +139,9 @@ class EnvioSolucionProblemaController extends Controller
             return ["estado" => false, "mensaje" => $e->getMessage()];
         }
         try {
+            DB::beginTransaction();
             for ($i = 0; $i < sizeof($batch_submissions); $i++) {
-                DB::beginTransaction();
+                
                 $evaluacion = new EvaluacionSolucion;
                 $evaluacion->token = $data[$i]['token'];
                 $evaluacion->envio()->associate($envio);
@@ -147,8 +149,8 @@ class EnvioSolucionProblemaController extends Controller
                     $evaluacion->casos_pruebas()->associate($casos[$i]);
                 }
                 $evaluacion->save();
-                DB::commit();
             }
+            DB::commit();
         } catch (\PDOException $e) {
             DB::rollBack();
             return ["estado" => false, "mensaje" => "Error en el ingreso de evaluaciones a la base de datos"];

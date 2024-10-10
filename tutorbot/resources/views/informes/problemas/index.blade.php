@@ -10,6 +10,7 @@
                 <div class="card-header pb-0">
                     <div class="d-flex justify-content-between">
                         <h6>Cursos asociados al problema</h6>
+                        <a href="{{route('problemas.index')}}" class="btn btn-outline-primary">Volver</a>
                     </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
@@ -65,7 +66,9 @@
                                                 <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                     @can('ver informe del problema')
                                                         <a class="btn btn-outline-warning"
-                                                            href="{{ route('informe.problema', ['id_curso' => $curso->id_curso, 'id_problema' => $problema->id]) }}">Ver</a>
+                                                            href="{{ route('informe.envios.problema', ['id_curso' => $curso->id_curso, 'id_problema' => $problema->id]) }}">Envios</a>
+                                                            <a class="btn btn-outline-warning"
+                                                            href="{{ route('informe.problema', ['id_curso' => $curso->id_curso, 'id_problema' => $problema->id]) }}">Informe</a>
                                                     @endcan
                                                 </div>
                                             </td>

@@ -9,7 +9,7 @@ function submitFormEliminar(item, id) {
         if (result.isConfirmed) {
             document.getElementById('eliminarForm_'+id).submit();
         }
-    });
+    })
 }
 
 function submitFormCrear() {
@@ -23,12 +23,12 @@ function submitFormCrear() {
         if (result.isConfirmed) {
             document.getElementById('crearForm').submit();
         }
-    });
+    })
 }
 
 function submitFormEditar(item) {
     Swal.fire({
-        title: "¿Estás seguro que quieres editar "+item+"?",
+        title: "¿Estás seguro que quieres editar el item "+item+"?",
         icon: "warning",
         showDenyButton: true,
         confirmButtonText: "Si",
@@ -37,5 +37,5 @@ function submitFormEditar(item) {
         if (result.isConfirmed) {
             document.getElementById('editarForm').submit();
         }
-    });
+    })
 }

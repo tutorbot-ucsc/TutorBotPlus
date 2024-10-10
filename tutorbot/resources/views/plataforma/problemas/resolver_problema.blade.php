@@ -1,9 +1,9 @@
-@extends('layout_plataforma.app', ['title_html' => $problema->nombre, 'title' => 'Problema - ' . $problema->nombre . ' - Resolver'])
+@extends('layout_plataforma.app', ['title_html' => $problema->nombre, 'title' => 'Problema - ' . $problema->nombre . ' - Resolver', 'breadcrumbs'=>[["nombre"=>"Cursos", "route"=>route("cursos.listado")],["nombre"=>"Problemas", "route"=>route('problemas.listado', ['id'=>$id_curso])],["nombre"=>$problema->nombre,"route"=>route('problemas.ver', ['codigo'=>$problema->codigo, 'id_curso'=>$id_curso])], ["nombre"=>"Resolver"]]])
 @section('content')
     <div class="container-fluid px-4 pb-4">
         @include('components.alert')
         <div class="row">
-            <div class="col">
+            <div class="col-sm col-xs-12">
                 <div class="card border-danger" style="height:100%">
                     <div class="card-header">
                         Editor de Código
@@ -17,7 +17,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-4 col-sm-4">
+            <div class="col-sm-4 col-xs-12">
                 <div class="card border-danger" style="height:100%;">
                     <div class="card-body px-5">
                         <form
@@ -40,7 +40,8 @@
                             </div>
                             <h6 class="text-center mt-4">Lenguaje de Programación</h6>
                             <select class="form-select mb-3" id="lenguaje" name="lenguaje"
-                                onchange="change_language(this)">
+                                onchange="change_language(this)" required>
+                                    <option value="">Selecciona un Lenguaje</option>
                                 @foreach ($lenguajes as $item)
                                     <option value="{{ $item->codigo }}" abreviatura="{{ $item->abreviatura }}">
                                         {{ $item->nombre }}</option>

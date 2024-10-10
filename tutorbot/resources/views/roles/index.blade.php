@@ -34,7 +34,7 @@
                                     <th
                                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                         Creado</th>
-                                    @canany(['editar rol', 'editar rol'])
+                                    @canany(['editar rol', 'eliminar rol'])
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             Acción</th>
@@ -59,7 +59,7 @@
                                             <p class="text-sm font-weight-bold mb-0">
                                                 {{ $rol->fecha ? $rol->fecha : 'Desconocido' }}</p>
                                         </td>
-                                        @canany(['editar rol', 'editar rol'])
+                                        @canany(['editar rol', 'eliminar rol'])
                                             <td class="align-middle text-end">
                                                 <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                     @can('editar rol')

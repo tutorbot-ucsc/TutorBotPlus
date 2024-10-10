@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg rounded border-bottom shadow-sm bg-body-tertiary py-2 px-4">
+<nav class="navbar navbar-expand-lg rounded border-bottom shadow-sm bg-body-tertiary py-2 px-4 position-sticky top-0 start-0" style="width: 100%; z-index:99">
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ route('cursos.listado') }}">
             <img src="{{ asset('img/ucsc_logo2.png') }}" alt="UCSC Logo" height="60" class="me-3">
@@ -19,7 +19,7 @@
                 </li>-->
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('envios.*') ? 'active fw-bold' : '' }}"
-                        href="{{ route('envios.listado') }}">Envios</a>
+                        href="{{ route('envios.listado') }}">Envíos</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
@@ -36,6 +36,8 @@
                             <hr class="dropdown-divider">
                         </li>-->
                         @auth
+                            <li><a class="dropdown-item" href="{{ route('ver.perfil') }}">Mi Perfil</a>
+                            </li>
                             <form role="form" method="post" action="{{ route('logout') }}" id="logout-form">
                                 @csrf
                                 <li><a class="dropdown-item"

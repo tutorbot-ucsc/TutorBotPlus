@@ -48,8 +48,10 @@
             <h3>{{ $title ? $title : 'No Definido' }}</h3>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="#">Inicio</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Cursos</li>
+                    <li class="breadcrumb-item"><a href="{{url('/')}}">Inicio</a></li>
+                    @foreach($breadcrumbs as $key=>$item)
+                    <li class="breadcrumb-item @if($key == sizeof($breadcrumbs)) active @endif" aria-current="page"> @if(isset($item["route"]))<a href="{{$item["route"]}}">{{$item["nombre"]}}</a> @else {{$item["nombre"]}} @endif </li>
+                    @endforeach
                 </ol>
             </nav>
         </div>

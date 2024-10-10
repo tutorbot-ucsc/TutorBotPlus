@@ -13,10 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\UserController;
@@ -40,18 +36,21 @@ if (env('APP_ENV') === 'production') {
     \URL::forceScheme('https');
 }
 //Autenticación
+Route::get('/home', function () {
+	return redirect()->route('login');
+})->middleware('guest');
 Route::get('/', function () {return redirect('/inicio');})->middleware('auth');
-Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
-Route::post('/register', [RegisterController::class, 'store'])->middleware('guest')->name('register.perform');
+//Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
+//Route::post('/register', [RegisterController::class, 'store'])->middleware('guest')->name('register.perform');
 Route::get('/login', [LoginController::class, 'show'])->middleware('guest')->name('login');
 Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login.perform');
-Route::get('/reset-password', [ResetPassword::class, 'show'])->middleware('guest')->name('reset-password');
-Route::post('/reset-password', [ResetPassword::class, 'send'])->middleware('guest')->name('reset.perform');
-Route::get('/change-password', [ChangePassword::class, 'show'])->middleware('guest')->name('change-password');
-Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
+Route::get('/forgot-password', [ResetPassword::class, 'show'])->middleware('guest')->name('password.request');
+Route::post('/forgot-password', [ResetPassword::class, 'send'])->middleware('guest')->name('password.email');
+Route::get('/reset-password/{token}', [ChangePassword::class, 'show'])->middleware('guest')->name('password.reset');
+Route::post('/reset-password', [ChangePassword::class, 'update'])->middleware('guest')->name('password.update');
 Route::get('/inicio', function(){
 	return view('pages.inicio');
-})->name('home')->middleware('auth');
+})->name('home')->middleware(['auth', 'can:acceso al panel de administración']);
 
 //Plataforma de Juez Online
 Route::group(['middleware'=>'auth'], function(){
@@ -76,18 +75,22 @@ Route::group(['middleware'=>'auth'], function(){
 	Route::get('/envio/{token}/retroalimentacion', [LlmController::class, 'ver_retroalimentacion'])->name('envios.retroalimentacion');
 	Route::get('/retroalimentacion/generar', [LlmController::class, 'generar_retroalimentacion'])->name('envios.generar_retroalimentacion');
 
-
+	Route::get('/perfil', [UserController::class, "ver_mi_perfil"])->name('ver.perfil');
+	Route::post('/perfil/update', [UserController::class, "actualizar_informacion"])->name('perfil.update');
 });
 //Panel de Administración
 Route::group(['middleware' => 'auth'], function () {
-	Route::get('/profile', [UserProfileController::class, 'show'])->name('profile');
-	Route::post('/profile', [UserProfileController::class, 'update'])->name('profile.update');
-	Route::get('/profile-static', [PageController::class, 'profile'])->name('profile-static'); 
-	Route::get('/{page}', [PageController::class, 'index'])->name('page');
+	//Route::get('/profile', [UserProfileController::class, 'show'])->name('profile');
+	//Route::post('/profile', [UserProfileController::class, 'update'])->name('profile.update');
+	//Route::get('/profile-static', [PageController::class, 'profile'])->name('profile-static'); 
+	//Route::get('/{page}', [PageController::class, 'index'])->name('page');
 	Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 	Route::prefix('usuarios')->group(function () {
 		Route::get('/index', [UserController::class, 'index'])->name('usuarios.index')->middleware('can:ver usuario'); 
 		Route::get('/crear', [UserController::class, 'crear'])->name('usuarios.crear')->middleware('can:crear usuario'); 
+		Route::get('/bulk_insert', [UserController::class, 'bulk_insertion_form'])->name('usuarios.bulk')->middleware('can:crear usuario'); 
+		Route::get('/bulk_insert/ejemplo', [UserController::class, 'bulk_insertion_example'])->name('usuarios.bulk_ejemplo')->middleware('can:crear usuario'); 
+		Route::post('/bulk_insert/store', [UserController::class, 'bulk_insertion'])->name('usuarios.bulk_store')->middleware('can:crear usuario'); 
 		Route::get('/editar', [UserController::class, 'editar'])->name('usuarios.editar')->middleware('can:editar usuario'); 
 		Route::post('/eliminar', [UserController::class, 'eliminar'])->name('usuarios.eliminar')->middleware('can:eliminar usuario'); 
 		Route::post('/store', [UserController::class, 'store'])->name('usuarios.store')->middleware('can:crear usuario'); 
@@ -146,7 +149,8 @@ Route::group(['middleware' => 'auth'], function () {
 
 	Route::prefix('informes')->group(function () {
 		Route::get('/problemas/{id}/index', [InformeController::class, 'index_problema'])->name('informes.problemas.index')->middleware('can:ver informe del problema'); 
-		Route::get('/problemas/envios/{id_curso}/{id_problema}', [InformeController::class, 'ver_informe_problema'])->name('informe.problema')->middleware('can:ver informe del problema'); 
+		Route::get('/problemas/envios/{id_curso}/{id_problema}/{id_usuario?}', [InformeController::class, 'ver_envios_problema'])->name('informe.envios.problema')->middleware('can:ver informe del problema'); 
+		Route::get('/problemas/informe/{id_curso}/{id_problema}', [InformeController::class, 'ver_informe_problema'])->name('informe.problema')->middleware('can:ver informe del problema'); 
 
 	});
 });

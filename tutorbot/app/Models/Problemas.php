@@ -47,14 +47,14 @@ class Problemas extends Model
     public static function createRules(bool $boolFechaInicio, bool $boolFechaTermino, $codigo=null, $sql=false, $update=false){
         $rules = [
             "nombre" => ['required','max:255','string'],
-            "memoria_limite" => ["nullable","numeric"],
+            "memoria_limite" => ["nullable","numeric", "min:0"],
             "cursos" => ["required","array","min:1"],
-            "tiempo_limite" => ["nullable", "numeric"],
+            "tiempo_limite" => ["nullable", "numeric", "min:0"],
             "visible" => ["required", "boolean"],
             "body_problema" => ["required", "string", "min:50"],
             "body_problema_resumido" => ["string", 'nullable'],
             "habilitar_llm" => ["boolean"],
-            "limite_llm" => ["nullable","numeric"],
+            "limite_llm" => ["nullable","numeric", "min:0"],
         ];
         if(!$sql){
             $rules["lenguajes"] = ['required', 'array', 'min:1'];

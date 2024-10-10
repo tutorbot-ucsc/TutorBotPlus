@@ -15,6 +15,9 @@
                                     <h4 class="font-weight-bolder">Iniciar Sesión</h4>
                                     <p class="mb-0">Ingrese su correo y contraseña</p>
                                 </div>
+                                <div id="alert">
+                                    @include('components.alert')
+                                </div>
                                 <div class="card-body">
                                     <form role="form" method="POST" action="{{ route('login.perform') }}">
                                         @csrf
@@ -48,7 +51,7 @@
                                 <div class="card-footer text-center pt-0 px-lg-2 px-1">
                                     <p class="mb-1 text-sm mx-auto">
                                         ¿Olvidaste tu contraseña? Recupera tu contraseña
-                                        <a href="{{ route('reset-password') }}"
+                                        <a href="{{ route('password.request') }}"
                                             class="text-primary text-gradient font-weight-bold">aquí</a>
                                     </p>
                                 </div>

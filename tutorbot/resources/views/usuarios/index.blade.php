@@ -8,7 +8,10 @@
                 <div class="card-header pb-0">
                     <div class="d-flex justify-content-between">
                         <h6>Usuarios</h6>
-                        <a class="btn btn-primary active" href="{{ route('usuarios.crear') }}">Crear</a>
+                        <div>
+                            <a class="btn btn-primary active" href="{{ route('usuarios.crear') }}">Crear</a>
+                            <a class="btn btn-primary active" href="{{ route('usuarios.bulk') }}">Inserción Masiva</a>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
@@ -40,7 +43,7 @@
                                     <th
                                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                         Creado</th>
-                                    @canany(['editar usuario', 'editar usuario'])
+                                    @canany(['editar usuario', 'eliminar usuario'])
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             Acción</th>
@@ -88,7 +91,7 @@
                                             <p class="text-sm font-weight-bold mb-0">
                                                 {{ $user->fecha ? $user->fecha : 'Desconocido' }}</p>
                                         </td>
-                                        @canany(['editar usuario', 'editar usuario'])
+                                        @canany(['editar usuario', 'eliminar usuario'])
                                             <td class="align-middle text-end">
                                                 <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                     @can('editar usuario')

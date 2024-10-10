@@ -37,7 +37,10 @@ class EvaluacionSolucionController extends Controller
             }
         }
         if (sizeof($evaluacion_arr) > 0) {
-            $this::api_request($juez, $evaluacion_arr, $envio);
+            $estado = $this::api_request($juez, $evaluacion_arr, $envio);
+            if($estado=="error"){
+                return redirect()->route('envios.listado')->with("error", $estado);
+            }
         }
         if(isset($envio->termino)){
             $diferencia = Carbon::parse($envio->termino)->diffInSeconds(Carbon::parse($envio->inicio));
@@ -64,6 +67,11 @@ class EvaluacionSolucionController extends Controller
                 'headers' => $header,
             ]);
             $data = json_decode($response->getBody(), true);
+        }catch(\Exception $e){
+            return ["error"=> "Error al conecatr con la API del juez virtual"];
+        }
+        try{
+            DB::beginTransaction();
             foreach ($data["submissions"] as $item) {
                 $evaluacion = $evaluacion_arr[$item["token"]];
                 $evaluacion->resultado = $item['status']["description"];
@@ -90,8 +98,10 @@ class EvaluacionSolucionController extends Controller
                     $evaluacion->save();
                 }
             }
-        } catch (\Exception $e) {
-            return $e->getMessage();
+            DB::commit();
+        } catch (\PDOException $e) {
+            DB::rollBack();
+            return ["error"=>"Error al verificar las evaluaciones"];
         }
     }
 }
