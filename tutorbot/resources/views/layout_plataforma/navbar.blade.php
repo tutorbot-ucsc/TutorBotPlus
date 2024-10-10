@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg rounded border-bottom shadow-sm bg-body-tertiary py-2 px-4">
+<nav class="navbar navbar-expand-lg rounded border-bottom shadow-sm bg-body-tertiary py-2 px-4 position-sticky top-0 start-0" style="width: 100%; z-index:99">
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ route('cursos.listado') }}">
             <img src="{{ asset('img/ucsc_logo2.png') }}" alt="UCSC Logo" height="60" class="me-3">
