@@ -9,7 +9,7 @@ function submitFormEliminar(item, id) {
         if (result.isConfirmed) {
             document.getElementById('eliminarForm_'+id).submit();
         }
-    });
+    })
 }
 
 function submitFormCrear() {
@@ -23,7 +23,7 @@ function submitFormCrear() {
         if (result.isConfirmed) {
             document.getElementById('crearForm').submit();
         }
-    });
+    })
 }
 
 function submitFormEditar(item) {
@@ -37,5 +37,5 @@ function submitFormEditar(item) {
         if (result.isConfirmed) {
             document.getElementById('editarForm').submit();
         }
-    });
+    })
 }

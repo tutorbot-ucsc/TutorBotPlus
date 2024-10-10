@@ -67,7 +67,6 @@ class EnvioSolucionProblemaController extends Controller
             $envio->codigo = $request->codigo;
             $envio->juez_virtual()->associate(JuecesVirtuales::find($request->juez_virtual));
             $envio->lenguaje()->associate(LenguajesProgramaciones::where("codigo", "=", $request->lenguaje)->first());
-            $envio->termino = Carbon::now();
             $envio->save();
             DB::commit();
         } catch (\PDOException $e) {
@@ -77,6 +76,8 @@ class EnvioSolucionProblemaController extends Controller
         
         $resultado = $this->enviar_api_juez($envio, $request->lenguaje);
         if ($resultado["estado"]) {
+            $envio->termino = Carbon::now();
+            $envio->save();
             return redirect()->route('envios.ver', ["token" => $envio->token]);
         } else {
             return back()->with('error', $resultado["mensaje"])->with("codigo", $request->codigo);

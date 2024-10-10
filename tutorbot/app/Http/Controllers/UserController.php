@@ -121,7 +121,7 @@ class UserController extends Controller
                 $usuario_nuevo->lastname = $usuario_data["lastname"];
                 $usuario_nuevo->email = $usuario_data["email"];
                 $usuario_nuevo->rut = $usuario_data["rut"];
-                $usuario_nuevo->password = str_replace("-", "", $usuario_data["rut"]);
+                $usuario_nuevo->password = substr($usuario_data["rut"], 0, -2);
                 $usuario_nuevo->save();
                 $cursos_modelos = Cursos::whereIn("codigo", $usuario_data["cursos"])->get();
                 $roles_modelos = Role::whereIn("name", $usuario_data["roles"])->get();
@@ -143,7 +143,7 @@ class UserController extends Controller
                 $user->notify(new UsuarioCreado());
             }
         }catch(\Exception $e){
-            return redirect()->route('usuarios.index')->with("success", "Advertencia: Usuarios creados pero ha ocurrido un error al enviar el correo de confirmación a los usuarios creados.");
+            return redirect()->route('usuarios.index')->with("success", "Advertencia: Los usuarios han sido creados pero ha ocurrido un error al enviar el correo de confirmación a los usuarios creados.");
         }
         return redirect()->route('usuarios.index')->with("success", "Los usuarios han sido creados de manera correcta.");
     }
@@ -164,8 +164,8 @@ class UserController extends Controller
             'firstname' => 'string',
             'lastname' => 'string',
             'fecha_nacimiento' => 'date',
-            'password' => 'required|min:8|required_with:password_confirmation|same:password_confirmation',
-            'password_confirmation' => 'required|min:8',
+            'cursos'=>'required|array|min:1',
+            'roles'=>'required|array|min:1',
         ]);
         DB::beginTransaction();
         try {
@@ -176,16 +176,17 @@ class UserController extends Controller
             $usuario->firstname = $request->input('firstname');
             $usuario->lastname = $request->input('lastname');
             $usuario->fecha_nacimiento = $request->input('fecha_nacimiento');
-            $usuario->password = $request->input('password');
+            $usuario->password = substr($request->input('rut'), 0, -2);
             $usuario->save();
             $usuario->cursos()->sync($request->input('cursos'));
+            $usuario->syncRoles($request->roles);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->route('usuarios.index')->with('error', $e->getMessage());
+            return redirect()->route('usuarios.index')->with('error', $e->getMessage())->withInput();
         }
-        $usuario->syncRoles($request->roles);
-        return redirect()->route('usuarios.index')->with('success', 'El usuario ha sido creado');
+        $usuario->notify(new UsuarioCreado());
+        return redirect()->route('usuarios.index')->with('success', 'El usuario "'.$usuario->username.'" ha sido creado');
     }
 
     public function update(Request $request)

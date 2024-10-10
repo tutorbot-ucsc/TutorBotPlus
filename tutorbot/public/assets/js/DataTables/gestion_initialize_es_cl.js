@@ -1,4 +1,4 @@
-var indexLastColumn = $("#table").find('tr')[0].cells.length-2; //busca la penultima columna de la tabla, la penultima columna es siempre la fecha de creación.
+var indexLastColumn = $("#table").find('tr')[0].cells.length-2 //busca la penultima columna de la tabla, la penultima columna es siempre la fecha de creación.
 const espaniol = {
     "aria": {
         "sortAscending": ": orden ascendente",
@@ -249,4 +249,4 @@ new DataTable('#table', {
     language :  espaniol,
     responsive: true,
     order: [[indexLastColumn, 'desc']]
-});
+})

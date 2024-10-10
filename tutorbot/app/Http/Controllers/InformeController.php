@@ -16,13 +16,20 @@ class InformeController extends Controller
 {
     public function index_problema(Request $request){
         $problema = Problemas::with("cursos")->find($request->id);
-        $cursos = $problema->cursos()->select('disponible.cantidad_resueltos', 'disponible.cantidad_intentos', 'disponible.cant_retroalimentacion_solicitada','cursos.id as id_curso','cursos.nombre', 'cursos.codigo')->get();
+        if(!isset($problema)){
+            return redirect()->route('problemas.index')->with('error', 'El problema que estás tratando de acceder no existe.');
+        }
+        $cursos_usuarios = auth()->user()->cursos()->select('cursos.id')->get()->pluck('id')->toArray();
+        $cursos = $problema->cursos()->select('disponible.cantidad_resueltos', 'disponible.cantidad_intentos', 'disponible.cant_retroalimentacion_solicitada','cursos.id as id_curso','cursos.nombre', 'cursos.codigo')->whereIn('cursos.id', $cursos_usuarios)->get();
         return view("informes.problemas.index", compact("problema", "cursos"));
     }
     public function ver_envios_problema(Request $request){
         $problema = Problemas::find($request->id_problema);
         if(!isset($problema) && !Cursos::where("id", "=", $request->id_curso)->exists()){
-            redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("Error", "El curso o problema no existe");
+           return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("Error", "El curso o problema no existe");
+        }
+        if(!auth()->user()->cursos()->where('cursos.id', '=', $request->id_curso)->exists()){
+           return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("Error", "No tienes acceso para ver éste informe");
         }
         $ultima_evaluacion = DB::table('evaluacion_solucions')
         ->select('resultado', 'id_envio', 'estado')
@@ -54,6 +61,12 @@ class InformeController extends Controller
     }
 
     public function ver_informe_problema(Request $request){
+        if(!Problemas::where('problemas.id', '=', $request->id_problema)->exists() || !Cursos::where("cursos.id", "=", $request->id_curso)->exists()){
+            return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("Error", "El curso o problema no existe");
+        }
+        if(!auth()->user()->cursos()->where('cursos.id', '=', $request->id_curso)->exists()){
+            return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("Error", "No tienes acceso para ver éste informe porque no estás asignado al curso correspondiente.");
+        }
         $estadistica_estados = EvaluacionSolucion::join('envio_solucion_problemas', 'envio_solucion_problemas.id', '=', 'evaluacion_solucions.id_envio')->select('resultado')->where('envio_solucion_problemas.id_problema', '=', $request->id_problema)->where('envio_solucion_problemas.id_curso', '=', $request->id_curso)->get()->countBy('resultado')->toArray();
         $cantidad_solucionados = EnvioSolucionProblema::where("id_problema", "=", $request->id_problema)->where('id_curso', '=', $request->id_curso)->where('solucionado', '=', true)->count();
         $info_usuarios_envios = DB::table('envio_solucion_problemas')

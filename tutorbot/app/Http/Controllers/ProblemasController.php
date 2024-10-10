@@ -238,6 +238,9 @@ class ProblemasController extends Controller
     {
         try {
             $problema = Problemas::where('codigo', '=', $request->codigo)->first();
+            if(!Cursos::where('cursos.id','=',$request->id_curso)->exists()){
+                return redirect()->route('cursos.listado')->with('error', 'El curso que estás tratando de acceder no existe.');
+            }
             $cursos_usuario = auth()->user()->cursos()->get()->pluck('id')->toArray();
             if (!$problema->cursos()->whereIn('cursos.id', $cursos_usuario)->exists() || $problema->visible == false) {
                 return redirect()->route('cursos.listado')->with('error', 'No tienes acceso al problema ' . $problema->nombre);

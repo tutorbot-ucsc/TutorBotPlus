@@ -26,48 +26,51 @@
 @push('js')
     <script src="{{ asset('assets/js/plugins/chartjs.min.js') }}"></script>
     <script>
+        const cant_lenguajes = @json(sizeof($lenguajes_estadistica));
+        const estadistica_estado_key = @json(array_keys($estadistica_estados));
+        var rgb_lenguajes = []
+        var rgb_estados_envios = []
+        for(var i=0; i<cant_lenguajes; i++){
+            rgb_lenguajes.push('rgb(' + Math.random() * 255 + ', ' + Math.random() * 255 + ', ' + Math.random() * 255 +')')
+        }
+        estadistica_estado_key.forEach(element => {
+            switch(element){
+                case "Accepted":
+                    rgb_estados_envios.push('rgb(42,255,0)');
+                    break;
+                case "Wrong Answer":
+                    rgb_estados_envios.push('rgb(255,45,0)');
+                    break;
+                case "Time Limit Exceeded":
+                    rgb_estados_envios.push('rgb(255,251,0)');
+                    break;
+                case "Compilation Error":
+                    rgb_estados_envios.push('rgb(26,82,255)');
+                    break;
+                case "Internal Error":
+                    rgb_estados_envios.push('rgb(255,193,29)')
+                    break;
+                case "Exec Format Error":
+                    rgb_estados_envios.push('rgb(39,246,243)')
+                    break;
+                default:
+                    rgb_estados_envios.push('rgb(255,)' + Math.random() * 255 + ', ' + Math.random() * 255 +')');
+            }
+        });
         const data_1 = {
             labels: @json(array_keys($estadistica_estados)),
             datasets: [{
-                label: 'Lenguajes de Programación',
+                label: 'Estados de los envios',
                 data: @json(array_values($estadistica_estados)),
-                backgroundColor: [
-                    'rgb(' + Math.random() * 255 + ', ' + Math.random() * 255 + ', ' + Math.random() * 255 +
-                    ')',
-                    'rgb(' + Math.random() * 255 + ', ' + Math.random() * 255 + ', ' + Math.random() * 255 +
-                    ')',
-                    'rgb(' + Math.random() * 255 + ', ' + Math.random() * 255 + ', ' + Math.random() * 255 +
-                    ')',
-                    'rgb(' + Math.random() * 255 + ', ' + Math.random() * 255 + ', ' + Math.random() * 255 +
-                    ')',
-                    'rgb(' + Math.random() * 255 + ', ' + Math.random() * 255 + ', ' + Math.random() * 255 +
-                    ')',
-                ],
+                backgroundColor: rgb_estados_envios,
             }]
         }
         const data_2 = {
             labels: @json(array_keys($lenguajes_estadistica)),
             datasets: [{
-                label: 'Estados de los envios',
+                label: 'Lenguajes de Programación utilizados',
                 data: @json(array_values($lenguajes_estadistica)),
-                backgroundColor: [
-                    'rgb(' + Math.random() * 255 + ', ' + Math.random() * 255 + ', ' + Math.random() * 255 +
-                    ')',
-                    'rgb(' + Math.random() * 255 + ', ' + Math.random() * 255 + ', ' + Math.random() * 255 +
-                    ')',
-                    'rgb(' + Math.random() * 255 + ', ' + Math.random() * 255 + ', ' + Math.random() * 255 +
-                    ')',
-                    'rgb(' + Math.random() * 255 + ', ' + Math.random() * 255 + ', ' + Math.random() * 255 +
-                    ')',
-                    'rgb(' + Math.random() * 255 + ', ' + Math.random() * 255 + ', ' + Math.random() * 255 +
-                    ')',
-                    'rgb(' + Math.random() * 255 + ', ' + Math.random() * 255 + ', ' + Math.random() * 255 +
-                    ')',
-                    'rgb(' + Math.random() * 255 + ', ' + Math.random() * 255 + ', ' + Math.random() * 255 +
-                    ')',
-                    'rgb(' + Math.random() * 255 + ', ' + Math.random() * 255 + ', ' + Math.random() * 255 +
-                    ')',
-                ],
+                backgroundColor: rgb_lenguajes,
             }]
         }
         const config_1 = {

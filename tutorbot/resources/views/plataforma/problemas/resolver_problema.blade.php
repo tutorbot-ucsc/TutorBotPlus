@@ -40,7 +40,8 @@
                             </div>
                             <h6 class="text-center mt-4">Lenguaje de Programación</h6>
                             <select class="form-select mb-3" id="lenguaje" name="lenguaje"
-                                onchange="change_language(this)">
+                                onchange="change_language(this)" required>
+                                    <option value="">Selecciona un Lenguaje</option>
                                 @foreach ($lenguajes as $item)
                                     <option value="{{ $item->codigo }}" abreviatura="{{ $item->abreviatura }}">
                                         {{ $item->nombre }}</option>

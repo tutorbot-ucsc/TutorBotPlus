@@ -34,6 +34,7 @@ class RoleController extends Controller
     public function store(Request $request){
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'permisos'=> 'required|array|min:1',
         ]);
         
         db::beginTransaction();
