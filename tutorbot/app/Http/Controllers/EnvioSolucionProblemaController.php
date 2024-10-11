@@ -16,7 +16,6 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Facades\Storage;
 class EnvioSolucionProblemaController extends Controller
 {
-
     public function ver_envios(Request $request){
         $ultima_evaluacion = DB::table('evaluacion_solucions')
         ->select('resultado', 'id_envio', 'estado')
@@ -86,6 +85,7 @@ class EnvioSolucionProblemaController extends Controller
 
     public function enviar_api_juez($envio, $lenguaje)
     {
+        $c_codes = [104, 75, 103, 48, 49, 50]; //codigos de compiladores de C en Judge0
         try {
             $problema = Problemas::find($envio->id_problema);
             $juez = JuecesVirtuales::find($envio->id_juez);
@@ -97,7 +97,11 @@ class EnvioSolucionProblemaController extends Controller
         $batch_submissions = [];
         $casos = $problema->casos_de_prueba()->get();
         $initial_json_string = '{"language_id":' . $lenguaje . ',"source_code":"' . $codigo . '"';
-        if(isset($memoria_limite)){
+        if(in_array($lenguaje, $c_codes)){
+            //añade la opción de compilador -lm para librerias <math.h>, esto es temporal.
+            $initial_json_string = $initial_json_string.',"compiler_options":"-lm"';
+        }
+        if(isset($problema->memoria_limite)){
             $initial_json_string = $initial_json_string.',"memory_limit":"'.$problema->memoria_limite.'"';
         }
         if(isset($problema->tiempo_limite)){
