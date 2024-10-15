@@ -13,7 +13,7 @@
                     <p>Para insertar usuarios de manera masiva, debe subir un archivo .csv con la información personal de los usuarios, cursos y roles.
                        <br><a href="{{asset('examples/ejemplo_bulk_usuarios.csv')}}" style="color: blue;" download>Haga click aquí</a> para descargar el archivo ejemplo de csv.
                     </p>
-                    <p>La contraseña se asigna de manera automática y es el rut del usuario.</p>
+                    <p>La contraseña se asigna de manera automática y es el RUT sin el dígito verificador del usuario.</p>
                     <div class="mb-3">
                         <input class="form-control" type="file" id="formFile" id="csvFile" name="csvFile" required>
                         <label for="formFile" class="form-label">Formatos: .csv, .txt</label>

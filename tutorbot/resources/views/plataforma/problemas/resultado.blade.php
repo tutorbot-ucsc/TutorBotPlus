@@ -82,15 +82,16 @@
                             <div class="row px-5">
                                 <a class="btn btn-primary btn-block {{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? '' : 'disabled' }}"
                                     href="{{ route('envios.generar_retroalimentacion', ['token' => $envio->token]) }}"
-                                    role="button" onclick="solicitarRetroalimentacion(event)">{{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? 'Solicitar Retroalimentacion (Cantidad Disponible: ' . $cant_retroalimentacion . ')' : 'Retroalimentación no disponible' }}</a>
+                                    role="button" onclick="solicitarRetroalimentacion(event)">{{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? 'Solicitar Ayuda (Cantidad Disponible: ' . $cant_retroalimentacion . ')' : 'Ayuda no disponible' }}</a>
                             </div>
                         @elseif($envio->id_usuario == auth()->user()->id && !$evaluaciones->contains('estado', '=', 'En Proceso') && $tieneRetroalimentacion == true)
                             <div class="row px-5">
                                 <a class="btn btn-primary text-nowrap btn-block"
                                     href="{{ route('envios.retroalimentacion', ['token' => $envio->token]) }}"
-                                    role="button">Ver Retroalimentación</a>
+                                    role="button">Ver Ayuda</a>
                             </div>
                         @endif
+                        <hr>
                         @if ($envio->id_usuario == auth()->user()->id && !$evaluaciones->contains('estado', '=', 'En Proceso') && $envio->solucionado == false)
                             <div class="row px-5 mt-2">
                                 <a class="btn btn-outline-secondary text-nowrap btn-block"
