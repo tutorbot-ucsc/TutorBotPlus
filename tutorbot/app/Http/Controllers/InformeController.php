@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\EvaluacionSolucion;
 use App\Models\LenguajesProgramaciones;
 use App\Models\EnvioSolucionProblema;
+use App\Models\SolicitudRaLlm;
 use Illuminate\Database\Query\Builder;
 use Carbon\Carbon;
 class InformeController extends Controller
@@ -117,5 +118,34 @@ class InformeController extends Controller
         }
         $problema_estadistica->tiempo_promedio = gmdate('H:i:s', $problema_estadistica->tiempo_promedio);
         return view('informes.problemas.informe', compact('estadistica_estados', 'envios', 'lenguajes_estadistica', 'problema_estadistica', 'cantidad_solucionados'))->with("id_problema", $request->id_problema);
+    }
+
+    public function ver_informe_curso(Request $request){
+        if(!auth()->user()->cursos()->where('cursos.id', '=', $request->id_curso)->exists()){
+            return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("Error", "No tienes acceso para ver éste informe porque no estás asignado al curso correspondiente.");
+        }
+        $estadistica_estados = EvaluacionSolucion::join('envio_solucion_problemas', 'envio_solucion_problemas.id', '=', 'evaluacion_solucions.id_envio')->select('resultado')->where('envio_solucion_problemas.id_curso', '=', $request->id_curso)->get()->countBy('resultado')->toArray();
+        $lenguajes_estadistica = DB::table('lenguajes_programaciones')
+        ->join('envio_solucion_problemas', 'envio_solucion_problemas.id_lenguaje', '=', 'lenguajes_programaciones.id')
+        ->select('lenguajes_programaciones.nombre')
+        ->where('envio_solucion_problemas.id_curso', '=', $request->id_curso)
+        ->whereNotNull('envio_solucion_problemas.termino')
+        ->get()->countBy('nombre')->toArray();
+        $problema_mas_intentado = DB::table('problemas')
+        ->join('envio_solucion_problemas', 'envio_solucion_problemas.id_problema', '=', 'problemas.id')
+        ->where('envio_solucion_problemas.id_curso', '=', $request->id_curso)
+        ->where('solucionado', '=', true)
+        ->select('problemas.nombre', 'problemas.codigo', DB::raw('count(envio_solucion_problemas.id) as cantidad_resueltos'))
+        ->groupBy('problemas.nombre', 'problemas.codigo')
+        ->orderBy('cantidad_resueltos', 'DESC')
+        ->get();
+        $problema_mas_resuelto = DB::table('problemas')
+        ->join('envio_solucion_problemas', 'envio_solucion_problemas.id_problema', '=', 'problemas.id')
+        ->where('envio_solucion_problemas.id_curso', '=', $request->id_curso)
+        ->select('problemas.nombre', 'problemas.codigo', DB::raw('count(envio_solucion_problemas.id) as cantidad_intentos'), DB::raw())
+        ->groupBy('problemas.nombre', 'problemas.codigo')
+        ->orderBy('cantidad_resueltos', 'DESC')
+        ->get();
+        
     }
 }

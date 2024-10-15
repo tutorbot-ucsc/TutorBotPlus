@@ -98,7 +98,7 @@ class UserController extends Controller
                 }
                 $usuario_data = array_filter(explode(";", $string_info));
                 if(sizeof($usuario_data)<7){
-                    throw new \Exception("Faltan datos en el usuario de la columna ".($key+1).": [".$string_info."]. Ingrese nuevamente el archivo corregido y asegurese de que todos los datos necesarios estén presentes.");
+                    throw new \Exception("Faltan datos en el usuario de la columna ".($key+1).": [".$string_info."]. Ingrese nuevamente el archivo corregido y asegúrese de que todos los datos requeridos estén presentes.");
                 }
                 $usuario_data = array_combine($keys_array, $usuario_data);
                 $usuario_data["cursos"] = array_filter(explode(",",str_replace(["[","]"], "", $usuario_data["cursos"])));
@@ -125,6 +125,9 @@ class UserController extends Controller
                 $usuario_nuevo->save();
                 $cursos_modelos = Cursos::whereIn("codigo", $usuario_data["cursos"])->get();
                 $roles_modelos = Role::whereIn("name", $usuario_data["roles"])->get();
+                if(!isset($cursos_modelos, $roles_modelos)){
+                    throw new \Exception("Error: Cursos y/o roles del usuario de la columna ".($key+1)." no existen:\n[".$string_info."].\n ");
+                }
                 $usuario_nuevo->cursos()->sync($cursos_modelos);
                 $usuario_nuevo->roles()->sync($roles_modelos);
                 $usuario_nuevo->save();

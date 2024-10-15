@@ -33,6 +33,7 @@ return new class extends Migration
             $table->foreign('id_problema')->references('id')->on('problemas')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('id_juez')->references('id')->on('jueces_virtuales')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('id_lenguaje')->references('id')->on('lenguajes_programaciones')->onDelete('set null')->onUpdate('cascade');
+            $table->foreign('id_certamen')->references('id')->on('resolucion_certamenes')->onDelete('set null')->onUpdate('cascade');
         });
     }
 
