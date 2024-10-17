@@ -8,15 +8,24 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Cursos;
 use App\Models\Problemas;
-
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Certamenes extends Model
 {
     use HasFactory;
 
-    public function cursos(): HasMany
+    public static $rules = 
+    [
+        "nombre" => ["string", "required"],
+        "descripcion" =>["string", "required","min:50"],
+        "fecha_inicio" => ["date", "before_or_equal:fecha_termino", "required"],
+        "fecha_termino" => ["date", "after_or_equal:fecha_inicio", "required"],
+        "curso" => ["required", "numeric"],
+        "penalizacion_error" => ["nullable", "min:0"]
+    ];
+    public function curso(): BelongsTo
     {
-        return $this->HasMany(Cursos::class, 'id_curso');
+        return $this->belongsTo(Cursos::class, 'id_curso');
     }
 
     public function problemas(): BelongsToMany

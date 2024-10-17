@@ -120,7 +120,7 @@ class InformeController extends Controller
         return view('informes.problemas.informe', compact('estadistica_estados', 'envios', 'lenguajes_estadistica', 'problema_estadistica', 'cantidad_solucionados'))->with("id_problema", $request->id_problema);
     }
 
-    public function ver_informe_curso(Request $request){
+    /*public function ver_informe_curso(Request $request){
         if(!auth()->user()->cursos()->where('cursos.id', '=', $request->id_curso)->exists()){
             return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("Error", "No tienes acceso para ver éste informe porque no estás asignado al curso correspondiente.");
         }
@@ -147,5 +147,5 @@ class InformeController extends Controller
         ->orderBy('cantidad_resueltos', 'DESC')
         ->get();
         
-    }
+    }*/
 }

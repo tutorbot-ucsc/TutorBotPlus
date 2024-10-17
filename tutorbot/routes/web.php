@@ -21,6 +21,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\ResetPassword;
 use App\Http\Controllers\ChangePassword;
+use App\Http\Controllers\CertamenesController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\LenguajesProgramacionesController;
 use App\Http\Controllers\CategoriaProblemaController;
@@ -127,6 +128,15 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/eliminar', [CategoriaProblemaController::class, 'eliminar'])->name('categorias.eliminar')->middleware('can:eliminar categoría de problema'); 
 		Route::post('/store', [CategoriaProblemaController::class, 'store'])->name('categorias.store')->middleware('can:crear categoría de problema'); 
 		Route::post('/update', [CategoriaProblemaController::class, 'update'])->name('categorias.update')->middleware('can:editar categoría de problema'); 
+	});
+
+	Route::prefix('evaluacion')->group(function () {
+		Route::get('/index', [CertamenesController::class, 'index'])->name('certamen.index')->middleware('can:ver certamen'); 
+		Route::get('/crear', [CertamenesController::class, 'crear'])->name('certamen.crear')->middleware('can:crear certamen'); 
+		Route::get('/editar', [CertamenesController::class, 'editar'])->name('certamen.editar')->middleware('can:editar certamen'); 
+		Route::post('/eliminar', [CertamenesController::class, 'eliminar'])->name('certamen.eliminar')->middleware('can:eliminar certamen'); 
+		Route::post('/store', [CertamenesController::class, 'store'])->name('certamen.store')->middleware('can:crear certamen'); 
+		Route::post('/update', [CertamenesController::class, 'update'])->name('certamen.update')->middleware('can:editar certamen'); 
 	});
 	Route::prefix('problemas')->group(function () {
 		Route::get('/index', [ProblemasController::class, 'index'])->name('problemas.index')->middleware('can:ver problemas'); 
