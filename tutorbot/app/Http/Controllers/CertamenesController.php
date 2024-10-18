@@ -48,7 +48,7 @@ class CertamenesController extends Controller
             DB::rollBack();
             return back()->withInput()->with("error", $e->getMessage());
         }
-        return redirect()->route('certamen.index')->with('success', 'La evaluación "'.$certamen->nombre.'" ha sido creado.');
+        return redirect()->route('certamen.banco_problemas', ['id_certamen'=>$certamen->id])->with('success', 'La evaluación "'.$certamen->nombre.'" ha sido creado.');
     }
 
     public function update(Request $request){
@@ -77,7 +77,7 @@ class CertamenesController extends Controller
     public function eliminar(Request $request){
         try{
             DB::beginTransaction();
-            $certamen = Certamen::find($request->id);
+            $certamen = Certamenes::find($request->id);
             $certamen->delete();
             DB::commit();
         }catch(\PDOException $e){

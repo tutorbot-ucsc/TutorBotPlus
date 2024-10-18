@@ -24,22 +24,21 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('casos_pruebas.add', ['id' => $problema->id]) }}" method="POST">
+                    <form action="{{ route('certamen.add_problema', ['id_certamen' => $certamen->id]) }}" method="POST">
                         @csrf
-                        @include('problemas.casos_pruebas.form')
+                        @include('certamen.banco_de_problemas.form')
                     </form>
                     
                     <div class="table-responsive p-0">
                         <table class="table align-items-center mb-0" id="table">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Puntaje
+                                    <th>Problema
                                     </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Problema
+                                    <th>Puntaje
                                     </th>
                                     @canany(['editar certamen'])
-                                        <th
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        <th>
                                             Acción</th>
                                     @endcanany
                                 </tr>
@@ -48,17 +47,16 @@
                                 @foreach ($banco_problemas as $problema)
                                     <tr>
                                         <td>
-                                            <h6 class="mb-0 text-sm">{{ $problema->puntaje }}
-                                            </h6>
+                                            <h6>{{ $problema->nombre }}
                                         </td>
                                         <td>
-                                            <h6 class="mb-0 text-sm">{{ $problema->nombre }}
+                                            <h6>{{ $problema->puntaje }}
                                             </h6>
                                         </td>
                                         <td class="align-middle text-end">
                                             <div class="d-flex px-3 py-1 justify-content-center align-items-center">
-                                                @can('editar problemas')
-                                                    <form action="{{ route('casos_pruebas.eliminar', ['id' => $item->id]) }}"
+                                                @can('editar certamen')
+                                                    <form action="{{ route('certamen.eliminar_problema', ['id_certamen' => $certamen->id, 'id_problema'=>$problema->id_problema]) }}"
                                                         method="POST">
                                                         @csrf
                                                         <button type="submit" class="btn btn-outline-danger"><i
@@ -76,7 +74,7 @@
             </div>
         </div>
     </div>
-    @include('problemas.casos_pruebas.ejemplo')
+    @include('certamen.banco_de_problemas.ayuda')
 @endsection
 @push('js')
     <link href="{{ asset('assets/js/DataTables/datatables.min.css') }}" rel="stylesheet">

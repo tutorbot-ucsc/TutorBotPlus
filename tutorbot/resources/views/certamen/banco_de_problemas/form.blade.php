@@ -2,8 +2,8 @@
     <div class="col">
         <div class="mb-3">
             <label for="problema" class="form-label">Problema</label>
-            <select class="form-select form-select-lg mb-3" id="problema" name="problema" required>
-                <option selected>Seleccione un problema</option>
+            <select class="form-select mb-3" id="problema" name="problema" required>
+                <option value="">Seleccione un problema</option>
                 @foreach($problemas as $problema)
                     <option value="{{$problema->id}}">{{$problema->nombre}}</option>
                 @endforeach
@@ -21,10 +21,14 @@
                 <p class="text-danger text-xs pt-1"> {{ $message }} </p>
             @enderror
         </div>
-        <button class="btn btn-primary mt-2" type="submit">Añadir</button>
-        <button type="button" class="btn bg-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#ejemplo_modal">
-            Ver Ejemplo
-        </button>
-        <a href="{{route('problemas.index')}}" class="btn bg-outline-primary mt-2">Volver</a>
     </div>
+</div>
+<div class="row">
+<div class="col d-flex justify-content-end">
+    <button class="btn btn-primary mt-2" type="submit">Añadir</button>
+    <button type="button" class="btn bg-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#ejemplo_modal">
+        Ayuda
+    </button>
+    <a href="{{route('certamen.index')}}" class="btn bg-outline-primary mt-2 me-5">Volver</a>
+</div>
 </div>

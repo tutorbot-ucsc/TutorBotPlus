@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Cursos;
 use App\Models\Problemas;
+use App\Models\banco_problemas_certamenes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Certamenes extends Model
@@ -30,6 +31,6 @@ class Certamenes extends Model
 
     public function problemas(): BelongsToMany
     {
-        return $this->belongsToMany(Problemas::class, 'banco_problemas_certamenes', 'id_certamen', 'id_problema');
+        return $this->belongsToMany(Problemas::class, 'banco_problemas_certamenes', 'id_certamen', 'id_problema')->withTimestamps()->withPivot(['puntaje', 'id'])->using(banco_problemas_certamenes::class);
     }
 }

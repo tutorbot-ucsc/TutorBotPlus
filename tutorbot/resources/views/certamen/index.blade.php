@@ -83,6 +83,8 @@
                                             <td class="align-middle text-end">
                                                 <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                     @can('editar certamen')
+                                                    <a class="btn btn-outline-warning"
+                                                            href="{{ route('certamen.banco_problemas', ['id_certamen' => $certamen->id]) }}">Banco</a>
                                                         <a class="btn btn-outline-warning"
                                                             href="{{ route('certamen.editar', ['id' => $certamen->id]) }}"><i
                                                                 class="fa fa-pencil"></i></a>
