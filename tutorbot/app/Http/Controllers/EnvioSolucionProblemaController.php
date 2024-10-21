@@ -25,25 +25,27 @@ class EnvioSolucionProblemaController extends Controller
         ->orderBy('id_caso','DESC')
         ->groupBy('id_envio', 'resultado', 'estado');
 
+
+        //dd($ultima_evaluacion->get());
         $envios_query = DB::table('envio_solucion_problemas')
-        ->join('problemas', 'problemas.id', '=', 'envio_solucion_problemas.id_problema')
-        ->join('casos__pruebas', 'casos__pruebas.id_problema', '=', 'problemas.id')
-        ->join('lenguajes_programaciones', 'lenguajes_programaciones.id', '=', 'envio_solucion_problemas.id_lenguaje')
-        ->join('cursos', 'cursos.id', '=', 'envio_solucion_problemas.id_curso')
         ->leftJoinSub($ultima_evaluacion, 'ultima_evaluacion', function (JoinClause $join){
             $join->on('envio_solucion_problemas.id', '=', 'ultima_evaluacion.id_envio');
         })
+        ->join('resolver', 'resolver.id', '=', 'envio_solucion_problemas.id_resolver')
+        ->join('problemas', 'problemas.id', '=', 'resolver.id_problema')
+        ->join('casos__pruebas', 'casos__pruebas.id_problema', '=', 'problemas.id')
+        ->join('lenguajes_programaciones', 'lenguajes_programaciones.id', '=', 'resolver.id_lenguaje')
+        ->join('cursa', 'cursa.id', '=', 'envio_solucion_problemas.id_cursa')
+        ->join('cursos', 'cursos.id', '=', 'cursa.id_curso')
         ->whereNull('id_certamen')
-        ->where('id_usuario', '=', auth()->user()->id)
+        ->where('cursa.id_usuario', '=', auth()->user()->id)
         ->whereNotNull('termino')
         ->select('problemas.nombre as nombre_problema', 'problemas.codigo as codigo_problema','envio_solucion_problemas.id as id_envio', 'envio_solucion_problemas.created_at','envio_solucion_problemas.token', 'envio_solucion_problemas.cant_casos_resuelto','envio_solucion_problemas.puntaje', 'lenguajes_programaciones.nombre as nombre_lenguaje', 'envio_solucion_problemas.solucionado', 'envio_solucion_problemas.inicio', 'envio_solucion_problemas.termino', 'cursos.nombre as nombre_curso', 'cursos.id as id_curso', 'ultima_evaluacion.resultado', 'ultima_evaluacion.estado', DB::raw('count(casos__pruebas.id) as total_casos'))
         ->groupBy('problemas.nombre', 'problemas.codigo','envio_solucion_problemas.id', 'envio_solucion_problemas.created_at','envio_solucion_problemas.token', 'envio_solucion_problemas.cant_casos_resuelto','envio_solucion_problemas.puntaje', 'lenguajes_programaciones.nombre', 'envio_solucion_problemas.solucionado', 'envio_solucion_problemas.inicio', 'envio_solucion_problemas.termino', 'cursos.nombre', 'cursos.id', 'ultima_evaluacion.resultado', 'ultima_evaluacion.estado')
         ->orderBy('envio_solucion_problemas.created_at', 'DESC');
-
         if(isset($request->id_problema)){
             $envios_query = $envios_query->where('problemas.id', '=', $request->id_problema);
         }
-        
         $envios = $envios_query->get()->map(function ($envio){
             $envio->inicio = Carbon::parse($envio->inicio)->locale('es_ES')->isoFormat('lll');
             $envio->termino = Carbon::parse($envio->termino)->locale('es_ES')->isoFormat('lll');
@@ -62,10 +64,13 @@ class EnvioSolucionProblemaController extends Controller
         }
         try {
             DB::beginTransaction();
-            $envio = auth()->user()->envios()->where('id_problema', '=', $request->id_problema)->where('id_curso','=', $request->id_curso)->orderBy('created_at', 'DESC')->first();
+            $envio = EnvioSolucionProblema::where('id_resolver', '=', $request->id_resolver)->where('id_cursa', '=', $request->id_cursa)->orderBy('created_at', 'DESC')->first();
             $envio->codigo = $request->codigo;
             $envio->juez_virtual()->associate(JuecesVirtuales::find($request->juez_virtual));
-            $envio->lenguaje()->associate(LenguajesProgramaciones::where("codigo", "=", $request->lenguaje)->first());
+            $lenguaje = LenguajesProgramaciones::where("codigo", "=", $request->lenguaje)->first();
+            $pivot_problema_lenguaje = $lenguaje->problemas()->find($request->id_problema)->pivot;
+            $envio->ProblemaLenguaje()->disassociate();
+            $envio->ProblemaLenguaje()->associate($pivot_problema_lenguaje);
             $envio->save();
             DB::commit();
         } catch (\PDOException $e) {
@@ -87,8 +92,8 @@ class EnvioSolucionProblemaController extends Controller
     {
         $c_codes = [104, 75, 103, 48, 49, 50]; //codigos de compiladores de C en Judge0
         try {
-            $problema = Problemas::find($envio->id_problema);
-            $juez = JuecesVirtuales::find($envio->id_juez);
+            $problema = $envio->problema;
+            $juez = $envio->juez_virtual;
             $codigo = base64_encode($envio->codigo);
         } catch (\PDOException $e) {
             return ["estado" => false];

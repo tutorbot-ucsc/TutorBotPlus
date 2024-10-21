@@ -86,4 +86,14 @@ class CertamenesController extends Controller
         }
         return redirect()->route('certamen.index')->with('success', 'La evaluación "'.$certamen->nombre.'" ha sido eliminado.');
     }
+
+    public function listado_certamenes(Request $request){
+        try{
+            $cursos_usuario = auth()->user()->cursos()->pluck('cursos.id');
+            $evaluaciones = Certamenes::whereIn('id_curso', $cursos_usuario)->orderBy('fecha_inicio', 'desc')->get();
+        }catch(\PDOException $e){
+            return redirect()->route('cursos.listado')->with("error", $e->getMessage());
+        }
+        return view('plataforma.certamen.index', compact('evaluaciones'));
+    }
 }

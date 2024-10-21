@@ -9,6 +9,7 @@ use App\Models\Problemas;
 use App\Models\EnvioSolucionProblema;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Validation\Rule;
 
 class Cursos extends Model
@@ -36,7 +37,7 @@ class Cursos extends Model
     }
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'cursa', 'id_curso', 'id_usuario');
+        return $this->belongsToMany(User::class, 'cursa', 'id_curso', 'id_usuario')->using(Cursa::class)->withTimestamps()->withPivot(['id']);
     }
 
     public function problemas(): BelongsToMany
@@ -44,8 +45,8 @@ class Cursos extends Model
         return $this->belongsToMany(Problemas::class,'disponible','id_curso','id_problema');
     }
 
-    public function envios(): HasMany
+    public function envios(): HasManyThrough
     {
-        return $this->hasMany(EnvioSolucionProblema::class,'id_curso');
+        return $this->HasManyThrough(EnvioSolucionProblema::class, Cursa::class, 'id_curso', 'id_cursa');
     }
 }

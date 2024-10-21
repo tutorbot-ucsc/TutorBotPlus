@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Facades\DB;
 class banco_problemas_certamenes extends Pivot
 {   
+    protected $table = 'banco_problemas_certamenes';
     protected $fillable = [
         "id_certamen",
         "id_problema",
@@ -18,7 +19,6 @@ class banco_problemas_certamenes extends Pivot
         static::created(function ($pivot_model) {
             DB::table('certamenes')->where('id','=',$pivot_model->id_certamen)->incrementEach([
                 'puntaje_total' => $pivot_model->puntaje,
-                'cantidad_problemas' => 1,
             ]);
         });
 
@@ -26,7 +26,6 @@ class banco_problemas_certamenes extends Pivot
             $puntaje = DB::table('banco_problemas_certamenes')->where('id_problema', '=', $pivot_model->id_problema)->where('id_certamen', '=', $pivot_model->id_certamen)->value('puntaje');
             DB::table('certamenes')->where('id','=',$pivot_model->id_certamen)->decrementEach([
                 'puntaje_total' => $puntaje,
-                'cantidad_problemas' => 1,
             ]);
         });
     }

@@ -10,9 +10,12 @@ use App\Models\JuecesVirtuales;
 use App\Models\EvaluacionSolucion;
 use App\Models\Problemas;
 use App\Models\Cursos;
+use App\Models\Cursa;
 use App\Models\LenguajesProgramaciones;
 use App\Models\SolicitudRaLlm;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class EnvioSolucionProblema extends Model
 {
@@ -30,19 +33,30 @@ class EnvioSolucionProblema extends Model
         "java" => "java",
         "sql" => "sql",
     ];
-    public function usuario(): BelongsTo
+    public function CursoUsuario(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'id_usuario');
+        return $this->BelongsTo(Cursa::class, 'id_cursa');
     }
 
     public function juez_virtual(): BelongsTo
     {
         return $this->belongsTo(JuecesVirtuales::class, 'id_juez');
     }
-
-    public function problema(): BelongsTo
+    public function usuario(): HasOneThrough{
+        return $this->hasOneThrough(User::class, Cursa::class, 'id', 'id','id_cursa', 'id_usuario');
+    }
+    public function curso(): HasOneThrough{
+        return $this->hasOneThrough(Cursos::class, Cursa::class, 'id', 'id','id_cursa', 'id_curso');
+    }
+    public function lenguaje(): HasOneThrough{
+        return $this->hasOneThrough(LenguajesProgramaciones::class, Resolver::class, 'id', 'id','id_resolver', 'id_lenguaje');
+    }
+    public function problema(): HasOneThrough{
+        return $this->hasOneThrough(Problemas::class, Resolver::class, 'id', 'id','id_resolver', 'id_problema');
+    }
+    public function ProblemaLenguaje(): BelongsTo
     {
-        return $this->belongsTo(Problemas::class, 'id_problema');
+        return $this->BelongsTo(Resolver::class, 'id_resolver');
     }
 
     public function evaluaciones(): HasMany
@@ -53,15 +67,5 @@ class EnvioSolucionProblema extends Model
     public function retroalimentaciones(): HasMany
     {
         return $this->hasMany(SolicitudRaLlm::class,'id_envio');
-    }
-
-    public function lenguaje(): BelongsTo
-    {
-        return $this->belongsTo(LenguajesProgramaciones::class, 'id_lenguaje');
-    }
-
-    public function curso(): BelongsTo
-    {
-        return $this->belongsTo(Cursos::class, 'id_curso');
     }
 }

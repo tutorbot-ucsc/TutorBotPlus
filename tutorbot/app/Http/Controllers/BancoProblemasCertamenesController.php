@@ -20,6 +20,14 @@ class BancoProblemasCertamenesController extends Controller
         ->get();
         return view('certamen.banco_de_problemas.add', compact('banco_problemas', 'certamen', 'problemas'));
     }
+    public function verficar_cantidad_problemas(Certamenes $certamen, $puntaje){
+        $banco_problema_puntajes = banco_problemas_certamenes::where('id_certamen', '=', $certamen->id)->distinct()->pluck('puntaje')->toArray();
+        $count_puntaje = sizeof($banco_problema_puntajes);
+        if($count_puntaje!=$certamen->cantidad_problemas){
+            $certamen->cantidad_problemas = $count_puntaje;
+            $certamen->save();
+        }
+    }
     public function add(Request $request){
         $request->validate([
             "puntaje" => "numeric|nullable",
@@ -31,10 +39,11 @@ class BancoProblemasCertamenesController extends Controller
             $problema = Problemas::find($request->input('problema'));
             $puntaje = isset($request->puntaje)? $request->input('puntaje') : 1;
             $certamen->problemas()->attach($request->input('problema'), ['puntaje'=>$puntaje]);
+            $this->verficar_cantidad_problemas($certamen, $request->input('puntaje'), $problema);
             DB::commit();
         }catch(\PDOException $e){
             DB::rollBack();
-            return redirect()->route('certamen.banco_problemas')->with("error", $e->getMessage());
+            return redirect()->route('certamen.banco_problemas', ['id_certamen'=>$request->id_certamen])->with("error", $e->getMessage());
         }
         return redirect()->route('certamen.banco_problemas', $request->id_certamen)->with("success", "El problema '".$problema->nombre."' ha sido añadido.");
     }
@@ -42,8 +51,10 @@ class BancoProblemasCertamenesController extends Controller
         try{
             DB::beginTransaction();
             $certamen = Certamenes::find($request->id_certamen);
+            $problema = $certamen->problemas()->find($request->id_problema);
+            $puntaje = $problema->pivot->puntaje;
             $certamen->problemas()->detach($request->id_problema);
-            $problema = Problemas::find($request->id_problema);
+            $this->verficar_cantidad_problemas($certamen, $puntaje);
             DB::commit();
         }catch(\PDOException $e){
             DB::rollBack();

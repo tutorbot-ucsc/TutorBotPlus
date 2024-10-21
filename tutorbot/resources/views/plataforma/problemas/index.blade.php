@@ -19,7 +19,7 @@
                                 <td><a href="{{route('problemas.ver', ['codigo'=>$problema->codigo, 'id_curso'=>$curso->id])}}">{{$problema->nombre}}</a></td>
                                 <td>{{$problema->puntaje_total}}</td>
                                 <td>{{$problema->categorias}}</td>
-                                <td>{{auth()->user()->envios()->where('id_problema', '=', $problema->id)->where('solucionado', '=', true)->exists()? 'Si':'No'}}</td>
+                                <td>{{$problema->resuelto? 'Si':'No'}}</td>
                                 <td>{{$problema->creado}}</td>
                             </tr>
                         @endforeach

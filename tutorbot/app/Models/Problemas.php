@@ -10,6 +10,8 @@ use App\Models\LenguajesProgramaciones;
 use App\Models\EnvioSolucionProblema;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+
 class Problemas extends Model
 {
     use HasFactory;
@@ -90,7 +92,7 @@ class Problemas extends Model
 
     public function lenguajes(): BelongsToMany
     {
-        return $this->belongsToMany(LenguajesProgramaciones::class, 'resolver', 'id_problema', 'id_lenguaje');
+        return $this->belongsToMany(LenguajesProgramaciones::class, 'resolver', 'id_problema', 'id_lenguaje')->withTimestamps()->withPivot('id')->using(Resolver::class);
     }
 
     public function cursos(): BelongsToMany
@@ -103,8 +105,8 @@ class Problemas extends Model
         return $this->hasMany(Casos_Pruebas::class, 'id_problema');
     }
     
-    public function envios(): HasMany
+    public function envios(): HasManyThrough
     {
-        return $this->hasMany(EnvioSolucionProblema::class,'id_problema');
+        return $this->HasManyThrough(EnvioSolucionProblema::class,Resolver::class, 'id_problema', 'id_resolver');
     }
 }

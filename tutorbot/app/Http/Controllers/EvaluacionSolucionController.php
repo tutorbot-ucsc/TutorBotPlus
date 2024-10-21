@@ -17,16 +17,16 @@ class EvaluacionSolucionController extends Controller
 
     public function ver_evaluacion(Request $request)
     {
-        $envio = EnvioSolucionProblema::where("token", "=", $request->token)->first();
+        $envio = EnvioSolucionProblema::with(['curso','problema', 'usuario'])->where("token", "=", $request->token)->first();
         if(!isset($envio)){
-            return redirect()->route('envios.listado')->with('error', 'El envio no se encuentra disponible');
+            return redirect()->route('envios.listado')->with('error', 'El envio no existe');
         }
-        $problema = $envio->problema()->first();
+        $problema = $envio->problema;
         $highlightjs_choice = EnvioSolucionProblema::$higlightjs_language[strtolower($envio->lenguaje->abreviatura)];
         $juez = $envio->juez_virtual;
         $evaluaciones = $envio->evaluaciones()->with('casos_pruebas')->get();
         //Calculo de intentos restante de retroalimentación
-        $cant_retroalimentacion = $problema->limite_llm - DB::table('solicitud_ra_llms')->leftJoin('envio_solucion_problemas', 'solicitud_ra_llms.id_envio', '=', 'envio_solucion_problemas.id')->where('envio_solucion_problemas.id_problema', '=', $problema->id)->where('id_usuario', '=', auth()->user()->id)->count();
+        $cant_retroalimentacion = $problema->limite_llm - DB::table('solicitud_ra_llms')->leftJoin('envio_solucion_problemas', 'solicitud_ra_llms.id_envio', '=', 'envio_solucion_problemas.id')->join('resolver', 'envio_solucion_problemas.id_resolver', '=', 'resolver.id')->join('cursa', 'envio_solucion_problemas.id_cursa', '=', 'cursa.id')->where('resolver.id_problema', '=', $problema->id)->where('cursa.id_usuario', '=', auth()->user()->id)->count();
         //Booleano que verifica si hay una retroalimentación asociado al código.
         $tieneRetroalimentacion = SolicitudRaLlm::where('id_envio', '=', $envio->id)->exists();
         $evaluacion_arr = [];
@@ -47,7 +47,7 @@ class EvaluacionSolucionController extends Controller
         }
         if (sizeof($evaluaciones) == $envio->cant_casos_resuelto && $envio->solucionado == false) {
             $envio->solucionado = true;
-            DB::table('disponible')->where('id_curso', '=', $envio->id_curso)->where('id_problema', '=', $problema->id)->incrementEach(
+            DB::table('disponible')->where('id_curso', '=', $envio->curso->id)->where('id_problema', '=', $problema->id)->incrementEach(
                 ["cantidad_resueltos"=>1,
                 "tiempo_total"=>$diferencia,
                 ]

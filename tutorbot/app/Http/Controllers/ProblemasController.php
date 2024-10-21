@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Cursos;
 use App\Models\Casos_Pruebas;
+use App\Models\Resolver;
 use App\Models\LenguajesProgramaciones;
 use App\Models\Categoria_Problema;
 use App\Models\JuecesVirtuales;
@@ -216,15 +217,19 @@ class ProblemasController extends Controller
     public function listado_problemas(Request $request)
     {
         try {
-            if (!auth()->user()->cursos()->get()->contains($request->id)) {
+            $curso = auth()->user()->cursos()->find($request->id);
+            //verifica si el usuario está registrado al curso que se quiere acceder 
+            if (!isset($curso)) {
                 return redirect()->route('cursos.listado')->with('error', 'No tienes acceso al curso al que estás tratando de acceder');
             }
-            $curso = Cursos::find($request->id);
+            //tabla intermedia entre usuario y curso
+            $curso_usuario_pivot = $curso->pivot;
             $fecha_ahora = Carbon::now();
-            $problemas = $curso->problemas()->where('visible', '=', true)->get()->map(function ($problema) {
+            $problemas = $curso->problemas()->where('visible', '=', true)->get()->map(function ($problema) use($curso_usuario_pivot){
                 $problema->puntaje_total = $problema->casos_de_prueba()->get()->pluck('puntos')->sum();
                 $problema->categorias = implode(',', array: $problema->categorias()->get()->pluck('nombre')->toArray());
                 $problema->creado = Carbon::parse($problema->created_at)->locale('es_ES')->isoFormat('lll');
+                $problema->resuelto = $problema->envios()->where('id_cursa', '=', $curso_usuario_pivot->id)->where('solucionado', '=', true)->exists();
                 return $problema;
             })->unique();
         } catch (\PDOException $e) {
@@ -241,11 +246,13 @@ class ProblemasController extends Controller
             if(!Cursos::where('cursos.id','=',$request->id_curso)->exists()){
                 return redirect()->route('cursos.listado')->with('error', 'El curso que estás tratando de acceder no existe.');
             }
-            $cursos_usuario = auth()->user()->cursos()->get()->pluck('id')->toArray();
-            if (!$problema->cursos()->whereIn('cursos.id', $cursos_usuario)->exists() || $problema->visible == false) {
+            $curso_usuario = auth()->user()->cursos()->find($request->id_curso);
+            if ($problema->cursos()->where('cursos.id', '=', $curso_usuario)->exists() || $problema->visible == false) {
                 return redirect()->route('cursos.listado')->with('error', 'No tienes acceso al problema ' . $problema->nombre);
             }
             $problema->disponible = true;
+            //verifica si el usuario ha solucionado el problema mediante la tabla intermedia de curso y usuario (pivot)
+            $problema->estado = $problema->envios()->where('id_cursa', '=', $curso_usuario->pivot->id)->where('solucionado', '=', true)->exists();
             $now = Carbon::now();
             if(isset($problema->fecha_inicio)){
             $fecha_inicio = Carbon::parse($problema->fecha_inicio);
@@ -290,41 +297,36 @@ class ProblemasController extends Controller
     public function resolver_problema(Request $request)
     {
         try {
+            $curso_usuario  = auth()->user()->cursos()->find($request->id_curso);
             $problema = Problemas::where('codigo', '=', $request->codigo)->first();
             $lenguajes = $problema->lenguajes()->get();
             $jueces = JuecesVirtuales::all();
-            $last_envio = auth()->user()->envios()->where('id_problema', '=', $problema->id)->orderBy('created_at', 'DESC');
-            if(isset($request->id_curso)){
-                $last_envio = $last_envio->where('id_curso', '=', $request->id_curso);
-            }
-            $last_envio = $last_envio->first();
-            $codigo = null;
+            $last_envio = $problema->envios()->where('id_cursa', '=', $curso_usuario->pivot->id)->orderBy('created_at', 'DESC')->first();
             if (isset($last_envio->termino) || !isset($last_envio)) {
                 DB::beginTransaction();
                 $envio = new EnvioSolucionProblema;
                 $envio->token = Str::random(40);
                 $envio->inicio = Carbon::now();
-                $envio->problema()->associate($problema);
-                $envio->usuario()->associate(auth()->user());
-                if(isset($request->id_curso)){
-                    $envio->curso()->associate(Cursos::find($request->id_curso));
-                    DB::table('disponible')->where('id_curso', '=', $request->id_curso)->where('id_problema', '=', $problema->id)->increment('cantidad_intentos');
+                if(isset($last_envio->termino)){
+                    $envio->ProblemaLenguaje()->associate($lenguajes->find($last_envio->lenguaje->id)->pivot);
+                }else{
+                    $envio->ProblemaLenguaje()->associate($lenguajes[0]->pivot);
                 }
+                $envio->CursoUsuario()->associate($curso_usuario->pivot);
+                DB::table('disponible')->where('id_curso', '=', $request->id_curso)->where('id_problema', '=', $problema->id)->increment('cantidad_intentos');
                 if(isset($last_envio->termino) && $last_envio->solucionado==false){
                     $codigo = $last_envio->codigo;
                     $envio->codigo = $codigo;
                     $envio->inicio = $last_envio->inicio;
                 }
                 $envio->save();
-                $problema->save();
+                $last_envio = $envio;
                 DB::commit();
-            }else if(isset($last_envio)){
-                $codigo = $last_envio->codigo;
             }
         } catch (\PDOException $e) {
             return redirect()->route('cursos.listado')->with('error', $e->getMessage());
         }
-        return view('plataforma.problemas.resolver_problema', compact('problema', 'lenguajes', 'jueces', 'codigo'))->with('id_curso', $request->id_curso);
+        return view('plataforma.problemas.resolver_problema', compact('problema', 'lenguajes', 'jueces', 'last_envio'))->with('id_curso', $request->id_curso);
     }
 
     public function pdf_enunciado(Request $request){
@@ -336,13 +338,18 @@ class ProblemasController extends Controller
     public function guardar_codigo(Request $request){
         try{
             DB::beginTransaction();
-            $last_envio = auth()->user()->envios()->where('id_problema', '=', $request->id_problema)->where('id_curso', '=', $request->id_curso)->orderBy('created_at', 'DESC')->first();
+            $last_envio = EnvioSolucionProblema::where('id_resolver', '=', $request->id_resolver)->where('id_cursa', '=', $request->id_cursa)->orderBy('created_at', 'DESC')->first();
             $last_envio->codigo = $request->codigo_save;
+            if(isset($request->lenguaje_save)){
+                $resolver = Resolver::where('id_problema', '=', $request->id_problema)->where('id_lenguaje', '=', $request->lenguaje_save)->first();
+                $last_envio->ProblemaLenguaje()->dissociate();
+                $last_envio->ProblemaLenguaje()->associate($resolver);
+            }
             $last_envio->save();
             DB::commit();
         }catch(\PDOException $e){
             DB::rollBack();
-            return redirect()->route('problemas.resolver', ['codigo'=>$request->codigo_problema, 'id_curso'=>$request->id_curso]);
+            return redirect()->route('problemas.resolver', ['codigo'=>$request->codigo_problema, 'id_curso'=>$request->id_curso])->with('error', $e->getMessage());
         }
         return redirect()->route('problemas.ver', ['codigo'=>$request->codigo_problema, 'id_curso'=>$request->id_curso])->with('succes', 'El código desarrollado ha sido almacenado');
     }

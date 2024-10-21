@@ -79,6 +79,8 @@ Route::group(['middleware'=>'auth'], function(){
 
 	Route::get('/perfil', [UserController::class, "ver_mi_perfil"])->name('ver.perfil');
 	Route::post('/perfil/update', [UserController::class, "actualizar_informacion"])->name('perfil.update');
+
+	Route::get('/evaluaciones', [CertamenesController::class, "listado_certamenes"])->name('certamenes.listado');
 });
 //Panel de Administración
 Route::group(['middleware' => 'auth'], function () {

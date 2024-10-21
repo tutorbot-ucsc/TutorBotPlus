@@ -78,13 +78,13 @@
                     <div class="card-body px-5">
                         <h6 class="text-center">Tiempo en Total:</h6>
                         <h5 id="tiempo" class="text-center"></h5>
-                        @if ($envio->id_usuario == auth()->user()->id && !$evaluaciones->contains('estado', '=', 'En Proceso') && $envio->solucionado == false && $tieneRetroalimentacion == false)
+                        @if ($envio->usuario->id == auth()->user()->id && !$evaluaciones->contains('estado', '=', 'En Proceso') && $envio->solucionado == false && $tieneRetroalimentacion == false)
                             <div class="row px-5">
                                 <a class="btn btn-primary btn-block {{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? '' : 'disabled' }}"
                                     href="{{ route('envios.generar_retroalimentacion', ['token' => $envio->token]) }}"
                                     role="button" onclick="solicitarRetroalimentacion(event)">{{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? 'Solicitar Ayuda (Cantidad Disponible: ' . $cant_retroalimentacion . ')' : 'Ayuda no disponible' }}</a>
                             </div>
-                        @elseif($envio->id_usuario == auth()->user()->id && !$evaluaciones->contains('estado', '=', 'En Proceso') && $tieneRetroalimentacion == true)
+                        @elseif($envio->usuario->id == auth()->user()->id && !$evaluaciones->contains('estado', '=', 'En Proceso') && $tieneRetroalimentacion == true)
                             <div class="row px-5">
                                 <a class="btn btn-primary text-nowrap btn-block"
                                     href="{{ route('envios.retroalimentacion', ['token' => $envio->token]) }}"
@@ -92,23 +92,23 @@
                             </div>
                         @endif
                         <hr>
-                        @if ($envio->id_usuario == auth()->user()->id && !$evaluaciones->contains('estado', '=', 'En Proceso') && $envio->solucionado == false)
+                        @if ($envio->usuario->id == auth()->user()->id && !$evaluaciones->contains('estado', '=', 'En Proceso') && $envio->solucionado == false)
                             <div class="row px-5 mt-2">
                                 <a class="btn btn-outline-secondary text-nowrap btn-block"
-                                    href="{{ route('problemas.resolver', ['codigo' => $envio->problema->codigo, 'id_curso' => $envio->id_curso]) }}"
+                                    href="{{ route('problemas.resolver', ['codigo' => $envio->problema->codigo, 'id_curso' => $envio->curso->id]) }}"
                                     role="button">Volver al intento</a>
                             </div>
                         @endif
                         <div class="row px-5 mt-2">
                             <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block"
-                                href="{{ route('problemas.ver', ['codigo' => $problema->codigo, 'id_curso' => $envio->id_curso]) }}"
+                                href="{{ route('problemas.ver', ['codigo' => $problema->codigo, 'id_curso' => $envio->curso->id]) }}"
                                 role="button">Volver al
                                 Enunciado</a>
                         </div>
                         @can('ver informe del problema')
                         <div class="row px-5 mt-2">
                             <a class="btn btn-outline-secondary btn-sm btn-block"
-                                href="{{ route('informe.envios.problema', ['id_curso' => $envio->id_curso, 'id_problema' => $envio->id_problema]) }}"
+                                href="{{ route('informe.envios.problema', ['id_curso' => $envio->curso->id, 'id_problema' => $envio->problema->id]) }}"
                                 role="button">Volver al informe de envios del problema</a>
                         </div>
                         @endcan

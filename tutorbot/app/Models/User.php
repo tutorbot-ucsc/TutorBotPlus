@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\Cursos;
 use App\Models\EnvioSolucionProblema;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class User extends Authenticatable implements CanResetPassword
 {
@@ -69,13 +70,13 @@ class User extends Authenticatable implements CanResetPassword
     }
 
     
-    public function envios(): HasMany
+    public function envios(): HasManyThrough
     {
-        return $this->hasMany(EnvioSolucionProblema::class,'id_usuario');
+        return $this->HasManyThrough(EnvioSolucionProblema::class, Cursa::class, 'id_usuario', 'id_cursa');
     }
     public function cursos(): BelongsToMany
     {
-        return $this->belongsToMany(Cursos::class, 'cursa', 'id_usuario', 'id_curso');
+        return $this->belongsToMany(Cursos::class, 'cursa', 'id_usuario', 'id_curso')->using(Cursa::class)->withTimestamps()->withPivot(['id']);
     }
 
 }
