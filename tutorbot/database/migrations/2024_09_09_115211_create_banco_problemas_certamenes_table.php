@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('banco_problemas_certamenes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("id_problema");
+            $table->unsignedBigInteger("id_categoria");
             $table->unsignedBigInteger("id_certamen");
-            $table->integer("puntaje")->nullable();
             $table->timestamps();
-            $table->foreign('id_problema')->references('id')->on('problemas')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('id_categoria')->references('id')->on('categoria__problemas')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('id_certamen')->references('id')->on('problemas')->onDelete('cascade')->onUpdate('cascade');
         });
     }

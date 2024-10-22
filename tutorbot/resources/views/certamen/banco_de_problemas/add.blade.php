@@ -24,7 +24,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('certamen.add_problema', ['id_certamen' => $certamen->id]) }}" method="POST">
+                    <form action="{{ route('certamen.add_categoria', ['id_certamen' => $certamen->id]) }}" method="POST">
                         @csrf
                         @include('certamen.banco_de_problemas.form')
                     </form>
@@ -33,9 +33,8 @@
                         <table class="table align-items-center mb-0" id="table">
                             <thead>
                                 <tr>
-                                    <th>Problema
+                                    <th>Categoria
                                     </th>
-                                    <th>Puntaje
                                     </th>
                                     @canany(['editar certamen'])
                                         <th>
@@ -44,19 +43,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($banco_problemas as $problema)
+                                @foreach ($banco_categorias as $categoria)
                                     <tr>
                                         <td>
-                                            <h6>{{ $problema->nombre }}
-                                        </td>
-                                        <td>
-                                            <h6>{{ $problema->puntaje }}
-                                            </h6>
+                                            <h6>{{ $categoria->nombre }}
                                         </td>
                                         <td class="align-middle text-end">
                                             <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                 @can('editar certamen')
-                                                    <form action="{{ route('certamen.eliminar_problema', ['id_certamen' => $certamen->id, 'id_problema'=>$problema->id_problema]) }}"
+                                                    <form action="{{ route('certamen.eliminar_categoria', ['id_certamen' => $certamen->id, 'id_categoria'=>$categoria->id_categoria]) }}"
                                                         method="POST">
                                                         @csrf
                                                         <button type="submit" class="btn btn-outline-danger"><i

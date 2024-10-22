@@ -6,7 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\Certamenes;
 use Illuminate\Support\Facades\DB;
 use App\Models\Cursos;
+use App\Models\ResolucionCertamenes;
+use App\Models\SeleccionProblemasCertamenes;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
+
 class CertamenesController extends Controller
 {
     public function index(Request $request){
@@ -90,10 +94,57 @@ class CertamenesController extends Controller
     public function listado_certamenes(Request $request){
         try{
             $cursos_usuario = auth()->user()->cursos()->pluck('cursos.id');
-            $evaluaciones = Certamenes::whereIn('id_curso', $cursos_usuario)->orderBy('fecha_inicio', 'desc')->get();
+            $evaluaciones = Certamenes::whereIn('id_curso', $cursos_usuario)->orderBy('fecha_inicio', 'desc')->get()->map(function($item){
+                $item->fecha_inicio = Carbon::parse( $item->fecha_inicio)->locale('es_ES')->isoFormat('lll');
+                $item->fecha_termino = Carbon::parse( $item->fecha_termino)->locale('es_ES')->isoFormat('lll');
+                return $item;
+            });
         }catch(\PDOException $e){
             return redirect()->route('cursos.listado')->with("error", $e->getMessage());
         }
         return view('plataforma.certamen.index', compact('evaluaciones'));
+    }
+
+    public function ver_certamen(Request $request){
+        try{
+            $certamen = Certamenes::find($request->id_certamen);
+            $_now = Carbon::now();
+            $certamen->disponibilidad = true;
+            if(!($_now->gte(Carbon::parse($certamen->fecha_inicio)) && $_now->lte(Carbon::parse($certamen->fecha_termino)))){
+                $certamen->disponibilidad = false;
+            }
+            $res_certamen = $certamen->resoluciones()->where('id_usuario', '=', auth()->user()->id)->first();
+            if(isset($res_certamen) && $res_certamen->finalizado==true){
+                $certamen->disponibilidad = false;
+            }
+            $certamen->fecha_inicio = Carbon::parse( $certamen->fecha_inicio)->locale('es_ES')->isoFormat('lll');
+            $certamen->fecha_termino = Carbon::parse( $certamen->fecha_termino)->locale('es_ES')->isoFormat('lll');
+        }catch(\PDOException $e){
+            return redirect()->route('certamenes.listado')->with("error", $e->getMessage());
+        }
+        return view('plataforma.certamen.ver_certamen', compact('certamen', 'res_certamen'));
+    }
+
+    public function iniciar_resolver_certamen(Request $request){
+        try{
+            $certamen = Certamenes::find($request->id_certamen);
+            $res_certamen = new ResolucionCertamenes;
+            $res_certamen->token = Str::random(55);
+            $res_certamen->id_usuario = auth()->user()->id;
+            $certamen->resoluciones()->save($res_certamen);
+            
+            $categorias = $certamen->categorias()->get();
+            $problemas_seleccionados = [];
+            foreach ($categorias as $categoria){
+                $problema_aleatorio = $categoria->problemas()->inRandomOrder()->first();
+                $seleccion = new SeleccionProblemasCertamenes;
+                $seleccion->problema()->associate($problema_aleatorio);
+                array_push($problemas_seleccionados, $seleccion);        
+            }
+            $res_certamen->ProblemasSeleccionadas()->saveMany($problemas_seleccionados);
+        }catch(\PDOException $e){ 
+            return redirect()->route('certamenes.listado')->with("error", $e->getMessage());
+        }
+        dd($res_certamen, $certamen);
     }
 }

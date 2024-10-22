@@ -136,7 +136,7 @@ class ProblemasController extends Controller
             } else {
                 $problema->habilitar_llm = false;
             }
-            $problema->limite_llm = $request->input('limite_llm');
+            $problema->limite_llm = $request->input('limite_llm')? $request->input('limite_llm') : 0;
             if(isset($request->archivos_adicionales)){
                 $archivo = $request->file('archivos_adicionales');
                 $nombre = $archivo->hashName();

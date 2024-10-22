@@ -55,14 +55,14 @@ Route::get('/inicio', function(){
 })->name('home')->middleware(['auth', 'can:acceso al panel de administración']);
 
 //Plataforma de Juez Online
-Route::group(['middleware'=>'auth'], function(){
-	Route::get('/', [CursosController::class, 'listado_cursos'])->name('cursos.listado');
+Route::group(['middleware'=>['auth', 'certamen_en_resolucion']], function(){
+	Route::get('/', [CursosController::class, 'listado_cursos'])->name('cursos.listado')->withoutMiddleware('certamen_en_resolucion');
 	Route::get('/cursos', function () {
 		return redirect()->route('cursos.listado');
-	});
+	})->withoutMiddleware('certamen_en_resolucion');
 	Route::get('/home', function () {
 		return redirect()->route('cursos.listado');
-	});
+	})->withoutMiddleware('certamen_en_resolucion');
 	Route::get('/cursos/{id}/problemas', [ProblemasController::class, 'listado_problemas'])->name('problemas.listado');
 	Route::get('/problema/{id_curso?}/{codigo}', [ProblemasController::class, 'ver_problema'])->name('problemas.ver');
 	Route::post('/problema/guardar_codigo', [ProblemasController::class, 'guardar_codigo'])->name('problemas.guardar_codigo');
@@ -80,7 +80,9 @@ Route::group(['middleware'=>'auth'], function(){
 	Route::get('/perfil', [UserController::class, "ver_mi_perfil"])->name('ver.perfil');
 	Route::post('/perfil/update', [UserController::class, "actualizar_informacion"])->name('perfil.update');
 
-	Route::get('/evaluaciones', [CertamenesController::class, "listado_certamenes"])->name('certamenes.listado');
+	Route::get('/evaluaciones', [CertamenesController::class, "listado_certamenes"])->name('certamenes.listado')->withoutMiddleware('certamen_en_resolucion');
+	Route::get('/evaluaciones/{id_certamen}', [CertamenesController::class, "ver_certamen"])->name('certamenes.ver')->withoutMiddleware('certamen_en_resolucion');
+	Route::get('/evaluaciones/{id_certamen}/iniciar', [CertamenesController::class, "iniciar_resolver_certamen"])->name('certamenes.iniciar_resolucion')->withoutMiddleware('certamen_en_resolucion');
 });
 //Panel de Administración
 Route::group(['middleware' => 'auth'], function () {
@@ -143,8 +145,8 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/update', [CertamenesController::class, 'update'])->name('certamen.update')->middleware('can:editar certamen'); 
 
 		Route::get('/banco_problemas/{id_certamen}', [BancoProblemasCertamenesController::class, 'index'])->name('certamen.banco_problemas')->middleware('can:editar certamen'); 
-		Route::post('/banco_problemas/delete', [BancoProblemasCertamenesController::class, 'delete'])->name('certamen.eliminar_problema')->middleware('can:editar certamen'); 
-		Route::post('/banco_problemas/{id_certamen}/add', [BancoProblemasCertamenesController::class, 'add'])->name('certamen.add_problema')->middleware('can:editar certamen'); 
+		Route::post('/banco_problemas/delete', [BancoProblemasCertamenesController::class, 'delete'])->name('certamen.eliminar_categoria')->middleware('can:editar certamen'); 
+		Route::post('/banco_problemas/{id_certamen}/add', [BancoProblemasCertamenesController::class, 'add'])->name('certamen.add_categoria')->middleware('can:editar certamen'); 
 
 	});
 	Route::prefix('problemas')->group(function () {

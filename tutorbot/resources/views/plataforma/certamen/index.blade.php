@@ -1,4 +1,4 @@
-@extends('layout_plataforma.app', ['title_html' => 'Evaluaciones', 'title'=>'Evaluaciones', 'breadcrumbs'=>[["nombre"=>"Cursos", "route"=>route("cursos.listado")],["nombre"=>"Evaluaciones"]]])
+@extends('layout_plataforma.app', ['title_html' => 'Evaluaciones', 'title'=>'Evaluaciones', 'breadcrumbs'=>[["nombre"=>"Evaluaciones"]]])
 @section('content')
     <div class="container-fluid py-3 px-4">
         <div class="card border-danger">
@@ -9,7 +9,6 @@
                             <th>Nombre</th>
                             <th>Curso</th>
                             <th>Cantidad Problemas</th>
-                            <th>Puntos</th>
                             <th>Penalización por error</th>
                             <th>Fecha Inicio</th>
                             <th>Fecha Termino</th>
@@ -18,10 +17,9 @@
                     <tbody>
                         @foreach ($evaluaciones as $evaluacion)
                             <tr>
-                                <td><a href="#">{{$evaluacion->nombre}}</a></td>
+                                <td><a href="{{route('certamenes.ver', ['id_certamen'=>$evaluacion->id])}}">{{$evaluacion->nombre}}</a></td>
                                 <td>{{$evaluacion->curso->nombre}}</td>
                                 <td>{{$evaluacion->cantidad_problemas}}</td>
-                                <td>{{$evaluacion->puntaje_total}}</td>
                                 <td>{{$evaluacion->penalizacion_error}}</td>
                                 <td>{{$evaluacion->fecha_inicio}}</td>
                                 <td>{{$evaluacion->fecha_termino}}</td>

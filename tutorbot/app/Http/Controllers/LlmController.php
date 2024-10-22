@@ -40,23 +40,31 @@ class LlmController extends Controller
             }else{
                 $prompt = SolicitudRaLlm::promptError   (null, $evaluacion->nombre_lenguaje,$evaluacion->resultado);
             }
-            $result = OpenAI::chat()->create([
-                'model' => 'gpt-4o-mini',
-                'messages' => [
-                    ['role' => 'system', 'content' => $prompt],
-                    ['role' => 'user', 'content' => $codigo],
-                ],
-            ]);
+            try{
+                $result = OpenAI::chat()->create([
+                    'model' => 'gpt-4o-mini',
+                    'messages' => [
+                        ['role' => 'system', 'content' => $prompt],
+                        ['role' => 'user', 'content' => $codigo],
+                    ],
+                ]);
+            }catch(\Exception $e){
+                return redirect()->route('envios.ver', ['token'=>$request->token])->with('error', $e->getMessage());
+            }
         }else if($evaluacion->estado == "Rechazado"){
             $entradas = $evaluacion->entradas;
             $salidas = $evaluacion->salidas;
-            $result = OpenAI::chat()->create([
-                'model' => 'gpt-4o-mini',
-                'messages' => [
-                    ['role' => 'system', 'content' => SolicitudRaLlm::promptErrorRespuestaErronea($entradas, $salidas, base64_decode($evaluacion->stout), $evaluacion->nombre_lenguaje, $evaluacion->body_problema_resumido)],
-                    ['role' => 'user', 'content' => $codigo],
-                ],
-            ]);
+            try{
+                $result = OpenAI::chat()->create([
+                    'model' => 'gpt-4o-mini',
+                    'messages' => [
+                        ['role' => 'system', 'content' => SolicitudRaLlm::promptErrorRespuestaErronea($entradas, $salidas, base64_decode($evaluacion->stout), $evaluacion->nombre_lenguaje, $evaluacion->body_problema_resumido)],
+                        ['role' => 'user', 'content' => $codigo],
+                    ],
+                ]);
+            }catch(\Exception $e){
+                return redirect()->route('envios.ver', ['token'=>$request->token])->with('error', $e->getMessage());
+            }
         }
         try{
             DB::beginTransaction();

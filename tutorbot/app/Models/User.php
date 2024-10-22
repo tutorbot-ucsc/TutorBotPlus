@@ -79,4 +79,7 @@ class User extends Authenticatable implements CanResetPassword
         return $this->belongsToMany(Cursos::class, 'cursa', 'id_usuario', 'id_curso')->using(Cursa::class)->withTimestamps()->withPivot(['id']);
     }
 
+    public function evaluaciones(): HasMany{
+        return $this->hasMany(ResolucionCertamenes::class, 'id_usuario');
+    }
 }

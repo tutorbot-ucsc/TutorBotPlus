@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Facades\DB;
 class banco_problemas_certamenes extends Pivot
@@ -11,22 +13,29 @@ class banco_problemas_certamenes extends Pivot
     protected $table = 'banco_problemas_certamenes';
     protected $fillable = [
         "id_certamen",
-        "id_problema",
-        "puntaje"
+        "id_categoria",
     ];
+
+    public function certamen(): BelongsTo{
+        return $this->belongsTo(Certamenes::class, 'id_certamen');
+    }
+
+    public function categorias(): HasMany{
+        return $this->hasMany(Categoria_Problema::class, 'id_categoria');
+    }
+
     protected static function booted()
     {
-        static::created(function ($pivot_model) {
-            DB::table('certamenes')->where('id','=',$pivot_model->id_certamen)->incrementEach([
-                'puntaje_total' => $pivot_model->puntaje,
-            ]);
+        static::created(function ($banco) {
+            $certamen = $banco->certamen;
+            $certamen->cantidad_problemas += 1;
+            $certamen->save(); 
         });
 
-        static::deleting(function ($pivot_model) {
-            $puntaje = DB::table('banco_problemas_certamenes')->where('id_problema', '=', $pivot_model->id_problema)->where('id_certamen', '=', $pivot_model->id_certamen)->value('puntaje');
-            DB::table('certamenes')->where('id','=',$pivot_model->id_certamen)->decrementEach([
-                'puntaje_total' => $puntaje,
-            ]);
+        static::deleting(function ($banco){
+            $certamen = $banco->certamen;
+            $certamen->cantidad_problemas -= 1;
+            $certamen->save(); 
         });
     }
 }
