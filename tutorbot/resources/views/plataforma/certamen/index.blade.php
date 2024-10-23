@@ -1,6 +1,7 @@
 @extends('layout_plataforma.app', ['title_html' => 'Evaluaciones', 'title'=>'Evaluaciones', 'breadcrumbs'=>[["nombre"=>"Evaluaciones"]]])
 @section('content')
     <div class="container-fluid py-3 px-4">
+        @include('components.alert')
         <div class="card border-danger">
             <div class="card-body px-5">
                 <table id="table" class="table table-striped" style="width:100%">

@@ -8,6 +8,7 @@ use App\Models\EnvioSolucionProblema;
 use App\Models\JuecesVirtuales;
 use App\Models\Problemas;
 use App\Models\SolicitudRaLlm;
+use App\Models\ResolucionCertamenes;
 use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
@@ -53,8 +54,13 @@ class EvaluacionSolucionController extends Controller
                 ]
             );
         }
+       
         $envio->save();
-        return view('plataforma.problemas.resultado', compact('envio', 'evaluaciones', 'highlightjs_choice', 'cant_retroalimentacion', 'tieneRetroalimentacion', 'problema', 'diferencia'));
+        $res_certamen = null;
+        if(isset($envio->id_certamen)){
+            $res_certamen = ResolucionCertamenes::find($envio->id_certamen);
+        }
+        return view('plataforma.problemas.resultado', compact('envio', 'evaluaciones', 'highlightjs_choice', 'cant_retroalimentacion', 'tieneRetroalimentacion', 'problema', 'diferencia', 'res_certamen'));
     }
 
     private static function api_request($juez, $evaluacion_arr, $envio)

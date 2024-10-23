@@ -21,19 +21,18 @@
                 <div class="card border-danger" style="height:100%;">
                     <div class="card-body px-5">
                         <form
-                            action="{{ route('problemas.guardar_codigo', ['codigo_problema' => $problema->codigo, 'id_problema' => $problema->id,'id_curso' => $id_curso, 'id_resolver'=>$last_envio->id_resolver, 'id_cursa'=>$last_envio->id_cursa]) }}"
+                            action="{{isset($res_certamen)?  route('certamenes.guardar_codigo', ['id_certamen'=>$res_certamen, 'token_certamen'=>$res_certamen->token]) : route('problemas.guardar_codigo', ['codigo_problema' => $problema->codigo, 'id_problema' => $problema->id,'id_curso' => $id_curso, 'id_resolver'=>$last_envio->id_resolver, 'id_cursa'=>$last_envio->id_cursa])}}"
                             method="POST" id="guardarForm">
                             @csrf
                             <div class="row px-5 mb-2">
 
                                 <input type="hidden" id="codigo_save" name="codigo_save">
                                 <input type="hidden" id="lenguaje_save" name="lenguaje_save">
-                                <button class="btn btn-outline-primary btn-sm" type="submit">Guardar y Volver</button>
-
+                                <button class="btn btn-outline-primary btn-sm" type="submit">{{isset($res_certamen)? "Guardar y Volver al Certamen" : "Guardar y Volver"}}</button>
                             </div>
                         </form>
                         <form
-                            action="{{ route('problemas.enviar', ['id_problema' => $problema->id, 'id_curso' => $id_curso, 'id_resolver'=>$last_envio->id_resolver, 'id_cursa'=>$last_envio->id_cursa]) }}"
+                            action="{{isset($res_certamen)? route('problemas.enviar', ['id_problema' => $problema->id,'id_resolver'=>$last_envio->id_resolver, 'id_certamen'=>$res_certamen->id, 'token_certamen'=>$res_certamen->token]) : route('problemas.enviar', ['id_problema' => $problema->id, 'id_resolver'=>$last_envio->id_resolver, 'id_cursa'=>$last_envio->id_cursa]) }}"
                             method="POST" id="evaluacion_form">
                             @csrf
                             <div class="row px-5">

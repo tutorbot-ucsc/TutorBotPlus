@@ -65,14 +65,14 @@ Route::group(['middleware'=>['auth', 'certamen_en_resolucion']], function(){
 	})->withoutMiddleware('certamen_en_resolucion');
 	Route::get('/cursos/{id}/problemas', [ProblemasController::class, 'listado_problemas'])->name('problemas.listado');
 	Route::get('/problema/{id_curso?}/{codigo}', [ProblemasController::class, 'ver_problema'])->name('problemas.ver');
-	Route::post('/problema/guardar_codigo', [ProblemasController::class, 'guardar_codigo'])->name('problemas.guardar_codigo');
+	Route::post('/problema/guardar_codigo', [ProblemasController::class, 'guardar_codigo'])->name('problemas.guardar_codigo')->withoutMiddleware('certamen_en_resolucion');
 	Route::get('/editorial/problema/{codigo}', [ProblemasController::class, 'ver_editorial'])->name('problemas.ver_editorial');
 	Route::get('/problema/{id_curso?}/{codigo}/resolver', [ProblemasController::class, 'resolver_problema'])->name('problemas.resolver');
-	Route::get('/pdf/problema/{id_problema}', [ProblemasController::class, 'pdf_enunciado'])->name('problemas.pdf_enunciado');
+	Route::get('/pdf/problema/{id_problema}', [ProblemasController::class, 'pdf_enunciado'])->name('problemas.pdf_enunciado')->withoutMiddleware('certamen_en_resolucion');
 
-	Route::post('/problema/enviar', [EnvioSolucionProblemaController::class, 'enviar_solucion'])->name('problemas.enviar');
+	Route::post('/problema/enviar', [EnvioSolucionProblemaController::class, 'enviar_solucion'])->name('problemas.enviar')->withoutMiddleware('certamen_en_resolucion');
 	Route::get('/envios/{id_problema?}', [EnvioSolucionProblemaController::class, 'ver_envios'])->name('envios.listado');
-	Route::get('/envio/{token}', [EvaluacionSolucionController::class, 'ver_evaluacion'])->name('envios.ver');
+	Route::get('/envio/{token}', [EvaluacionSolucionController::class, 'ver_evaluacion'])->name('envios.ver')->withoutMiddleware('certamen_en_resolucion');
 
 	Route::get('/envio/{token}/retroalimentacion', [LlmController::class, 'ver_retroalimentacion'])->name('envios.retroalimentacion');
 	Route::get('/retroalimentacion/generar', [LlmController::class, 'generar_retroalimentacion'])->name('envios.generar_retroalimentacion');
@@ -82,7 +82,13 @@ Route::group(['middleware'=>['auth', 'certamen_en_resolucion']], function(){
 
 	Route::get('/evaluaciones', [CertamenesController::class, "listado_certamenes"])->name('certamenes.listado')->withoutMiddleware('certamen_en_resolucion');
 	Route::get('/evaluaciones/{id_certamen}', [CertamenesController::class, "ver_certamen"])->name('certamenes.ver')->withoutMiddleware('certamen_en_resolucion');
-	Route::get('/evaluaciones/{id_certamen}/iniciar', [CertamenesController::class, "iniciar_resolver_certamen"])->name('certamenes.iniciar_resolucion')->withoutMiddleware('certamen_en_resolucion');
+	Route::get('/evaluaciones/{id_certamen}/resolver', [CertamenesController::class, "inicializar_certamen"])->name('certamenes.iniciar_resolucion')->withoutMiddleware('certamen_en_resolucion');
+
+	Route::get('/evaluaciones/{token}/resolucion', [CertamenesController::class, "resolver_certamen"])->name('certamenes.resolucion')->withoutMiddleware('certamen_en_resolucion');
+	Route::get('/evaluaciones/{token_certamen}/problema/{codigo}', [ProblemasController::class, "resolver_problema"])->name('certamenes.resolver_problema')->withoutMiddleware('certamen_en_resolucion');
+	Route::post('/evaluaciones/guardar_codigo', [CertamenesController::class, "guardar_codigo_certamen"])->name('certamenes.guardar_codigo')->withoutMiddleware('certamen_en_resolucion');
+
+	Route::post('/evaluaciones/{token}/finalizar', [CertamenesController::class, "finalizar_certamen"])->name('certamen.finalizar')->withoutMiddleware('certamen_en_resolucion');
 });
 //Panel de Administración
 Route::group(['middleware' => 'auth'], function () {

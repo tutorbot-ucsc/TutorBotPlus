@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('envio_solucion_problemas', function (Blueprint $table) {
             $table->id();
             $table->string('token');
-            $table->unsignedBigInteger('id_cursa');
+            $table->unsignedBigInteger('id_cursa')->nullable();
             $table->unsignedBigInteger('id_resolver');
             $table->unsignedBigInteger('id_certamen')->nullable();
             $table->unsignedBigInteger('id_juez')->nullable();

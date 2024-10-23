@@ -12,6 +12,7 @@ use App\Models\Resolver;
 use App\Models\LenguajesProgramaciones;
 use App\Models\Categoria_Problema;
 use App\Models\JuecesVirtuales;
+use App\Models\ResolucionCertamenes;
 use App\Models\EnvioSolucionProblema;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Builder;
@@ -297,11 +298,17 @@ class ProblemasController extends Controller
     public function resolver_problema(Request $request)
     {
         try {
-            $curso_usuario  = auth()->user()->cursos()->find($request->id_curso);
             $problema = Problemas::where('codigo', '=', $request->codigo)->first();
+            $curso_usuario  = auth()->user()->cursos()->find($request->id_curso);
             $lenguajes = $problema->lenguajes()->get();
             $jueces = JuecesVirtuales::all();
-            $last_envio = $problema->envios()->where('id_cursa', '=', $curso_usuario->pivot->id)->orderBy('created_at', 'DESC')->first();
+            $res_certamen = null;
+            if(isset($request->token_certamen)){
+                $res_certamen = ResolucionCertamenes::where('token', '=', $request->token_certamen)->first();
+                $last_envio = $problema->envios()->where('id_certamen', '=', $res_certamen->id)->orderBy('created_at', 'DESC')->first();
+            }else{
+                $last_envio = $problema->envios()->where('id_cursa', '=', $curso_usuario->pivot->id)->whereNull('id_certamen')->orderBy('created_at', 'DESC')->first();
+            }
             if (isset($last_envio->termino) || !isset($last_envio)) {
                 DB::beginTransaction();
                 $envio = new EnvioSolucionProblema;
@@ -313,6 +320,9 @@ class ProblemasController extends Controller
                     $envio->ProblemaLenguaje()->associate($lenguajes[0]->pivot);
                 }
                 $envio->CursoUsuario()->associate($curso_usuario->pivot);
+                if(isset($res_certamen)){
+                    $envio->id_certamen = $res_certamen->id;
+                }
                 DB::table('disponible')->where('id_curso', '=', $request->id_curso)->where('id_problema', '=', $problema->id)->increment('cantidad_intentos');
                 if(isset($last_envio->termino) && $last_envio->solucionado==false){
                     $codigo = $last_envio->codigo;
@@ -326,7 +336,7 @@ class ProblemasController extends Controller
         } catch (\PDOException $e) {
             return redirect()->route('cursos.listado')->with('error', $e->getMessage());
         }
-        return view('plataforma.problemas.resolver_problema', compact('problema', 'lenguajes', 'jueces', 'last_envio'))->with('id_curso', $request->id_curso);
+        return view('plataforma.problemas.resolver_problema', compact('problema', 'lenguajes', 'jueces', 'last_envio','res_certamen'))->with('id_curso', $request->id_curso);
     }
 
     public function pdf_enunciado(Request $request){
@@ -353,4 +363,5 @@ class ProblemasController extends Controller
         }
         return redirect()->route('problemas.ver', ['codigo'=>$request->codigo_problema, 'id_curso'=>$request->id_curso])->with('succes', 'El código desarrollado ha sido almacenado');
     }
+
 }

@@ -7,7 +7,7 @@
             <div class="col-sm-8 col-xs-12">
                 <div class="card border-danger overflow-auto" style="height:40rem">
                     <div class="card-header">
-                        Desripción
+                        Descripción
                     </div>
                     <div class="card-body p-4 text-wrap" id="body_markdown">
                         {!! Str::markdown($certamen->descripcion, [
@@ -21,9 +21,9 @@
                 <div class="card border-danger" style="height:40rem">
                     <div class="card-body px-3">
                         <div class="row px-5">
-                            @if(isset($res_certamen) && $res_certamen->finalizado==false)
-                                <a class="btn btn-primary text-nowrap btn-block {{ $certamen->disponibilidad ? '' : 'disabled' }}" href="#"
-                                    role="button">{{ 'Volver al Certamen' }}</a>
+                            @if(isset($res_certamen))
+                                <a class="btn btn-primary text-nowrap btn-block {{ $res_certamen->finalizado == true ? 'disabled' : ''}}" href="{{route('certamenes.resolucion', ["token"=>$res_certamen->token])}}"
+                                    role="button">{{ $res_certamen->finalizado == true?  'Has finalizado el Certamen' : 'Volver al Certamen' }}</a>
                             @else
                                 <a class="btn btn-primary text-nowrap btn-block {{ $certamen->disponibilidad ? '' : 'disabled' }}" href="{{route('certamenes.iniciar_resolucion', ['id_certamen'=>$certamen->id])}}"
                                     role="button">{{ $certamen->disponibilidad ? 'Resolver Certamen' : 'Certamen No Disponible' }}</a>
@@ -56,6 +56,10 @@
                             @if (isset($certamen->fecha_termino))
                                 <li class="list-group-item"><strong>Fecha de Termino:</strong>
                                     {{ $certamen->fecha_termino }}</li>
+                            @endif
+                            @if (isset($res_certamen) && $res_certamen->finalizado==true)
+                            <li class="list-group-item"><strong>Finalizado:</strong>
+                                {{ $certamen->fecha_termino }}</li>
                             @endif
                         </ul>
                     </div>

@@ -120,13 +120,13 @@ class UserController extends Controller
                 $usuario_nuevo->firstname = $usuario_data["firstname"];
                 $usuario_nuevo->lastname = $usuario_data["lastname"];
                 $usuario_nuevo->email = $usuario_data["email"];
-                $usuario_nuevo->rut = $usuario_data["rut"];
-                $usuario_nuevo->password = substr($usuario_data["rut"], 0, -2);
+                $usuario_nuevo->rut = str_replace(' ', '', $usuario_data["rut"]);
+                $usuario_nuevo->password = substr(str_replace(' ', '', $usuario_data["rut"]), 0, -2);
                 $usuario_nuevo->save();
                 $cursos_modelos = Cursos::whereIn("codigo", $usuario_data["cursos"])->get();
                 $roles_modelos = Role::whereIn("name", $usuario_data["roles"])->get();
                 if(!isset($cursos_modelos, $roles_modelos)){
-                    throw new \Exception("Error: Cursos y/o roles del usuario de la columna ".($key+1)." no existen:\n[".$string_info."].\n ");
+                    throw new \Exception("Error: Cursos y/o roles del usuario de la columna ".($key+1)." no existen:\n[".$string_info."].\n Asegúrese de que los cursos y/o roles que ingresa existan en la plataforma.");
                 }
                 $usuario_nuevo->cursos()->sync($cursos_modelos);
                 $usuario_nuevo->roles()->sync($roles_modelos);

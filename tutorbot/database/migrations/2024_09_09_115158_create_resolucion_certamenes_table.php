@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer("puntaje_obtenido")->default(0);
             $table->integer("problemas_resueltos")->default(0);
             $table->boolean("finalizado")->default(0);
+            $table->dateTime("fecha_finalizado")->nullable();
             $table->timestamps();
             $table->foreign('id_usuario')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('id_certamen')->references('id')->on('certamenes')->onDelete('cascade')->onUpdate('cascade');

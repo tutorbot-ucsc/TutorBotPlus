@@ -37,7 +37,7 @@ class UsuarioCreado extends Notification implements ShouldQueue
         return (new MailMessage)
                     ->subject('Tu cuenta de Tutorbot+ ha sido creado')
                     ->line('Tu cuenta de Tutorbot+ has sido creado para su uso.')
-                    ->line('Para acceder a tu cuenta debes ingresar tu correo institucional y la contraseña es el RUT sin el dígito verficador.')
+                    ->line('Para acceder a tu cuenta debes ingresar tu correo institucional y la contraseña es el RUT sin el dígito verificador.')
                     ->action('Has click aquí para iniciar sesión', route('login'));
     }
 

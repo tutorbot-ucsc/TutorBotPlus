@@ -64,7 +64,11 @@ class EnvioSolucionProblemaController extends Controller
         }
         try {
             DB::beginTransaction();
-            $envio = EnvioSolucionProblema::where('id_resolver', '=', $request->id_resolver)->where('id_cursa', '=', $request->id_cursa)->orderBy('created_at', 'DESC')->first();
+            if(isset($request->id_certamen)){
+                $envio = EnvioSolucionProblema::where('id_resolver', '=', $request->id_resolver)->where('id_certamen', '=', $request->id_certamen)->orderBy('created_at', 'DESC')->first();
+            }else{
+                $envio = EnvioSolucionProblema::where('id_resolver', '=', $request->id_resolver)->where('id_cursa', '=', $request->id_cursa)->orderBy('created_at', 'DESC')->first();
+            }
             $envio->codigo = $request->codigo;
             $envio->juez_virtual()->associate(JuecesVirtuales::find($request->juez_virtual));
             $lenguaje = LenguajesProgramaciones::where("codigo", "=", $request->lenguaje)->first();
