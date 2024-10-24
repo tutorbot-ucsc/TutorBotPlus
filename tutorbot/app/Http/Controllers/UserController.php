@@ -104,13 +104,13 @@ class UserController extends Controller
                 $usuario_data["cursos"] = array_filter(explode(",",str_replace(["[","]"], "", $usuario_data["cursos"])));
                 $usuario_data["roles"] = array_filter(explode(",",str_replace(["[","]"], "", strtolower($usuario_data["roles"]))));
                 $validator = Validator::make($usuario_data, [
-                    'username' => 'required|string|max:255',
-                    'rut' => 'required|string|unique:App\Models\User,rut',
-                    'email' => 'required|email|unique:App\Models\User,email',
-                    'firstname' => 'required|string',
-                    'lastname' => 'required|string',
-                    'cursos'=> "array|min:1",
-                    'roles' => 'array|min:1',
+                    'username' => ['required', 'string', 'max:255'],
+                    'rut' => ['required', 'string', 'unique:App\Models\User,rut','regex:/^[1-9]\d*\-(\d|k|K)$/'],
+                    'email' => ['required', 'email', 'unique:App\Models\User,email'],
+                    'firstname' => ['required', 'string'],
+                    'lastname' => ['required', 'string'],
+                    'cursos'=> ['array', 'min:1'],
+                    'roles' =>  ['array', 'min:1'],
                 ]);
                 if ($validator->fails()) {
                     throw new \Exception("Error en la validación del usuario de la columna ".($key+1).":\n[".$string_info."].\n ".implode(",",$validator->messages()->all()));
@@ -125,8 +125,11 @@ class UserController extends Controller
                 $usuario_nuevo->save();
                 $cursos_modelos = Cursos::whereIn("codigo", $usuario_data["cursos"])->get();
                 $roles_modelos = Role::whereIn("name", $usuario_data["roles"])->get();
-                if(!isset($cursos_modelos, $roles_modelos)){
-                    throw new \Exception("Error: Cursos y/o roles del usuario de la columna ".($key+1)." no existen:\n[".$string_info."].\n Asegúrese de que los cursos y/o roles que ingresa existan en la plataforma.");
+                if(sizeof($cursos_modelos)==0){
+                    throw new \Exception("Error: Los cursos del usuario de la columna ".($key+1)." no existen:\n[".$string_info."].\n Asegúrese de que los cursos que se asignan existan en la plataforma.");
+                }
+                if(sizeof($roles_modelos)==0){
+                    throw new \Exception("Error: Los roles del usuario de la columna ".($key+1)." no existen:\n[".$string_info."].\n Asegúrese de que los roles que se asigna existan en la plataforma.");
                 }
                 $usuario_nuevo->cursos()->sync($cursos_modelos);
                 $usuario_nuevo->roles()->sync($roles_modelos);

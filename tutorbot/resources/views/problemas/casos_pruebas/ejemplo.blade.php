@@ -22,7 +22,8 @@
                     <textarea class="form-control" rows="3" disabled>6
 10</textarea>
                     <br>Esto es siempre dependiendo del problema subido la cantidad de entradas que debe recibir y la salidas que debe entregar el código.
-                    <br> <strong class="text-warning">Importante: Los casos de pruebas se añaden de a uno, no debe ingresar todos los casos de pruebas en uno solo, ya que entregara errores de respuesta erronea.</strong>
+                    <br> <strong class="text-warning">Importante: Los casos de pruebas se añaden de a uno, no debe ingresar todos los casos de pruebas en uno solo, ya que entregará errores de respuesta erronea.</strong><br>
+                    <br> Las entradas y salidas de un caso de prueba se pueden ocultar en la evaluación del código, si desea esto debe hacer click a la casilla.
                 </p>
             </div>
             <div class="modal-footer">
