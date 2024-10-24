@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('token');
             $table->unsignedBigInteger('id_cursa')->nullable();
-            $table->unsignedBigInteger('id_resolver');
+            $table->unsignedBigInteger('id_resolver')->nullable();
             $table->unsignedBigInteger('id_certamen')->nullable();
             $table->unsignedBigInteger('id_juez')->nullable();
             $table->text('codigo')->nullable();
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('id_cursa')->references('id')->on('cursa')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('id_resolver')->references('id')->on('resolver')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('id_resolver')->references('id')->on('resolver')->onDelete('set null')->onUpdate('cascade');
             $table->foreign('id_juez')->references('id')->on('jueces_virtuales')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('id_certamen')->references('id')->on('resolucion_certamenes')->onDelete('set null')->onUpdate('cascade');
         });

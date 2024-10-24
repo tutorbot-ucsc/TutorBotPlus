@@ -21,7 +21,7 @@ return new class extends Migration
                     $table->unsignedBigInteger('id_resolver')->nullable();
 
                     $table->foreign('id_cursa')->references('id')->on('cursa')->onDelete('cascade')->onUpdate('cascade');
-                    $table->foreign('id_resolver')->references('id')->on('resolver')->onDelete('cascade')->onUpdate('cascade');
+                    $table->foreign('id_resolver')->references('id')->on('resolver')->onDelete('set null')->onUpdate('cascade');
                 });
             }
             $envios = EnvioSolucionProblema::all();
@@ -57,6 +57,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        
+
     }
 };
