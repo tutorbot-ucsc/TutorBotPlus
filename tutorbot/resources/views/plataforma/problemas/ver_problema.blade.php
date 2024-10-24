@@ -1,13 +1,5 @@
 @extends('layout_plataforma.app', ['title_html' => $problema->nombre, 'title' => 'Problema - ' . $problema->nombre, 'breadcrumbs' => [['nombre' => 'Cursos', 'route' => route('cursos.listado')], ['nombre' => 'Problemas', 'route' => route('problemas.listado', ['id' => $id_curso])], ['nombre' => $problema->nombre]]])
-@php
-    $estado = auth()
-        ->user()
-        ->envios()
-        ->where('id_problema', '=', $problema->id)
-        ->where('id_curso', '=', $id_curso)
-        ->where('solucionado', '=', true)
-        ->exists();
-@endphp
+
 @section('content')
     <div class="container-fluid py-3 px-4">
         @include('components.alert')
@@ -68,7 +60,7 @@
                                 {{ implode(', ', $problema->cursos()->where('cursos.id', '=', $id_curso)->pluck('nombre')->toArray()) }}
                             </li>
                             <li class="list-group-item"><strong>Estado:</strong> <span
-                                    class="badge {{ $estado ? 'text-bg-success' : 'text-bg-secondary' }}">{{ $estado ? 'Resuelto' : 'No Resuelto' }}</span>
+                                    class="badge {{ $problema->estado ? 'text-bg-success' : 'text-bg-secondary' }}">{{ $problema->estado ? 'Resuelto' : 'No Resuelto' }}</span>
                             </li>
                             <li class="list-group-item"><strong>Categorías:</strong>
                                 {{ implode(', ', $problema->categorias()->get()->pluck('nombre')->toArray()) }}</li>

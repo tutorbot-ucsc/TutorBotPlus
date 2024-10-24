@@ -12,8 +12,8 @@ class LlmObserver
     public function created(SolicitudRaLlm $solicitudRaLlm): void
     {
         DB::table('disponible')
-        ->where('id_curso', '=', $solicitudRaLlm->envio->id_curso)
-        ->where('id_problema', '=', $solicitudRaLlm->envio->id_problema)
+        ->where('id_curso', '=', $solicitudRaLlm->envio->curso->id)
+        ->where('id_problema', '=', $solicitudRaLlm->envio->problema->id)
         ->increment('cant_retroalimentacion_solicitada');
     }
 

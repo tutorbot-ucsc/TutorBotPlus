@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->unsignedBigInteger('id_problema');
-            $table->unsignedBigInteger('id_lenguaje');
+            $table->unsignedBigInteger('id_lenguaje')->nullable();
 
             $table->foreign('id_problema')->references('id')->on('problemas')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_lenguaje')->references('id')->on('lenguajes_programaciones')->onUpdate('cascade')->onDelete('cascade');

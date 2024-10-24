@@ -21,6 +21,8 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\ResetPassword;
 use App\Http\Controllers\ChangePassword;
+use App\Http\Controllers\CertamenesController;
+use App\Http\Controllers\BancoProblemasCertamenesController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\LenguajesProgramacionesController;
 use App\Http\Controllers\CategoriaProblemaController;
@@ -53,30 +55,40 @@ Route::get('/inicio', function(){
 })->name('home')->middleware(['auth', 'can:acceso al panel de administración']);
 
 //Plataforma de Juez Online
-Route::group(['middleware'=>'auth'], function(){
-	Route::get('/', [CursosController::class, 'listado_cursos'])->name('cursos.listado');
+Route::group(['middleware'=>['auth', 'certamen_en_resolucion']], function(){
+	Route::get('/', [CursosController::class, 'listado_cursos'])->name('cursos.listado')->withoutMiddleware('certamen_en_resolucion');
 	Route::get('/cursos', function () {
 		return redirect()->route('cursos.listado');
-	});
+	})->withoutMiddleware('certamen_en_resolucion');
 	Route::get('/home', function () {
 		return redirect()->route('cursos.listado');
-	});
+	})->withoutMiddleware('certamen_en_resolucion');
 	Route::get('/cursos/{id}/problemas', [ProblemasController::class, 'listado_problemas'])->name('problemas.listado');
 	Route::get('/problema/{id_curso?}/{codigo}', [ProblemasController::class, 'ver_problema'])->name('problemas.ver');
-	Route::post('/problema/guardar_codigo', [ProblemasController::class, 'guardar_codigo'])->name('problemas.guardar_codigo');
+	Route::post('/problema/guardar_codigo', [ProblemasController::class, 'guardar_codigo'])->name('problemas.guardar_codigo')->withoutMiddleware('certamen_en_resolucion');
 	Route::get('/editorial/problema/{codigo}', [ProblemasController::class, 'ver_editorial'])->name('problemas.ver_editorial');
 	Route::get('/problema/{id_curso?}/{codigo}/resolver', [ProblemasController::class, 'resolver_problema'])->name('problemas.resolver');
-	Route::get('/pdf/problema/{id_problema}', [ProblemasController::class, 'pdf_enunciado'])->name('problemas.pdf_enunciado');
+	Route::get('/pdf/problema/{id_problema}', [ProblemasController::class, 'pdf_enunciado'])->name('problemas.pdf_enunciado')->withoutMiddleware('certamen_en_resolucion');
 
-	Route::post('/problema/enviar', [EnvioSolucionProblemaController::class, 'enviar_solucion'])->name('problemas.enviar');
+	Route::post('/problema/enviar', [EnvioSolucionProblemaController::class, 'enviar_solucion'])->name('problemas.enviar')->withoutMiddleware('certamen_en_resolucion');
 	Route::get('/envios/{id_problema?}', [EnvioSolucionProblemaController::class, 'ver_envios'])->name('envios.listado');
-	Route::get('/envio/{token}', [EvaluacionSolucionController::class, 'ver_evaluacion'])->name('envios.ver');
+	Route::get('/envio/{token}', [EvaluacionSolucionController::class, 'ver_evaluacion'])->name('envios.ver')->withoutMiddleware('certamen_en_resolucion');
 
 	Route::get('/envio/{token}/retroalimentacion', [LlmController::class, 'ver_retroalimentacion'])->name('envios.retroalimentacion');
 	Route::get('/retroalimentacion/generar', [LlmController::class, 'generar_retroalimentacion'])->name('envios.generar_retroalimentacion');
 
 	Route::get('/perfil', [UserController::class, "ver_mi_perfil"])->name('ver.perfil');
 	Route::post('/perfil/update', [UserController::class, "actualizar_informacion"])->name('perfil.update');
+
+	Route::get('/evaluaciones', [CertamenesController::class, "listado_certamenes"])->name('certamenes.listado')->withoutMiddleware('certamen_en_resolucion');
+	Route::get('/evaluaciones/{id_certamen}', [CertamenesController::class, "ver_certamen"])->name('certamenes.ver')->withoutMiddleware('certamen_en_resolucion');
+	Route::get('/evaluaciones/{id_certamen}/resolver', [CertamenesController::class, "inicializar_certamen"])->name('certamenes.iniciar_resolucion')->withoutMiddleware('certamen_en_resolucion');
+
+	Route::get('/evaluaciones/{token}/resolucion', [CertamenesController::class, "resolver_certamen"])->name('certamenes.resolucion')->withoutMiddleware('certamen_en_resolucion');
+	Route::get('/evaluaciones/{token_certamen}/problema/{codigo}', [ProblemasController::class, "resolver_problema"])->name('certamenes.resolver_problema')->withoutMiddleware('certamen_en_resolucion');
+	Route::post('/evaluaciones/guardar_codigo', [CertamenesController::class, "guardar_codigo_certamen"])->name('certamenes.guardar_codigo')->withoutMiddleware('certamen_en_resolucion');
+
+	Route::post('/evaluaciones/{token}/finalizar', [CertamenesController::class, "finalizar_certamen"])->name('certamen.finalizar')->withoutMiddleware('certamen_en_resolucion');
 });
 //Panel de Administración
 Route::group(['middleware' => 'auth'], function () {
@@ -126,7 +138,22 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/editar', [CategoriaProblemaController::class, 'editar'])->name('categorias.editar')->middleware('can:editar categoría de problema'); 
 		Route::post('/eliminar', [CategoriaProblemaController::class, 'eliminar'])->name('categorias.eliminar')->middleware('can:eliminar categoría de problema'); 
 		Route::post('/store', [CategoriaProblemaController::class, 'store'])->name('categorias.store')->middleware('can:crear categoría de problema'); 
-		Route::post('/update', [CategoriaProblemaController::class, 'update'])->name('categorias.update')->middleware('can:editar categoría de problema'); 
+		Route::post('/update', [CategoriaProblemaController::class, 'update'])->name('categorias.update')->middleware('can:editar categoría de problema');
+		
+	});
+
+	Route::prefix('evaluacion')->group(function () {
+		Route::get('/index', [CertamenesController::class, 'index'])->name('certamen.index')->middleware('can:ver certamen'); 
+		Route::get('/crear', [CertamenesController::class, 'crear'])->name('certamen.crear')->middleware('can:crear certamen'); 
+		Route::get('/editar', [CertamenesController::class, 'editar'])->name('certamen.editar')->middleware('can:editar certamen'); 
+		Route::post('/eliminar', [CertamenesController::class, 'eliminar'])->name('certamen.eliminar')->middleware('can:eliminar certamen'); 
+		Route::post('/store', [CertamenesController::class, 'store'])->name('certamen.store')->middleware('can:crear certamen'); 
+		Route::post('/update', [CertamenesController::class, 'update'])->name('certamen.update')->middleware('can:editar certamen'); 
+
+		Route::get('/banco_problemas/{id_certamen}', [BancoProblemasCertamenesController::class, 'index'])->name('certamen.banco_problemas')->middleware('can:editar certamen'); 
+		Route::post('/banco_problemas/delete', [BancoProblemasCertamenesController::class, 'delete'])->name('certamen.eliminar_categoria')->middleware('can:editar certamen'); 
+		Route::post('/banco_problemas/{id_certamen}/add', [BancoProblemasCertamenesController::class, 'add'])->name('certamen.add_categoria')->middleware('can:editar certamen'); 
+
 	});
 	Route::prefix('problemas')->group(function () {
 		Route::get('/index', [ProblemasController::class, 'index'])->name('problemas.index')->middleware('can:ver problemas'); 

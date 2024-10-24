@@ -40,6 +40,6 @@ class LenguajesProgramaciones extends Model
 
     public function problemas(): BelongsToMany
     {
-        return $this->belongsToMany(Problemas::class, 'resolver', 'id_lenguaje', 'id_problema');
+        return $this->belongsToMany(Problemas::class, 'resolver', 'id_lenguaje', 'id_problema')->withTimestamps()->withPivot(['id'])->using(Resolver::class);
     }
 }

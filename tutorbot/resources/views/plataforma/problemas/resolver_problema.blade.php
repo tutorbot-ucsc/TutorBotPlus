@@ -13,7 +13,7 @@
                             <p class="text-danger text-xs pt-1"> Debes escribir al menos una línea de código para enviarlo como
                                 solución.</p>
                         @enderror
-                        <div id="editor">{{ isset($codigo) ? $codigo : '' }}</div>
+                        <div id="editor">{{ isset($last_envio->codigo) ? old('codigo', $last_envio->codigo) : '' }}</div>
                     </div>
                 </div>
             </div>
@@ -21,18 +21,18 @@
                 <div class="card border-danger" style="height:100%;">
                     <div class="card-body px-5">
                         <form
-                            action="{{ route('problemas.guardar_codigo', ['codigo_problema' => $problema->codigo, 'id_curso' => $id_curso, 'id_problema' => $problema->id]) }}"
+                            action="{{isset($res_certamen)?  route('certamenes.guardar_codigo', ['id_certamen'=>$res_certamen, 'token_certamen'=>$res_certamen->token]) : route('problemas.guardar_codigo', ['codigo_problema' => $problema->codigo, 'id_problema' => $problema->id,'id_curso' => $id_curso, 'id_resolver'=>$last_envio->id_resolver, 'id_cursa'=>$last_envio->id_cursa])}}"
                             method="POST" id="guardarForm">
                             @csrf
                             <div class="row px-5 mb-2">
 
                                 <input type="hidden" id="codigo_save" name="codigo_save">
-                                <button class="btn btn-outline-primary btn-sm" type="submit">Guardar y Volver</button>
-
+                                <input type="hidden" id="lenguaje_save" name="lenguaje_save">
+                                <button class="btn btn-outline-primary btn-sm" type="submit">{{isset($res_certamen)? "Guardar y Volver al Certamen" : "Guardar y Volver"}}</button>
                             </div>
                         </form>
                         <form
-                            action="{{ route('problemas.enviar', ['id_problema' => $problema->id, 'id_curso' => $id_curso]) }}"
+                            action="{{isset($res_certamen)? route('problemas.enviar', ['id_problema' => $problema->id,'id_resolver'=>$last_envio->id_resolver, 'id_certamen'=>$res_certamen->id, 'token_certamen'=>$res_certamen->token]) : route('problemas.enviar', ['id_problema' => $problema->id, 'id_resolver'=>$last_envio->id_resolver, 'id_cursa'=>$last_envio->id_cursa]) }}"
                             method="POST" id="evaluacion_form">
                             @csrf
                             <div class="row px-5">
@@ -43,7 +43,7 @@
                                 onchange="change_language(this)" required>
                                     <option value="">Selecciona un Lenguaje</option>
                                 @foreach ($lenguajes as $item)
-                                    <option value="{{ $item->codigo }}" abreviatura="{{ $item->abreviatura }}">
+                                    <option value="{{ $item->codigo }}" id="{{$item->id}}" @if($last_envio->ProblemaLenguaje->lenguaje->id == $item->id) selected @endif>
                                         {{ $item->nombre }}</option>
                                 @endforeach
                             </select>
@@ -82,7 +82,7 @@
             92: 'python',
             82: 'sql',
         }
-        var set_lenguaje = lenguajes[{{ strtolower($lenguajes[0]->codigo) }}]
+        var set_lenguaje = lenguajes[{{ strtolower($last_envio->ProblemaLenguaje->lenguaje->codigo) }}]
         editor.setTheme("ace/theme/monokai");
         editor.session.setMode("ace/mode/" + set_lenguaje);
         editor.setOptions({
@@ -92,6 +92,7 @@
 
         function change_language(item) {
             editor.session.setMode("ace/mode/" + lenguajes[item.value]);
+           document.querySelector('#lenguaje_save').value = item.options[item.selectedIndex].id;
         }
         document.querySelector('#evaluacion_form').addEventListener('submit', e => {
             e.preventDefault();

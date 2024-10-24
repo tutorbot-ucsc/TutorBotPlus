@@ -13,7 +13,7 @@
                     <p>Para insertar usuarios de manera masiva, debe subir un archivo .csv con la información personal de los usuarios, cursos y roles.
                        <br><a href="{{asset('examples/ejemplo_bulk_usuarios.csv')}}" style="color: blue;" download>Haga click aquí</a> para descargar el archivo ejemplo de csv.
                     </p>
-                    <p>La contraseña se asigna de manera automática y es el rut del usuario.</p>
+                    <p>La contraseña se asigna de manera automática y es el RUT sin el dígito verificador del usuario.</p>
                     <div class="mb-3">
                         <input class="form-control" type="file" id="formFile" id="csvFile" name="csvFile" required>
                         <label for="formFile" class="form-label">Formatos: .csv, .txt</label>
@@ -22,7 +22,7 @@
                         <p class="text-danger text-xs pt-1"> {{ $message }} </p>
                     @enderror
                     <br><strong> <span class="text-warning">Importante:</span> Debe seguir el siguiente orden.</strong> <br>
-                        <ul class="list-group list-group-numbered mb-4">
+                        <ul class="list-group list-group-numbered mb-2">
                             <li class="list-group-item"><strong>Nombre de Usuario</strong></li>
                             <li class="list-group-item"><strong>Nombre</strong></li>
                             <li class="list-group-item"><strong>Apellido</strong></li>
@@ -31,8 +31,9 @@
                             <li class="list-group-item"><strong>Códigos de los cursos en un Array</strong></li>
                             <li class="list-group-item"><strong>Nombres de los roles en un array</strong></li>
                         </ul>
-                    <input type="submit" class="btn btn-primary" value="Insertar">
-                    <a href="{{route('usuarios.index')}}" class="btn btn-outline-primary">Volver</a>
+                    <br><strong> <span class="text-warning">Importante: No debe ingresar una fila de encabezado al archivo.</strong> </span><br>
+                    <input type="submit" class="btn btn-primary mt-4" value="Insertar">
+                    <a href="{{route('usuarios.index')}}" class="btn btn-outline-primary mt-4">Volver</a>
                 </div>
             </div>            
         </form>

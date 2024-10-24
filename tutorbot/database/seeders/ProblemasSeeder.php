@@ -42,5 +42,6 @@ class ProblemasSeeder extends Seeder
         ]);
 
         $problema->puntaje_total = 45;
+        $problema->save();
     }
 }

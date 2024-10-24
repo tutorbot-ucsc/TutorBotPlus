@@ -98,19 +98,19 @@ class UserController extends Controller
                 }
                 $usuario_data = array_filter(explode(";", $string_info));
                 if(sizeof($usuario_data)<7){
-                    throw new \Exception("Faltan datos en el usuario de la columna ".($key+1).": [".$string_info."]. Ingrese nuevamente el archivo corregido y asegurese de que todos los datos necesarios estén presentes.");
+                    throw new \Exception("Faltan datos en el usuario de la columna ".($key+1).": [".$string_info."]. Ingrese nuevamente el archivo corregido y asegúrese de que todos los datos requeridos estén presentes.");
                 }
                 $usuario_data = array_combine($keys_array, $usuario_data);
                 $usuario_data["cursos"] = array_filter(explode(",",str_replace(["[","]"], "", $usuario_data["cursos"])));
                 $usuario_data["roles"] = array_filter(explode(",",str_replace(["[","]"], "", strtolower($usuario_data["roles"]))));
                 $validator = Validator::make($usuario_data, [
-                    'username' => 'required|string|max:255',
-                    'rut' => 'required|string|unique:App\Models\User,rut',
-                    'email' => 'required|email|unique:App\Models\User,email',
-                    'firstname' => 'required|string',
-                    'lastname' => 'required|string',
-                    'cursos'=> "array|min:1",
-                    'roles' => 'array|min:1',
+                    'username' => ['required', 'string', 'max:255'],
+                    'rut' => ['required', 'string', 'unique:App\Models\User,rut','regex:/^[1-9]\d*\-(\d|k|K)$/'],
+                    'email' => ['required', 'email', 'unique:App\Models\User,email'],
+                    'firstname' => ['required', 'string'],
+                    'lastname' => ['required', 'string'],
+                    'cursos'=> ['array', 'min:1'],
+                    'roles' =>  ['array', 'min:1'],
                 ]);
                 if ($validator->fails()) {
                     throw new \Exception("Error en la validación del usuario de la columna ".($key+1).":\n[".$string_info."].\n ".implode(",",$validator->messages()->all()));
@@ -120,11 +120,17 @@ class UserController extends Controller
                 $usuario_nuevo->firstname = $usuario_data["firstname"];
                 $usuario_nuevo->lastname = $usuario_data["lastname"];
                 $usuario_nuevo->email = $usuario_data["email"];
-                $usuario_nuevo->rut = $usuario_data["rut"];
-                $usuario_nuevo->password = substr($usuario_data["rut"], 0, -2);
+                $usuario_nuevo->rut = str_replace(' ', '', $usuario_data["rut"]);
+                $usuario_nuevo->password = substr(str_replace(' ', '', $usuario_data["rut"]), 0, -2);
                 $usuario_nuevo->save();
                 $cursos_modelos = Cursos::whereIn("codigo", $usuario_data["cursos"])->get();
                 $roles_modelos = Role::whereIn("name", $usuario_data["roles"])->get();
+                if(sizeof($cursos_modelos)==0){
+                    throw new \Exception("Error: Los cursos del usuario de la columna ".($key+1)." no existen:\n[".$string_info."].\n Asegúrese de que los cursos que se asignan existan en la plataforma.");
+                }
+                if(sizeof($roles_modelos)==0){
+                    throw new \Exception("Error: Los roles del usuario de la columna ".($key+1)." no existen:\n[".$string_info."].\n Asegúrese de que los roles que se asigna existan en la plataforma.");
+                }
                 $usuario_nuevo->cursos()->sync($cursos_modelos);
                 $usuario_nuevo->roles()->sync($roles_modelos);
                 $usuario_nuevo->save();
