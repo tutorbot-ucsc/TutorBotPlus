@@ -21,7 +21,21 @@ class EnvioSolucionProblema extends Model
 {
     use HasFactory;
 
-
+    protected $fillable = [
+            'token',
+            'id_problema',
+            'id_usuario', 
+            'id_curso',
+            'id_juez', 
+            'id_lenguaje',
+            'codigo',
+            'inicio',
+            'termino',
+            'cant_casos_resueltos',
+            'puntaje',
+            'solucionado',
+    ];
+    
     public static $rules = [
         "codigo" => ["required", "min:5"],
     ];
