@@ -129,6 +129,7 @@ class CertamenesController extends Controller
 
     public function inicializar_certamen(Request $request){
         try{
+            DB::beginTransaction();
             $res_certamen = auth()->user()->evaluaciones()->where('id_certamen','=',$request->id_certamen)->first();
             if(isset($res_certamen)){
                 if($res_certamen->finalizado == true){
@@ -143,17 +144,23 @@ class CertamenesController extends Controller
                 
                 $categorias = $certamen->categorias()->get();
                 $problemas_seleccionados = [];
+                $problemas_seleccionados_id = [];
                 foreach ($categorias as $categoria){
+                    //selecciona un problema aleatorio, ignorando los problemas que ya fueron escogidos previamente
                     $problema_aleatorio = $categoria->problemas()->inRandomOrder()->first();
                     $seleccion = new SeleccionProblemasCertamenes;
                     $seleccion->problema()->associate($problema_aleatorio);
                     array_push($problemas_seleccionados, $seleccion);        
+                    array_push($problemas_seleccionados_id, $problema_aleatorio->id);
                 }
                 $res_certamen->ProblemasSeleccionadas()->saveMany($problemas_seleccionados);
             }
-        }catch(\PDOException $e){ 
+            DB::commit();
+        }catch(\PDOException $e){
+            DB::rollback();
             return redirect()->route('certamenes.listado')->with("error", $e->getMessage());
         }catch(\Exception $e){
+            DB::rollback();
             return redirect()->route('certamenes.listado')->with("error", $e->getMessage());
         }
         return redirect()->route('certamenes.resolucion', ['token'=>$res_certamen->token]);

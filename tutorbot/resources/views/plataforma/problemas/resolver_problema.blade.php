@@ -4,60 +4,14 @@
         @include('components.alert')
         <div class="row">
             <div class="col-sm col-xs-12">
-                <div class="card border-danger" style="height:100%">
-                    <div class="card-header">
-                        Editor de Código
-                    </div>
-                    <div class="card-body">
-                        @error('codigo')
-                            <p class="text-danger text-xs pt-1"> Debes escribir al menos una línea de código para enviarlo como
-                                solución.</p>
-                        @enderror
-                        <div id="editor">{{ isset($last_envio->codigo) ? old('codigo', $last_envio->codigo) : '' }}</div>
-                    </div>
-                </div>
+                
+                @include('plataforma.problemas.componentes.card_editor')
             </div>
             <div class="col-sm-4 col-xs-12">
-                <div class="card border-danger" style="height:100%;">
-                    <div class="card-body px-5">
-                        <form
-                            action="{{isset($res_certamen)?  route('certamenes.guardar_codigo', ['id_certamen'=>$res_certamen, 'token_certamen'=>$res_certamen->token]) : route('problemas.guardar_codigo', ['codigo_problema' => $problema->codigo, 'id_problema' => $problema->id,'id_curso' => $id_curso, 'id_resolver'=>$last_envio->id_resolver, 'id_cursa'=>$last_envio->id_cursa])}}"
-                            method="POST" id="guardarForm">
-                            @csrf
-                            <div class="row px-5 mb-2">
-
-                                <input type="hidden" id="codigo_save" name="codigo_save">
-                                <input type="hidden" id="lenguaje_save" name="lenguaje_save">
-                                <button class="btn btn-outline-primary btn-sm" type="submit">{{isset($res_certamen)? "Guardar y Volver al Certamen" : "Guardar y Volver"}}</button>
-                            </div>
-                        </form>
-                        <form
-                            action="{{isset($res_certamen)? route('problemas.enviar', ['id_problema' => $problema->id,'id_resolver'=>$last_envio->id_resolver, 'id_certamen'=>$res_certamen->id, 'token_certamen'=>$res_certamen->token]) : route('problemas.enviar', ['id_problema' => $problema->id, 'id_resolver'=>$last_envio->id_resolver, 'id_cursa'=>$last_envio->id_cursa]) }}"
-                            method="POST" id="evaluacion_form">
-                            @csrf
-                            <div class="row px-5">
-                                <button class="btn btn-primary" type="submit">Enviar Solución</button>
-                            </div>
-                            <h6 class="text-center mt-4">Lenguaje de Programación</h6>
-                            <select class="form-select mb-3" id="lenguaje" name="lenguaje"
-                                onchange="change_language(this)" required>
-                                    <option value="">Selecciona un Lenguaje</option>
-                                @foreach ($lenguajes as $item)
-                                    <option value="{{ $item->codigo }}" id="{{$item->id}}" @if($last_envio->ProblemaLenguaje->lenguaje->id == $item->id) selected @endif>
-                                        {{ $item->nombre }}</option>
-                                @endforeach
-                            </select>
-                            <h6 class="text-center mt-2">Evaluador</h6>
-                            <select class="form-select mb-3" id="juez_virtual" name="juez_virtual">
-                                <option value="0">Selección Aleatoria de Juez Virtual</option>
-                                @foreach ($jueces as $item)
-                                    <option value="{{ $item->id }}">{{ $item->nombre }}</option>
-                                @endforeach
-                            </select>
-                            <input type="hidden" id="codigo" name="codigo" value="">
-                        </form>
-                    </div>
-                </div>
+                @if(isset($res_certamen))
+                @include('plataforma.problemas.componentes.card_timer_certamen')
+                @endif
+                @include('plataforma.problemas.componentes.card_enviar_solucion')
             </div>
         </div>
     </div>

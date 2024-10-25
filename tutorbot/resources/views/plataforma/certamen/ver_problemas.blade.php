@@ -81,9 +81,6 @@
         showdown.setOption('moreStyling', 'true')
         showdown.setFlavor('github');
         var converter = new showdown.Converter();
-        Number.prototype.pad = function(n) {
-            return new Array(n).join('0').slice((n || 2) * -1) + this;
-        }
 
         function style_table() {
             var table = document.querySelector("#body_markdown table")
@@ -157,14 +154,14 @@
             var horas = Math.floor((distancia / (1000 * 60 * 60)));
             var minutos = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
             var segundos = Math.floor((distancia % (1000 * 60)) / 1000);
-            document.getElementById("timer").innerHTML = horas.pad(1) + ":" + minutos.pad(1) + ":" + segundos.pad(
-                1);
+            document.getElementById("timer").innerHTML = ("0" + horas).slice(-2) + ":" + ("0" + minutos).slice(-2) + ":" + ("0" + segundos).slice(-2);
             if (distancia < 1800000) {
                 document.getElementById("timer").classList.add('text-danger');
             }
             if (distancia < 0) {
                 clearInterval(x);
                 document.getElementById("timer").innerHTML = "Finalizado";
+                document.getElementById('finalizar_form').submit();
             }
         }, 1000);
     </script>

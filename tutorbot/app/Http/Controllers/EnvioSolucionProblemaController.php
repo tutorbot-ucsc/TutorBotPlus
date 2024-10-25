@@ -113,7 +113,7 @@ class EnvioSolucionProblemaController extends Controller
         if(isset($problema->memoria_limite)){
             $initial_json_string = $initial_json_string.',"memory_limit":"'.$problema->memoria_limite.'"';
         }
-        if(isset($problema->tiempo_limite)){
+        if(isset($problema->tiempo_limite) && $problema->tiempo_limite>0){
             $initial_json_string = $initial_json_string.',"cpu_time_limit":"'.$problema->tiempo_limite.'"';
         }
         if(isset($problema->archivo_adicional)){
