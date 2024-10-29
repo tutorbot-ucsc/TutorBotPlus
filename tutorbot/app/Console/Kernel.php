@@ -3,8 +3,9 @@
 namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
+use App\Models\EnvioSolucionProblema;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-
+use App\Console\Commands\EvaluarEnvios;
 class Kernel extends ConsoleKernel
 {
     /**
@@ -13,6 +14,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
+        $schedule->command('app:evaluar-envios')->everyTenSeconds()->withoutOverlapping();
     }
 
     /**

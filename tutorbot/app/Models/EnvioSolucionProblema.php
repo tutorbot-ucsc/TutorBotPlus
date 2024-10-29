@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Jobs\EnviosProcess;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 use App\Models\User;
 use App\Models\JuecesVirtuales;
 use App\Models\EvaluacionSolucion;
@@ -13,9 +15,14 @@ use App\Models\Cursos;
 use App\Models\Cursa;
 use App\Models\LenguajesProgramaciones;
 use App\Models\SolicitudRaLlm;
+
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Illuminate\Database\Eloquent\Builder;
+use GuzzleHttp\Client;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class EnvioSolucionProblema extends Model
 {
@@ -47,6 +54,7 @@ class EnvioSolucionProblema extends Model
         "java" => "java",
         "sql" => "sql",
     ];
+
     public function CursoUsuario(): BelongsTo
     {
         return $this->BelongsTo(Cursa::class, 'id_cursa');

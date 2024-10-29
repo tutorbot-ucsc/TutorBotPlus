@@ -38,7 +38,7 @@ class BancoProblemasCertamenesController extends Controller
         ]);
         try {
             $certamen = Certamenes::find($request->id_certamen);
-            if ($certamen->categorias()->where('categorias.id', '=', $request->input('categoria'))->exists())) {
+            if (!$certamen->categorias()->where('categoria__problemas.id', '=', $request->input('categoria'))->exists()) {
                 DB::beginTransaction();
                 $categoria = Categoria_Problema::find($request->input('categoria'));
                 $certamen->categorias()->attach($request->input('categoria'));
@@ -55,14 +55,16 @@ class BancoProblemasCertamenesController extends Controller
         try {
             DB::beginTransaction();
             $certamen = Certamenes::find($request->id_certamen);
-            $categoria = $certamen->categorias()->find($request->id_categoria);
-            $certamen->categorias()->detach($request->id_categoria);
+            if ($certamen->categorias()->where('categoria__problemas.id', '=', $request->input('id_categoria'))->exists()) {
+                $categoria = $certamen->categorias()->find($request->id_categoria);
+                $certamen->categorias()->detach($request->id_categoria);
+            }
             DB::commit();
         } catch (\PDOException $e) {
             DB::rollBack();
             return redirect()->route('certamen.banco_problemas')->with("error", $e->getMessage());
         }
-        $nombre_categoria = $categoria->nombre ? $categoria->nombre : "";
+        $nombre_categoria = isset($categoria) ? $categoria->nombre : "";
         return redirect()->route('certamen.banco_problemas', $request->id_certamen)->with("success", "La categoría '" . $nombre_categoria . "' ha sido removido.");
     }
 }

@@ -32,8 +32,8 @@
                     </div>
                     <h5 class="text-center my-3">Tiempo Restante: <strong id="timer">--:--:--</strong></h5>
                     <div class="d-flex justify-content-center">
-                        <form action="{{ route('certamen.finalizar', ['token' => $res_certamen->token]) }}" method="POST" id="finalizar_form"
-                            onsubmit="event.preventDefault();advertencia_finalizar()">
+                        <form action="{{ route('certamen.finalizar', ['token' => $res_certamen->token]) }}" method="POST"
+                            id="finalizar_form" onsubmit="event.preventDefault();advertencia_finalizar()">
                             @csrf
                             <button class="btn btn-secondary btn-large align-self-center" type="submit">Finalizar</button>
                         </form>
@@ -42,10 +42,11 @@
                 <div class="card border-danger" style="height:28rem">
                     <div class="card-body px-3">
                         <div class="row px-5 mt-2">
-                            <a class="btn btn-primary btn-sm btn-block @if($problemas[0]->resuelto == true) disabled @endif" href="{{$problemas[0]->resolver_ruta}}" role="button" id="boton_resolver"> {{$problemas[0]->resuelto == true? "Problema Resuelto" : "Resolver Problema"}}</a>
-                            <a class="btn btn-outline-secondary btn-sm btn-block mt-2"
-                                href="{{ $problemas[0]->pdf_ruta }}" id="boton_pdf"
-                                target="_blank" role="button">Descargar PDF del Enunciado</a>
+                            <a class="btn btn-primary btn-sm btn-block @if ($problemas[0]->resuelto == true) disabled @endif"
+                                href="{{ $problemas[0]->resolver_ruta }}" role="button" id="boton_resolver">
+                                {{ $problemas[0]->resuelto == true ? 'Problema Resuelto' : 'Resolver Problema' }}</a>
+                            <a class="btn btn-outline-secondary btn-sm btn-block mt-2" href="{{ $problemas[0]->pdf_ruta }}"
+                                id="boton_pdf" target="_blank" role="button">Descargar PDF del Enunciado</a>
                         </div>
                         <hr>
                         <h6 class="ms-3 mt-3"><strong>Información:</strong></h6>
@@ -74,7 +75,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
     <script>
         const fecha_termino = new Date(@json($res_certamen->certamen->fecha_termino));
-        const problemas = @json($problemas);
+        var problemas = @json($problemas);
         var id_problema_activo = 0;
         showdown.setOption('tables', 'true')
         showdown.setOption('tablesHeaderId', 'true')
@@ -132,11 +133,11 @@
                 }
                 let boton_resolver = document.getElementById("boton_resolver");
                 let boton_pdf = document.getElementById("boton_pdf");
-                if(problemas[item]["resuelto"]==true){
+                if (problemas[item]["resuelto"] == true) {
                     boton_resolver.classList.add('disabled');
                     boton_resolver.innerHTML = "Problema Resuelto";
 
-                }else{
+                } else {
                     boton_resolver.classList.remove('disabled');
                     boton_resolver.innerHTML = "Resolver Problema";
                     boton_resolver.setAttribute("href", problemas[item]["resolver_ruta"])
@@ -145,7 +146,7 @@
                 style_table()
             }
         }
-        var x = setInterval(function() {
+        var timer_certamen = setInterval(function() {
 
             var now = new Date().getTime();
 
@@ -154,15 +155,51 @@
             var horas = Math.floor((distancia / (1000 * 60 * 60)));
             var minutos = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
             var segundos = Math.floor((distancia % (1000 * 60)) / 1000);
-            document.getElementById("timer").innerHTML = ("0" + horas).slice(-2) + ":" + ("0" + minutos).slice(-2) + ":" + ("0" + segundos).slice(-2);
+            document.getElementById("timer").innerHTML = ("0" + horas).slice(-2) + ":" + ("0" + minutos).slice(-2) +
+                ":" + ("0" + segundos).slice(-2);
             if (distancia < 1800000) {
                 document.getElementById("timer").classList.add('text-danger');
             }
             if (distancia < 0) {
-                clearInterval(x);
+                clearInterval(timer_certamen);
                 document.getElementById("timer").innerHTML = "Finalizado";
                 document.getElementById('finalizar_form').submit();
             }
         }, 1000);
+
+        var actualizar_informacion = setInterval(function() {
+
+            fetch("{{route('certamenes.update_data', ["token"=>$res_certamen->token])}}", {
+                method: 'GET', 
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                })
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(result) {
+                    problemas = result;
+                    for(var i=0; i<result.length;i++){
+                        var button_problema = document.getElementById('problema_'+i);
+                        button_problema.classList.remove('btn-success','btn-danger','btn-outline-secondary')
+                        
+                        if(result[i]["resuelto"] == true){
+                            button_problema.classList.add('btn-success');
+                            if(i==id_problema_activo && !boton_resolver.contains('disabled')){
+                                boton_resolver.classList.toggle('disabled');
+                            }
+                        }else if(result[i]["resuelto"] == false){
+                            button_problema.classList.add('btn-danger');
+                        }else{
+                            button_problema.classList.add('btn-outline-secondary');
+                        }
+
+                    }
+                })
+                .catch(function(error) {
+                    clearInterval(actualizar_informacion);
+                });
+        }, 4000);
     </script>
 @endpush

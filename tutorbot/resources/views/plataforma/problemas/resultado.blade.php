@@ -15,9 +15,10 @@
                                     <h2 class="accordion-header">
                                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                             data-bs-target="#resultados_{{ $i }}" aria-expanded="false"
-                                            aria-controls="resultados_{{ $i }}">
+                                            aria-controls="resultados_{{ $i }}"
+                                            id="evaluacion_{{$i}}_button">
                                             @if($evaluaciones[$i]->estado=="En Proceso") 
-                                            Caso de Prueba #{{ $i + 1 }}: <span class="mx-2 badge text-bg-warning">In Process</span> 
+                                            Caso de Prueba #{{ $i + 1 }}: <span class="mx-2 badge text-bg-warning" id="badge_estado_{{$i}}">In Process</span><span id="informacion_span_{{$i}}"></span>
                                             @else Caso de Prueba #{{ $i + 1 }}:<span class="mx-2 badge {{ $evaluaciones[$i]->estado == 'Aceptado' ? 'text-bg-success' : 'text-bg-danger' }}">{{ $evaluaciones[$i]->resultado }}</span>
                                             - Tiempo: {{ $evaluaciones[$i]->tiempo ? $evaluaciones[$i]->tiempo : '0' }}
                                             segundos - Memoria:
@@ -29,42 +30,41 @@
                                         data-bs-parent="#resultados_accord">
                                         <div class="accordion-body">
                                             <div class="d-flex flex-row mb-3">
-                                                @if (isset($evaluaciones[$i]->casos_pruebas->entradas) && $evaluaciones[$i]->casos_pruebas->ejemplo == true)
+                                                @if (!isset($res_certamen) && isset($evaluaciones[$i]->casos_pruebas->entradas) && $evaluaciones[$i]->casos_pruebas->ejemplo == true)
                                                     <div class="card">
                                                         <div class="card-body">
                                                             <h5 class="card-title">Entradas</h5>
-                                                            <p class="card-text">
+                                                            <p class="card-text"  id="evaluacion_{{$i}}_e">
                                                                 {!! nl2br($evaluaciones[$i]->casos_pruebas->entradas) !!}</p>
                                                         </div>
                                                     </div>
                                                 @endif
-                                                @if (isset($evaluaciones[$i]->casos_pruebas->salidas) && $evaluaciones[$i]->casos_pruebas->ejemplo == true)
+                                                @if (!isset($res_certamen) && isset($evaluaciones[$i]->casos_pruebas->salidas) && $evaluaciones[$i]->casos_pruebas->ejemplo == true)
                                                     <div class="card mx-2">
                                                         <div class="card-body">
                                                             <h5 class="card-title">Salidas Esperadas</h5>
-                                                            <p class="card-text">{!! nl2br($evaluaciones[$i]->casos_pruebas->salidas) !!}
+                                                            <p class="card-text" id="evaluacion_{{$i}}_se">{!! nl2br($evaluaciones[$i]->casos_pruebas->salidas) !!}
                                                             </p>
                                                         </div>
                                                     </div>
                                                 @endif
                                                 <div
-                                                    class="card {{ $evaluaciones[$i]->estado == 'Rechazado' || $evaluaciones[$i]->estado == 'Error' ? 'border-danger' : 'border-success' }}">
+                                                    class="card {{ $evaluaciones[$i]->estado == 'Rechazado' || $evaluaciones[$i]->estado == 'Error' ? 'border-danger' : 'border-success' }}" id="card_evaluacion_{{$i}}">
                                                     <div class="card-body">
                                                         <h5 class="card-title">Salidas</h5>
-                                                        <p class="card-text">
-                                                            {!! $evaluaciones[$i]->stout ? nl2br(base64_decode($evaluaciones[$i]->stout)) : 'Error' !!}</p>
+                                                        <p class="card-text" id="evaluacion_{{$i}}_s">
+                                                            {!! $evaluaciones[$i]->stout ? nl2br(base64_decode($evaluaciones[$i]->stout)) : '-' !!}</p>
                                                     </div>
                                                 </div>
                                             </div>
-                                            @if (isset($evaluaciones[$i]->error_compilacion))
-                                                <div class="card border-danger">
+                                                <div class="card border-danger @if (!isset($evaluaciones[$i]->error_compilacion)) d-none @endif" id="card_error_compilacion_{{$i}}">
                                                     <div class="card-body">
                                                         <h5 class="card-title">Mensaje del Compilador</h5>
-                                                        <p class="card-text text-danger">
+                                                        <p class="card-text text-danger"  id="evaluacion_{{$i}}_ec">
                                                             {!! $evaluaciones[$i]->error_compilacion ? nl2br(base64_decode($evaluaciones[$i]->error_compilacion)) : '-' !!}</p>
                                                     </div>
                                                 </div>
-                                            @endif
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -140,6 +140,63 @@
         const tiempo_desarrollo = {{ $diferencia }}
         const string_tiempo_desarrollo = new Date(tiempo_desarrollo * 1000).toISOString().slice(11, 19);
         const tiempo = document.getElementById("tiempo")
+        const ruta_actualizacion = "{{route('envio.get_update', ["token"=>$envio->token])}}";
+        var evaluaciones_pendientes = {{$pendientes}};
         tiempo.innerHTML = string_tiempo_desarrollo
+
+        let actualizacion_estado = setInterval(() => {
+            if(evaluaciones_pendientes==0){
+                clearInterval(actualizacion_estado)
+            }else{
+                fetch(ruta_actualizacion, {
+                method: 'GET', 
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                })
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(result) {
+                    for(var i=0; i<result.length;i++){
+                        let button_evaluacion = document.getElementById('evaluacion_'+i+'_button');
+                        let texto_salidas = document.getElementById('evaluacion_'+i+'_s');
+                        let texto_error_compilacion = document.getElementById('evaluacion_'+i+'_ec');
+                        let card_evaluacion = document.getElementById('card_evaluacion_'+i);
+                        let badge_estado = document.getElementById('badge_estado_'+i);
+                        if(result[i]["estado"]=="Rechazado" || result[i]["estado"]=="Error"){
+                            badge_estado.classList.remove('text-bg-warning')
+                            badge_estado.classList.add('text-bg-danger')
+                            card_evaluacion.classList.add('border-danger')
+                            evaluaciones_pendientes = evaluaciones_pendientes - 1;
+                        }else if(result[i]["estado"]=="Aceptado"){
+                            badge_estado.classList.remove('text-bg-warning')
+                            badge_estado.classList.add('text-bg-success')
+                            card_evaluacion.classList.add('border-success')
+                            evaluaciones_pendientes = evaluaciones_pendientes - 1;
+                        }
+                        if(result[i]["memoria"]!=null && result[i]["tiempo"]!=null){
+                            document.getElementById("informacion_span_"+i).innerHTML = "- Tiempo: "+result[i]["tiempo"]+" segundos - Memoria: "+result[i]["memoria"]+" KB";
+                        }
+                        badge_estado.innerHTML = result[i]["resultado"]!=null? result[i]["resultado"] : "In Process"
+                        if(result[i]["stout"]!=null){
+                            texto_salidas.innerHTML = result[i]["stout"]
+                            if(result[i]["estado"]=="Rechazado" || result[i]["estado"]=="Error"){
+                                card_evaluacion.classList.add('border-danger')
+                            }else if(result[i]["estado"]=="Aceptado"){
+                                card_evaluacion.classList.add('border-success')
+                            }
+                        }
+                        if(result[i]["error_compilacion"]!=null){
+                            texto_error_compilacion.innerHTML = result[i]["error_compilacion"];
+                            document.getElementById('card_error_compilacion_'+i).classList.remove('d-none');
+                        }
+                    }
+                })
+                .catch(function(error) {
+                    clearInterval(actualizacion_estado);
+                });
+            }
+        }, 2000);
     </script>
 @endpush

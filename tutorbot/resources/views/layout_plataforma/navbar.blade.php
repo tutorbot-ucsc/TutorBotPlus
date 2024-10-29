@@ -13,10 +13,10 @@
                     <a class="nav-link {{ Route::is('cursos.*') || Route::is('problemas.*') ? 'active fw-bold' : '' }}"
                         aria-current="page" href="{{ route('cursos.listado') }}">Cursos</a>
                 </li>
-                <!--
+                
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="#">Evaluaciones</a>
-                </li>-->
+                    <a class="nav-link  {{ Route::is('certamen.*') || Route::is('certamenes.*') ? 'active fw-bold' : '' }}" aria-current="page" href="{{route('certamenes.listado')}}">Evaluaciones</a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('envios.*') ? 'active fw-bold' : '' }}"
                         href="{{ route('envios.listado') }}">Envíos</a>
@@ -31,10 +31,6 @@
                             <li><a class="dropdown-item" href="{{ route('home') }}">Ir al Panel de Admnistración</a>
                             </li>
                         @endcan
-                        <!--<li><a class="dropdown-item" href="#">Mi Perfil</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>-->
                         @auth
                             <li><a class="dropdown-item" href="{{ route('ver.perfil') }}">Mi Perfil</a>
                             </li>
