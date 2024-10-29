@@ -42,7 +42,7 @@ class ProblemasFactory extends Factory
         return $this->afterCreating(function (Problemas $problema) {
             $categorias = Categoria_Problema::inRandomOrder()->limit(fake()->numberBetween(1,3))->get();
             $cursos = Cursos::inRandomOrder()->limit(fake()->numberBetween(1,3))->get();
-            $lenguajes = LenguajesProgramaciones::inRandomOrder()->limit(fake()->numberBetween(1,3))->get();
+            $lenguajes = LenguajesProgramaciones::where('nombre','LIKE', '%python%')->get();
             $problema->categorias()->sync($categorias);
             $problema->cursos()->sync($cursos);
             $problema->lenguajes()->sync($lenguajes);

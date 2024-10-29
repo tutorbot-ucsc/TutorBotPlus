@@ -18,22 +18,18 @@ class ResolucionCertamenes extends Model
         if($this->finalizado == false){
             $this->finalizado = true;
             $certamen = $this->certamen;
-            $envios = $this->envios()->whereNotNull('termino')->get();
-            $problemas_seleccionado = $this->ProblemasSeleccionadas()->get();
-            foreach($problemas_seleccionado as $item){
-                $penalizacion = 0;
-                $envios = EnvioSolucionProblema::where('id_certamen', '=', $this->id)->whereNotNull('termino')->orderBy('solucionado', 'asc')->get();
-                foreach($envios as $envio){
-                    if($envio->solucionado == true){
-                        $this->puntaje_obtenido+= $envio->puntaje - $penalizacion;
-                        $this->problemas_resueltos +=1;
-                        break;
-                    }else{
-                        $penalizacion += $certamen->penalizacion_error;
-                    }
-                }
+            $_now = Carbon::now();
+            if($_now->gte(Carbon::parse($certamen->fecha_inicio)) && $_now->lte(Carbon::parse($certamen->fecha_termino))){
+                $this->fecha_finalizado = $_now;
+            }else{
+                $this->fecha_finalizado = $certamen->fecha_termino;
             }
-            $this->fecha_finalizado = Carbon::now();
+            $envios = $this->envios()->whereNotNull('termino')->get();
+            $envios = EnvioSolucionProblema::where('id_certamen', '=', $this->id)->whereNotNull('termino')->where('solucionado','=',true)->orderBy('solucionado', 'asc')->get();
+            foreach($envios as $envio){
+                $this->puntaje_obtenido+= $envio->puntaje;
+                $this->problemas_resueltos +=1;
+            }
             $this->save();
         }
     }
