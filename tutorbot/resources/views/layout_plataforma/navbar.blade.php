@@ -15,7 +15,7 @@
                 </li>
                 
                 <li class="nav-item">
-                    <a class="nav-link  {{ Route::is('certamen.*') || Route::is('certamenes.*') ? 'active fw-bold' : '' }}" aria-current="page" href="{{route('certamenes.listado')}}">Evaluaciones</a>
+                    <a class="nav-link disabled {{ Route::is('certamen.*') || Route::is('certamenes.*') ? 'active fw-bold' : '' }}" aria-current="page" href="{{route('certamenes.listado')}}">Evaluaciones</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('envios.*') ? 'active fw-bold' : '' }}"

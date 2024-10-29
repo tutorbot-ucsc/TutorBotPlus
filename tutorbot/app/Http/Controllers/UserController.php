@@ -144,13 +144,13 @@ class UserController extends Controller
             DB::rollBack();
             return back()->with("error", $e->getMessage());
         }
-        try{
+        /*try{
             foreach($users as $user){
                 $user->notify(new UsuarioCreado());
             }
         }catch(\Exception $e){
             return redirect()->route('usuarios.index')->with("success", "Advertencia: Los usuarios han sido creados pero ha ocurrido un error al enviar el correo de confirmación a los usuarios creados.");
-        }
+        }*/
         return redirect()->route('usuarios.index')->with("success", "Los usuarios han sido creados de manera correcta.");
     }
     public function editar(Request $request)
