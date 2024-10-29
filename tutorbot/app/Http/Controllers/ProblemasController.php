@@ -122,7 +122,9 @@ class ProblemasController extends Controller
             }else{
                 $problema->fecha_termino = null;
             }
-            $problema->memoria_limite = $request->input('memoria_limite');
+            if(isset($request->memoria_limite)){
+                $problema->memoria_limite = $request->input('memoria_limite');
+            }
             $problema->tiempo_limite = $request->input('tiempo_limite');
             $problema->body_problema = $request->input('body_problema');
             $problema->body_problema_resumido = $request->input('body_problema_resumido');

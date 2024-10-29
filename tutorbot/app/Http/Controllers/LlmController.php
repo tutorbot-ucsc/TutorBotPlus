@@ -89,7 +89,7 @@ class LlmController extends Controller
         ->select('solicitud_ra_llms.*', 'problemas.id as id_problema', 'problemas.limite_llm', 'problemas.habilitar_llm')
         ->where('envio_solucion_problemas.token', '=', $request->token)
         ->orderBy('created_at', 'DESC')->first(); 
-        $cant_retroalimentacion = $retroalimentacion->limite_llm - DB::table('solicitud_ra_llms')->leftJoin('envio_solucion_problemas', 'solicitud_ra_llms.id_envio', '=', 'envio_solucion_problemas.id')->join('resolver', 'envio_solucion_problemas.id_resolver', '=', 'resolver.id')->join('cursa', 'envio_solucion_problemas.id_cursa', '=', 'cursa.id')->where('resolver.id_problema', '=', $retroalimentacion->id)->where('cursa.id_usuario', '=', auth()->user()->id)->count();
+        $cant_retroalimentacion = $retroalimentacion->limite_llm - DB::table('solicitud_ra_llms')->leftJoin('envio_solucion_problemas', 'solicitud_ra_llms.id_envio', '=', 'envio_solucion_problemas.id')->join('resolver', 'envio_solucion_problemas.id_resolver', '=', 'resolver.id')->join('cursa', 'envio_solucion_problemas.id_cursa', '=', 'cursa.id')->where('resolver.id_problema', '=', $retroalimentacion->id_problema)->where('cursa.id_usuario', '=', auth()->user()->id)->count();
         $highlightjs_choice = EnvioSolucionProblema::$higlightjs_language[strtolower($envios->lenguaje->abreviatura)];
         if(!isset($retroalimentacion)){
             return redirect()->route('generar_retroalimentacion', ['token'=>$request->token]);

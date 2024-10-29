@@ -77,7 +77,7 @@
             <div class="input-group mb-3">
 
                 <input type="number" class="form-control @error('tiempo_limite') is-invalid @enderror"
-                    name="tiempo_limite" id="tiempo_limite" placeholder="Ej. 5" min="0"
+                    name="tiempo_limite" id="tiempo_limite" placeholder="Ej. 5" min="0" step=".1"
                     value="{{ isset($problema) ? old('tiempo_limite', $problema->tiempo_limite) : old('tiempo_limite') }}">
                 <span class="input-group-text" id="basic-addon1">Segundos</span>
             </div>

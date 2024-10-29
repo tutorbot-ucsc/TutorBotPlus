@@ -33,6 +33,8 @@ use App\Http\Controllers\EnvioSolucionProblemaController;
 use App\Http\Controllers\EvaluacionSolucionController;
 use App\Http\Controllers\InformeController;
 use App\Http\Controllers\LlmController;
+use App\Models\EnvioSolucionProblema;
+use App\Models\JuecesVirtuales;
 
 if (env('APP_ENV') === 'production') {
     \URL::forceScheme('https');
@@ -75,6 +77,7 @@ Route::group(['middleware'=>['auth', 'certamen_en_resolucion']], function(){
 	Route::get('/envio/{token}', [EvaluacionSolucionController::class, 'ver_evaluacion'])->name('envios.ver')->withoutMiddleware('certamen_en_resolucion');
 
 	Route::get('/envio/{token}/retroalimentacion', [LlmController::class, 'ver_retroalimentacion'])->name('envios.retroalimentacion');
+	Route::get('/envio/{token}/get_update', [EvaluacionSolucionController::class, 'obtener_status_evaluaciones'])->name('envio.get_update')->withoutMiddleware('certamen_en_resolucion');
 	Route::get('/retroalimentacion/generar', [LlmController::class, 'generar_retroalimentacion'])->name('envios.generar_retroalimentacion');
 
 	Route::get('/perfil', [UserController::class, "ver_mi_perfil"])->name('ver.perfil');
@@ -87,7 +90,7 @@ Route::group(['middleware'=>['auth', 'certamen_en_resolucion']], function(){
 	Route::get('/evaluaciones/{token}/resolucion', [CertamenesController::class, "resolver_certamen"])->name('certamenes.resolucion')->withoutMiddleware('certamen_en_resolucion');
 	Route::get('/evaluaciones/{token_certamen}/problema/{codigo}', [ProblemasController::class, "resolver_problema"])->name('certamenes.resolver_problema')->withoutMiddleware('certamen_en_resolucion');
 	Route::post('/evaluaciones/guardar_codigo', [CertamenesController::class, "guardar_codigo_certamen"])->name('certamenes.guardar_codigo')->withoutMiddleware('certamen_en_resolucion');
-
+	Route::get('/evaluaciones/{token}/data/update', [CertamenesController::class, "obtener_ultimos_envios_json"])->name('certamenes.update_data')->withoutMiddleware('certamen_en_resolucion');
 	Route::post('/evaluaciones/{token}/finalizar', [CertamenesController::class, "finalizar_certamen"])->name('certamen.finalizar')->withoutMiddleware('certamen_en_resolucion');
 });
 //Panel de Administración

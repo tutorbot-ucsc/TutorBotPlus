@@ -17,7 +17,19 @@ class ResolucionCertamenes extends Model
     public function finalizar_certamen(){
         if($this->finalizado == false){
             $this->finalizado = true;
-            //$this->fecha_finalizado = Carbon::now();
+            $certamen = $this->certamen;
+            $_now = Carbon::now();
+            if($_now->gte(Carbon::parse($certamen->fecha_inicio)) && $_now->lte(Carbon::parse($certamen->fecha_termino))){
+                $this->fecha_finalizado = $_now;
+            }else{
+                $this->fecha_finalizado = $certamen->fecha_termino;
+            }
+            $envios = $this->envios()->whereNotNull('termino')->get();
+            $envios = EnvioSolucionProblema::where('id_certamen', '=', $this->id)->whereNotNull('termino')->where('solucionado','=',true)->orderBy('solucionado', 'asc')->get();
+            foreach($envios as $envio){
+                $this->puntaje_obtenido+= $envio->puntaje;
+                $this->problemas_resueltos +=1;
+            }
             $this->save();
         }
     }
@@ -29,6 +41,10 @@ class ResolucionCertamenes extends Model
     public function certamen(): BelongsTo
     {
         return $this->BelongsTo(Certamenes::class, 'id_certamen');
+    }
+
+    public function envios(): HasMany{
+        return $this->hasMany(EnvioSolucionProblema::class, 'id_certamen');
     }
 
     public function ProblemasSeleccionadas(): HasMany{

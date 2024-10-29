@@ -43,5 +43,7 @@ class ProblemasSeeder extends Seeder
 
         $problema->puntaje_total = 45;
         $problema->save();
+
+        $problemas = Problemas::factory()->count(35)->create();
     }
 }

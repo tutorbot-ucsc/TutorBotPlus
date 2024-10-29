@@ -13,6 +13,7 @@ use App\Models\EnvioSolucionProblema;
 use App\Models\Resolver;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Str;
 
@@ -129,6 +130,7 @@ class CertamenesController extends Controller
 
     public function inicializar_certamen(Request $request){
         try{
+            DB::beginTransaction();
             $res_certamen = auth()->user()->evaluaciones()->where('id_certamen','=',$request->id_certamen)->first();
             if(isset($res_certamen)){
                 if($res_certamen->finalizado == true){
@@ -143,32 +145,29 @@ class CertamenesController extends Controller
                 
                 $categorias = $certamen->categorias()->get();
                 $problemas_seleccionados = [];
+                $problemas_seleccionados_id = [];
                 foreach ($categorias as $categoria){
+                    //selecciona un problema aleatorio, ignorando los problemas que ya fueron escogidos previamente
                     $problema_aleatorio = $categoria->problemas()->inRandomOrder()->first();
                     $seleccion = new SeleccionProblemasCertamenes;
                     $seleccion->problema()->associate($problema_aleatorio);
                     array_push($problemas_seleccionados, $seleccion);        
+                    array_push($problemas_seleccionados_id, $problema_aleatorio->id);
                 }
                 $res_certamen->ProblemasSeleccionadas()->saveMany($problemas_seleccionados);
             }
-        }catch(\PDOException $e){ 
+            DB::commit();
+        }catch(\PDOException $e){
+            DB::rollback();
             return redirect()->route('certamenes.listado')->with("error", $e->getMessage());
         }catch(\Exception $e){
+            DB::rollback();
             return redirect()->route('certamenes.listado')->with("error", $e->getMessage());
         }
         return redirect()->route('certamenes.resolucion', ['token'=>$res_certamen->token]);
     }
 
-    public function resolver_certamen(Request $request){
-        try{
-            $res_certamen = ResolucionCertamenes::with(['certamen', 'ProblemasSeleccionadas'])->where('token', '=', $request->token)->first();
-            if(!isset($res_certamen)){
-                throw new \Exception("Error: El token de resolución de certamen no existe");
-            }
-            if($res_certamen->id_usuario != auth()->user()->id){
-                throw new \Exception("Error: Estás tratando de acceder a una resolución de certamen que no te pertenece.");
-            }
-
+    public function get_ultimos_envios(ResolucionCertamenes $res_certamen){
             $ultimos_envios = DB::table('envio_solucion_problemas')
             ->leftJoin('resolver', 'resolver.id', '=', 'envio_solucion_problemas.id_resolver')
             ->leftJoin('cursa', 'cursa.id', '=', 'envio_solucion_problemas.id_cursa')
@@ -186,6 +185,30 @@ class CertamenesController extends Controller
                 $item->pdf_ruta = route('problemas.pdf_enunciado', ['id_problema'=>$item->id]);
                 return $item;
             });
+            return $problemas;
+    }
+
+    public function obtener_ultimos_envios_json(Request $request){
+        try{
+            $res_certamen = ResolucionCertamenes::with(['certamen', 'ProblemasSeleccionadas'])->where('token', '=', $request->token)->first();
+            $problemas = $this->get_ultimos_envios($res_certamen);
+        }catch(\PDOException $e){
+            return response($e->getMessage(), 500);
+        }
+        return response()->json($problemas, 200);
+    }
+
+    public function resolver_certamen(Request $request){
+        try{
+            $res_certamen = ResolucionCertamenes::with(['certamen', 'ProblemasSeleccionadas'])->where('token', '=', $request->token)->first();
+            if(!isset($res_certamen)){
+                throw new \Exception("Error: El token de resolución de certamen no existe");
+            }
+            if($res_certamen->id_usuario != auth()->user()->id){
+                throw new \Exception("Error: No tienes permiso para acceder a esta resolución de certamen.");
+            }
+
+            $problemas = $this->get_ultimos_envios($res_certamen);
             
         }catch(\PDOException $e){
             return redirect()->route('certamenes.listado')->with("error", $e->getMessage());
