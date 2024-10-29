@@ -51,7 +51,7 @@ class EvaluarEnvios extends Command
                 ]);
                 $data = json_decode($response->getBody(), true);
             }catch(\Exception $e){
-                $this->info("Error al conectar con la API del juez virtual");
+                $this->error("Error al conectar con la API del juez virtual");
             }
             try{
                 DB::beginTransaction();
@@ -94,7 +94,7 @@ class EvaluarEnvios extends Command
                 DB::commit();
             } catch (\PDOException $e) {
                 DB::rollBack();
-                $this->info("Error al verificar las evaluaciones");
+                $this->error("Error al verificar las evaluaciones");
             }
         }
         $this->info("Se ha verificado las evaluaciones pendientes (".sizeof($envios).")");
