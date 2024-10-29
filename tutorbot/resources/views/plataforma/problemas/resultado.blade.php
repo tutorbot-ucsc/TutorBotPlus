@@ -78,19 +78,17 @@
                     <div class="card-body px-5">
                         <h6 class="text-center">Tiempo en Total:</h6>
                         <h5 id="tiempo" class="text-center"></h5>
-                        @if (!isset($res_certamen) && $envio->usuario->id == auth()->user()->id && !$evaluaciones->contains('estado', '=', 'En Proceso') && $envio->solucionado == false && $tieneRetroalimentacion == false)
-                            <div class="row px-5">
+                        
+                            <div class="row px-5 @if (isset($res_certamen) || $envio->usuario->id != auth()->user()->id || $evaluaciones->contains('estado', '=', 'En Proceso') || $envio->solucionado == true ||$tieneRetroalimentacion == true) d-none @endif" id="div_btn_retroalimentacion">
                                 <a class="btn btn-primary btn-block {{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? '' : 'disabled' }}"
                                     href="{{ route('envios.generar_retroalimentacion', ['token' => $envio->token]) }}"
                                     role="button" onclick="solicitarRetroalimentacion(event)">{{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? 'Solicitar Ayuda (Cantidad Disponible: ' . $cant_retroalimentacion . ')' : 'Ayuda no disponible' }}</a>
                             </div>
-                        @elseif(!isset($res_certamen) && $envio->usuario->id == auth()->user()->id && !$evaluaciones->contains('estado', '=', 'En Proceso') && $tieneRetroalimentacion == true)
-                            <div class="row px-5">
+                            <div class="row px-5 @if(isset($res_certamen) || $envio->usuario->id != auth()->user()->id || $tieneRetroalimentacion == false) d-none @endif" id="div_btn_ver_ayuda">
                                 <a class="btn btn-primary text-nowrap btn-block"
-                                    href="{{ route('envios.retroalimentacion', ['token' => $envio->token]) }}"
+                                    href="{{$tieneRetroalimentacion == true? route('envios.retroalimentacion', ['token' => $envio->token]) : "#" }}"
                                     role="button">Ver Ayuda</a>
                             </div>
-                        @endif
                         <hr>
                         @if ($envio->usuario->id == auth()->user()->id && !$evaluaciones->contains('estado', '=', 'En Proceso') && $envio->solucionado == false)
                             <div class="row px-5 mt-2">
@@ -139,8 +137,13 @@
         hljs.highlightAll();
         const tiempo_desarrollo = {{ $diferencia }}
         const string_tiempo_desarrollo = new Date(tiempo_desarrollo * 1000).toISOString().slice(11, 19);
+        const esUsuario = @json($envio->usuario->id == auth()->user()->id);
+        const esCertamen = @json(isset($res_certamen));
+        const tieneRetroalimentacion = @json($tieneRetroalimentacion);
         const tiempo = document.getElementById("tiempo")
         const ruta_actualizacion = "{{route('envio.get_update', ["token"=>$envio->token])}}";
+        const boton_ayuda = document.getElementById('div_btn_ver_ayuda');
+        const boton_retroalimentacion = document.getElementById('div_btn_retroalimentacion');
         var evaluaciones_pendientes = {{$pendientes}};
         tiempo.innerHTML = string_tiempo_desarrollo
 
@@ -169,6 +172,15 @@
                             badge_estado.classList.add('text-bg-danger')
                             card_evaluacion.classList.add('border-danger')
                             evaluaciones_pendientes = evaluaciones_pendientes - 1;
+                            if(tieneRetroalimentacion==true && esUsuario == true && esCertamen==false){
+                                if(boton_ayuda.classList.contains('d-none')){
+                                    boton_ayuda.classList.toggle('d-none');
+                                }
+                            }else if (tieneRetroalimentacion==false && esUsuario == true && esCertamen==false){
+                                if(boton_retroalimentacion.classList.contains('d-none')){
+                                    boton_retroalimentacion.classList.toggle('d-none');
+                                }
+                            }
                         }else if(result[i]["estado"]=="Aceptado"){
                             badge_estado.classList.remove('text-bg-warning')
                             badge_estado.classList.add('text-bg-success')
