@@ -100,9 +100,22 @@ class CertamenesController extends Controller
     public function listado_certamenes(Request $request){
         try{
             $cursos_usuario = auth()->user()->cursos()->pluck('cursos.id');
-            $evaluaciones = Certamenes::whereIn('id_curso', $cursos_usuario)->orderBy('fecha_inicio', 'desc')->get()->map(function($item){
+            $resultados_certamenes = DB::table('resolucion_certamenes')
+            ->leftJoin('envio_solucion_problemas', 'envio_solucion_problemas.id_certamen', '=', 'resolucion_certamenes.id')
+            ->where('id_usuario','=', auth()->user()->id)
+            ->select('resolucion_certamenes.id_certamen',  DB::raw('max(finalizado) as estado_finalizado'), 'fecha_finalizado', DB::raw('max(puntaje_obtenido) as puntaje_maximo'), DB::raw('max(problemas_resueltos) as maximo_resuelto'))
+            ->groupBy('resolucion_certamenes.id_certamen', 'fecha_finalizado')
+            ->orderBy('fecha_finalizado', 'desc');
+            $evaluaciones = Certamenes::leftJoinSub($resultados_certamenes, 'resultados_certamenes', function (JoinClause $join){
+                $join->on('resultados_certamenes.id_certamen', '=', 'certamenes.id');
+            })->whereIn('id_curso', $cursos_usuario)->orderBy('fecha_inicio', 'desc')->get()->map(function($item){
+                $fecha_inicio = Carbon::parse($item->fecha_inicio);
                 $item->fecha_inicio = Carbon::parse( $item->fecha_inicio)->locale('es_ES')->isoFormat('lll');
                 $item->fecha_termino = Carbon::parse( $item->fecha_termino)->locale('es_ES')->isoFormat('lll');
+                if(isset($item->fecha_finalizado)){
+                    $fecha_termino = Carbon::parse($item->fecha_finalizado);
+                    $item->tiempo_desarrollo = $fecha_termino->diffInSeconds($fecha_inicio);
+                }
                 return $item;
             });
         }catch(\PDOException $e){
@@ -119,13 +132,21 @@ class CertamenesController extends Controller
             if(!($_now->gte(Carbon::parse($certamen->fecha_inicio)) && $_now->lte(Carbon::parse($certamen->fecha_termino)))){
                 $certamen->disponibilidad = false;
             }
-            $res_certamen = $certamen->resoluciones()->where('id_usuario', '=', auth()->user()->id)->first();
+            $res_certamen = $certamen->resoluciones()->with(['ProblemasSeleccionadas','envios'])->where('id_usuario', '=', auth()->user()->id)->first();
+            $resultado = DB::table('problemas')
+            ->join('casos__pruebas', 'casos__pruebas.id_problema', '=', 'problemas.id')
+            ->leftJoin('seleccion_problemas_certamen', 'problemas.id', '=', 'seleccion_problemas_certamen.id_problema')
+            ->leftJoin('envio_solucion_problemas', 'envio_solucion_problemas.id_certamen', '=', 'seleccion_problemas_certamen.id_res_certamen')
+            ->select('problemas.nombre', DB::raw('sum(casos__pruebas.puntos) as puntos_total'), DB::raw('count(casos__pruebas.id) as total_casos'), DB::raw('count(envio_solucion_problemas.id) as cantidad_intentos'), DB::raw('COALESCE(max(envio_solucion_problemas.puntaje),0) as maximo_puntaje'), DB::raw('COALESCE(max(solucionado),0) as resuelto'), DB::raw('COALESCE(max(cant_casos_resuelto), 0) as max_casos_resueltos'))
+            ->where('seleccion_problemas_certamen.id_res_certamen', '=', $res_certamen->id)
+            ->groupBy('problemas.nombre')
+            ->get();
             $certamen->fecha_inicio = Carbon::parse( $certamen->fecha_inicio)->locale('es_ES')->isoFormat('lll');
             $certamen->fecha_termino = Carbon::parse( $certamen->fecha_termino)->locale('es_ES')->isoFormat('lll');
         }catch(\PDOException $e){
             return redirect()->route('certamenes.listado')->with("error", $e->getMessage());
         }
-        return view('plataforma.certamen.ver_certamen', compact('certamen', 'res_certamen'));
+        return view('plataforma.certamen.ver_certamen', compact('certamen', 'res_certamen', 'resultado'));
     }
 
     public function inicializar_certamen(Request $request){

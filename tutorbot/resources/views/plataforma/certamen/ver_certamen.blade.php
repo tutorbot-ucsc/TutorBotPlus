@@ -1,4 +1,4 @@
-@extends('layout_plataforma.app', ['title_html' => $certamen->nombre, 'title' => 'Certamen - ' . $certamen->nombre, 'breadcrumbs'=>[["nombre"=>"Evaluaciones", "route"=>route('certamenes.listado')], ["nombre"=>$certamen->nombre]]])
+@extends('layout_plataforma.app', ['title_html' => $certamen->nombre, 'title' => 'Certamen - ' . $certamen->nombre, 'breadcrumbs' => [['nombre' => 'Evaluaciones', 'route' => route('certamenes.listado')], ['nombre' => $certamen->nombre]]])
 
 @section('content')
     <div class="container-fluid py-3 px-4">
@@ -21,33 +21,34 @@
                 <div class="card border-danger" style="height:40rem">
                     <div class="card-body px-3">
                         <div class="row px-5">
-                            @if(isset($res_certamen))
-                                <a class="btn btn-primary text-nowrap btn-block {{ $res_certamen->finalizado == true ? 'disabled' : ''}}" href="{{route('certamenes.resolucion', ["token"=>$res_certamen->token])}}"
-                                    role="button">{{ $res_certamen->finalizado == true?  'Has finalizado el Certamen' : 'Volver al Certamen' }}</a>
+                            @if (isset($res_certamen))
+                                <a class="btn btn-primary text-nowrap btn-block {{ $res_certamen->finalizado == true ? 'disabled' : '' }}"
+                                    href="{{ route('certamenes.resolucion', ['token' => $res_certamen->token]) }}"
+                                    role="button">{{ $res_certamen->finalizado == true ? 'Has finalizado el Certamen' : 'Volver al Certamen' }}</a>
                             @else
-                                <a class="btn btn-primary text-nowrap btn-block {{ $certamen->disponibilidad ? '' : 'disabled' }}" href="{{route('certamenes.iniciar_resolucion', ['id_certamen'=>$certamen->id])}}"
+                                <a class="btn btn-primary text-nowrap btn-block {{ $certamen->disponibilidad ? '' : 'disabled' }}"
+                                    href="{{ route('certamenes.iniciar_resolucion', ['id_certamen' => $certamen->id]) }}"
                                     role="button">{{ $certamen->disponibilidad ? 'Resolver Certamen' : 'Certamen No Disponible' }}</a>
                             @endif
                         </div>
                         @can('ver informe del certamen')
                             <div class="row px-5 mt-2 mb-2">
-                                <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block"
-                                    href="#"
+                                <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block" href="#"
                                     role="button">Ver Informe del Certamen</a>
                             </div>
                         @endcan
                         @can('editar certamen')
                             <div class="row px-5 mt-2 mb-2">
                                 <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block"
-                                    href="{{route('certamen.editar', ['id'=>$certamen->id])}}"
-                                    role="button">Editar Certamen</a>
+                                    href="{{ route('certamen.editar', ['id' => $certamen->id]) }}" role="button">Editar
+                                    Certamen</a>
                             </div>
                         @endcan
                         <hr>
                         <h6 class="ms-3 mt-3"><strong>Información:</strong></h6>
                         <ul class="list-group mt-3">
                             <li class="list-group-item"><strong>Curso:</strong>
-                                {{$certamen->curso->nombre}}
+                                {{ $certamen->curso->nombre }}
                             </li>
                             @if (isset($certamen->fecha_inicio))
                                 <li class="list-group-item"><strong>Fecha de Inicio:</strong> {{ $certamen->fecha_inicio }}
@@ -57,14 +58,47 @@
                                 <li class="list-group-item"><strong>Fecha de Termino:</strong>
                                     {{ $certamen->fecha_termino }}</li>
                             @endif
-                            @if (isset($res_certamen) && $res_certamen->finalizado==true)
-                            <li class="list-group-item"><strong>Finalizado:</strong>
-                                {{ $certamen->fecha_termino }}</li>
+                            @if (isset($res_certamen) && $res_certamen->finalizado == true)
+                                <li class="list-group-item"><strong>Finalizado:</strong>
+                                    {{ $certamen->fecha_termino }}</li>
                             @endif
                         </ul>
                     </div>
                 </div>
             </div>
+            @if (isset($res_certamen) && $res_certamen->finalizado == true)
+                <div class="col">
+                    <div class="card border-danger mt-3" style="height:auto">
+                        <div class="card-header">
+                            Resultado
+                        </div>
+                        <div class="card-body px-3">
+                            <div class="table-responsive">
+                                <table id="table-res" class="table table-striped" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Problema</th>
+                                            <th>Casos Resueltos</th>
+                                            <th>Puntaje Obtenido</th>
+                                            <th>¿Solucionado?</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($resultado as $item)
+                                            <tr>
+                                                <td>{{ $item->nombre }}</td>
+                                                <td>{{ $item->max_casos_resueltos . ' / ' . $item->total_casos }}</td>
+                                                <td>{{ $item->maximo_puntaje . ' / ' . $item->puntos_total }}</td>
+                                                <td>{{ $item->resuelto ? 'Si' : 'No' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 @endsection
