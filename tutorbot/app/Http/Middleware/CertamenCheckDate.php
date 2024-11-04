@@ -16,10 +16,7 @@ class CertamenCheckDate
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $ultimo_res_certamen = auth()->user()>evaluaciones()->with('certamen')->orderBy('created_at', 'desc')->first();
-        if(isset($ultimo_res_certamen)){
-            return redirect()->route('certamenes.listado')->with('error', 'No tienes permiso para acceder');
-        }
+        $ultimo_res_certamen = auth()->user()->evaluaciones()->with('certamen')->orderBy('created_at', 'desc')->first();
         $_now = Carbon::now();
         if($_now->gte(Carbon::parse($ultimo_res_certamen->certamen->fecha_inicio)) && $_now->lte(Carbon::parse($ultimo_res_certamen->certamen->fecha_termino))){
             return $next($request);

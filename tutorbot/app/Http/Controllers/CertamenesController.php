@@ -118,6 +118,7 @@ class CertamenesController extends Controller
                 }
                 return $item;
             });
+            
         }catch(\PDOException $e){
             return redirect()->route('cursos.listado')->with("error", $e->getMessage());
         }
@@ -133,14 +134,22 @@ class CertamenesController extends Controller
                 $certamen->disponibilidad = false;
             }
             $res_certamen = $certamen->resoluciones()->with(['ProblemasSeleccionadas','envios'])->where('id_usuario', '=', auth()->user()->id)->first();
-            $resultado = DB::table('problemas')
-            ->join('casos__pruebas', 'casos__pruebas.id_problema', '=', 'problemas.id')
-            ->leftJoin('seleccion_problemas_certamen', 'problemas.id', '=', 'seleccion_problemas_certamen.id_problema')
-            ->leftJoin('envio_solucion_problemas', 'envio_solucion_problemas.id_certamen', '=', 'seleccion_problemas_certamen.id_res_certamen')
-            ->select('problemas.nombre', DB::raw('sum(casos__pruebas.puntos) as puntos_total'), DB::raw('count(casos__pruebas.id) as total_casos'), DB::raw('count(envio_solucion_problemas.id) as cantidad_intentos'), DB::raw('COALESCE(max(envio_solucion_problemas.puntaje),0) as maximo_puntaje'), DB::raw('COALESCE(max(solucionado),0) as resuelto'), DB::raw('COALESCE(max(cant_casos_resuelto), 0) as max_casos_resueltos'))
-            ->where('seleccion_problemas_certamen.id_res_certamen', '=', $res_certamen->id)
-            ->groupBy('problemas.nombre')
-            ->get();
+            $resultado = null;
+            if(isset($res_certamen)){
+                $resultado_certamenes = DB::table('envio_solucion_problemas')
+                ->leftJoin('resolver', 'envio_solucion_problemas.id_resolver', '=', 'resolver.id')
+                ->select('resolver.id_problema', DB::raw('count(envio_solucion_problemas.id) as cantidad_intentos'), DB::raw('COALESCE(max(envio_solucion_problemas.puntaje),0) as maximo_puntaje'), DB::raw('COALESCE(max(solucionado),0) as resuelto'), DB::raw('COALESCE(max(cant_casos_resuelto), 0) as max_casos_resueltos'))
+                ->where('envio_solucion_problemas.id_certamen', '=', $res_certamen->id)
+                ->groupBy('resolver.id_problema');
+
+                $resultado = DB::table('problemas')
+                ->join('casos__pruebas', 'casos__pruebas.id_problema', '=', 'problemas.id')
+                ->leftJoinSub($resultado_certamenes,'resultados_certamenes','problemas.id', '=', 'resultados_certamenes.id_problema')
+                ->select('problemas.id', 'problemas.nombre', DB::raw('sum(casos__pruebas.puntos) as puntos_total'), DB::raw('count(casos__pruebas.id) as total_casos'), DB::raw('COALESCE(cantidad_intentos, 0) as cantidad_intentos'), DB::raw('COALESCE(maximo_puntaje, 0) as maximo_puntaje'), DB::raw('COALESCE(resuelto, 0) as resuelto'),DB::raw('COALESCE(max_casos_resueltos, 0) as max_casos_resueltos'))
+                ->groupBy('problemas.id', 'problemas.nombre', 'cantidad_intentos', 'maximo_puntaje', 'resuelto', 'max_casos_resueltos')
+                ->whereIn('problemas.id',$res_certamen->ProblemasSeleccionadas()->pluck('id_problema'))
+                ->get();
+            }
             $certamen->fecha_inicio = Carbon::parse( $certamen->fecha_inicio)->locale('es_ES')->isoFormat('lll');
             $certamen->fecha_termino = Carbon::parse( $certamen->fecha_termino)->locale('es_ES')->isoFormat('lll');
         }catch(\PDOException $e){
