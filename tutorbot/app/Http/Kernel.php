@@ -67,5 +67,6 @@ class Kernel extends HttpKernel
         'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         'certamen_en_resolucion' => \App\Http\Middleware\CheckUserCertamen::class,
+        'chequear_fecha_certamen' => \App\Http\Middleware\CertamenCheckDate::class,
     ];
 }

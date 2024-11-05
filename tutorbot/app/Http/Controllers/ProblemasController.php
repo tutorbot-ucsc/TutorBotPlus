@@ -255,7 +255,7 @@ class ProblemasController extends Controller
             }
             $problema->disponible = true;
             //verifica si el usuario ha solucionado el problema mediante la tabla intermedia de curso y usuario (pivot)
-            $problema->estado = $problema->envios()->where('id_cursa', '=', $curso_usuario->pivot->id)->where('solucionado', '=', true)->exists();
+            $problema->estado = $problema->envios()->where('id_cursa', '=', $curso_usuario->pivot->id)->whereNull('id_certamen')->where('solucionado', '=', true)->exists();
             $now = Carbon::now();
             if(isset($problema->fecha_inicio)){
             $fecha_inicio = Carbon::parse($problema->fecha_inicio);

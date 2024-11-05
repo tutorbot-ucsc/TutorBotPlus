@@ -78,16 +78,16 @@
                     <div class="card-body px-5">
                         <h6 class="text-center">Tiempo en Total:</h6>
                         <h5 id="tiempo" class="text-center"></h5>
-                        
-                            <div class="row px-5 @if (isset($res_certamen) || $envio->usuario->id != auth()->user()->id || $evaluaciones->contains('estado', '=', 'En Proceso') || $envio->solucionado == true ||$tieneRetroalimentacion == true) d-none @endif" id="div_btn_retroalimentacion">
+                            <div class="d-flex flex-column align-items-center @if (isset($res_certamen) || $envio->usuario->id != auth()->user()->id || $evaluaciones->contains('estado', '=', 'En Proceso') || $envio->solucionado == true ||$tieneRetroalimentacion == true) d-none @endif" id="div_btn_retroalimentacion">
                                 <a class="btn btn-primary btn-block {{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? '' : 'disabled' }}"
                                     href="{{ route('envios.generar_retroalimentacion', ['token' => $envio->token]) }}"
-                                    role="button" onclick="solicitarRetroalimentacion(event)">{{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? 'Solicitar Ayuda (Cantidad Disponible: ' . $cant_retroalimentacion . ')' : 'Ayuda no disponible' }}</a>
+                                    role="button" onclick="solicitarRetroalimentacion(event)"> <img src="{{asset('img/AlienitoPensativo.png')}}" style="width:65px" class="me-3"><span class="align-middle"> {{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? 'Solicitar Ayuda' : 'Ayuda no disponible' }}</span></a>
+                                    <strong class="text-center mt-2">Cantidad de Ayuda Disponible: {{$cant_retroalimentacion}}</strong>
                             </div>
-                            <div class="row px-5 @if(isset($res_certamen) || $envio->usuario->id != auth()->user()->id || $tieneRetroalimentacion == false) d-none @endif" id="div_btn_ver_ayuda">
+                            <div class="d-flex flex-column align-items-center @if(isset($res_certamen) || $envio->usuario->id != auth()->user()->id || $tieneRetroalimentacion == false) d-none @endif" id="div_btn_ver_ayuda">
                                 <a class="btn btn-primary text-nowrap btn-block"
                                     href="{{$tieneRetroalimentacion == true? route('envios.retroalimentacion', ['token' => $envio->token]) : "#" }}"
-                                    role="button">Ver Ayuda</a>
+                                    role="button"><img src="{{asset('img/AlienitoPensativo.png')}}" style="width:65px" class="me-3">Ver Ayuda</a>
                             </div>
                         <hr>
                         @if ($envio->usuario->id == auth()->user()->id && !$evaluaciones->contains('estado', '=', 'En Proceso') && $envio->solucionado == false)

@@ -3,7 +3,7 @@
     <div class="container-fluid py-3 px-4">
         <div class="row">
             <div class="col-sm col-xs-12">
-                <div class="card border-danger overflow-auto" style="height: 30rem;">
+                <div class="card border-danger overflow-auto" style="height: 35rem;">
                     <div class="card-header">
                         Retroalimentación
                     </div>
@@ -21,7 +21,7 @@
                         <div class="row px-5">
                             <a class="btn btn-primary btn-block {{ $retroalimentacion->habilitar_llm == true && $cant_retroalimentacion > 0 ? '' : 'disabled' }}"
                                 href="{{ route('envios.generar_retroalimentacion', ['token' => $token]) }}"
-                                role="button" onclick="solicitarRetroalimentacion(event)">{{ $retroalimentacion->habilitar_llm == true && $cant_retroalimentacion > 0 ? 'Generar Nueva Retroalimentacion (Cantidad Disponible: ' . $cant_retroalimentacion . ')' : 'Retroalimentación no disponible' }}</a>
+                                role="button" onclick="solicitarRetroalimentacion(event)">{{ $retroalimentacion->habilitar_llm == true && $cant_retroalimentacion > 0 ? 'Generar Nueva Ayuda (Cantidad Disponible: ' . $cant_retroalimentacion . ')' : 'Ayuda no disponible' }}</a>
                         </div>
                         <div class="row px-5 mt-2">
                             <a class="btn btn-outline-primary text-nowrap btn-sm btn-block"
@@ -34,7 +34,7 @@
     </div>
     <div class="row mt-3 mx-2">
         <div class="col">
-            <div class="card border-danger overflow-auto mb-5" style="height: 25rem;">
+            <div class="card border-danger overflow-auto mb-5" style="height: 15rem;">
                 <div class="card-header">
                     Código Fuente
                 </div>

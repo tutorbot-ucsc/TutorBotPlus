@@ -22,7 +22,7 @@ class SolicitudRaLlm extends Model
             if(str_contains($resultado, 'Time')){
                 $queMejorar = "tiempo de ejecucción";
             }
-            return "Eres un asistente de programación, el usuario te enviará un código escrito en ".$lenguaje." en que el resultado entrego el siguiente error '".$resultado."'. Debes analizar el código línea por línea y dar sugerencias de cómo podria mejorar el código en cuanto a ".$queMejorar.". No entregues el código mejorado, solo indica las posibles mejoras.";
+            return "Eres un asistente de programación, el usuario te enviará un código escrito en ".$lenguaje." en que el resultado entrego el siguiente error '".$resultado."'. Debes analizar el código línea por línea y dar sugerencias de cómo podría mejorar el código en cuanto a ".$queMejorar.". No entregues el código mejorado, solo indica las posibles mejoras.";
         }
     }
 

@@ -87,8 +87,9 @@ Route::group(['middleware'=>['auth', 'certamen_en_resolucion']], function(){
 	Route::get('/evaluaciones/{id_certamen}', [CertamenesController::class, "ver_certamen"])->name('certamenes.ver')->withoutMiddleware('certamen_en_resolucion');
 	Route::get('/evaluaciones/{id_certamen}/resolver', [CertamenesController::class, "inicializar_certamen"])->name('certamenes.iniciar_resolucion')->withoutMiddleware('certamen_en_resolucion');
 
-	Route::get('/evaluaciones/{token}/resolucion', [CertamenesController::class, "resolver_certamen"])->name('certamenes.resolucion')->withoutMiddleware('certamen_en_resolucion');
-	Route::get('/evaluaciones/{token_certamen}/problema/{codigo}', [ProblemasController::class, "resolver_problema"])->name('certamenes.resolver_problema')->withoutMiddleware('certamen_en_resolucion');
+	Route::get('/evaluaciones/{token}/resolucion', [CertamenesController::class, "resolver_certamen"])->name('certamenes.resolucion')->withoutMiddleware('certamen_en_resolucion')->middleware('chequear_fecha_certamen');
+	Route::get('/evaluaciones/{token_certamen}/problema/{codigo}', [ProblemasController::class, "resolver_problema"])->name('certamenes.resolver_problema')->withoutMiddleware('certamen_en_resolucion')->middleware('chequear_fecha_certamen');
+	Route::post('/evaluacion/problema/enviar', [EnvioSolucionProblemaController::class, 'enviar_solucion'])->name('certamenes.enviar_problema')->withoutMiddleware('certamen_en_resolucion')->middleware('chequear_fecha_certamen');
 	Route::post('/evaluaciones/guardar_codigo', [CertamenesController::class, "guardar_codigo_certamen"])->name('certamenes.guardar_codigo')->withoutMiddleware('certamen_en_resolucion');
 	Route::get('/evaluaciones/{token}/data/update', [CertamenesController::class, "obtener_ultimos_envios_json"])->name('certamenes.update_data')->withoutMiddleware('certamen_en_resolucion');
 	Route::post('/evaluaciones/{token}/finalizar', [CertamenesController::class, "finalizar_certamen"])->name('certamen.finalizar')->withoutMiddleware('certamen_en_resolucion');
