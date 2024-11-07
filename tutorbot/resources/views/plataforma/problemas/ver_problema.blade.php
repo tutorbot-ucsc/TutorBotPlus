@@ -1,5 +1,4 @@
 @extends('layout_plataforma.app', ['title_html' => $problema->nombre, 'title' => 'Problema - ' . $problema->nombre, 'breadcrumbs' => [['nombre' => 'Cursos', 'route' => route('cursos.listado')], ['nombre' => 'Problemas', 'route' => route('problemas.listado', ['id' => $id_curso])], ['nombre' => $problema->nombre]]])
-
 @section('content')
     <div class="container-fluid py-3 px-4">
         @include('components.alert')
@@ -87,15 +86,18 @@
 
 @push('js')
     <script>
-        var table = document.querySelector("#body_markdown table")
+        var table = document.querySelectorAll("#body_markdown table")
         if (table != null) {
-            var table_body = table.querySelector("tbody")
-            table.classList.add("table")
-            table.classList.add("table-bordered")
-            table.classList.add("table-hover")
-            table.classList.add("mt-3")
-            table.style.width = "auto"
-            table_body.classList.add("table-group-divider")
+            for(var i = 0; i<table.length; i++){
+                var table_body = table[i].querySelector("tbody")
+                table[i].classList.add("table")
+                table[i].classList.add("table-bordered")
+                table[i].classList.add("table-hover")
+                table[i].classList.add("mt-3")
+                table[i].style.width = "auto"
+                table_body.classList.add("table-group-divider")
+            }
+            
         }
     </script>
 @endpush

@@ -107,7 +107,7 @@ class EnvioSolucionProblemaController extends Controller
         $casos = $problema->casos_de_prueba()->get();
         $initial_json_string = '{"language_id":' . $lenguaje . ',"source_code":"' . $codigo . '"';
         if(in_array($lenguaje, $c_codes)){
-            //añade la opción de compilador -lm para librerias <math.h>, esto es temporal.
+            //añade la opción de compilador -lm para incluir la libreria <math.h>, esto es solo para soluciones desarrolladas en C.
             $initial_json_string = $initial_json_string.',"compiler_options":"-lm"';
         }
         if(isset($problema->memoria_limite)){

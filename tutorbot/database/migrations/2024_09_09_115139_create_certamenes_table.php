@@ -21,6 +21,7 @@ return new class extends Migration
             $table->float("penalizacion_error")->default(0);
             $table->integer("cantidad_problemas")->default(0);
             $table->integer("puntaje_total")->default(0);
+            $table->integer('cantidad_penalizacion')->default(0);
             $table->timestamps();
 
             $table->foreign('id_curso')->references('id')->on('cursos')->onDelete('cascade')->onUpdate('cascade');
