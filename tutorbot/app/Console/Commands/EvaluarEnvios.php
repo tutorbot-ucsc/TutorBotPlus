@@ -64,7 +64,7 @@ class EvaluarEnvios extends Command
                         if(strlen($item['stdout'])<=65535){
                             $evaluacion->stout = $item['stdout'];
                         }else{
-                            $evaluacion->stout = "Error: El texto de salida es muy largo.";
+                            $evaluacion->stout = base64_encode("Error: El texto de salida es muy largo.");
                         }
                         if (isset($item["stderr"])) {
                             $evaluacion->error_compilacion = $item["stderr"];
