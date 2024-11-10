@@ -43,6 +43,7 @@ class ProblemasController extends Controller
             
             return $item;
         });
+
         return view('problemas.index', compact('problemas'));
     }
 

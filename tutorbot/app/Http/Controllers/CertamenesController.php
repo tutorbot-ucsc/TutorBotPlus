@@ -163,8 +163,10 @@ class CertamenesController extends Controller
                 ->groupBy('problemas.id', 'problemas.nombre', 'cantidad_intentos', 'maximo_puntaje', 'resuelto', 'max_casos_resueltos')
                 ->whereIn('problemas.id',$res_certamen->ProblemasSeleccionadas()->pluck('id_problema'))
                 ->get()->map(function($item) use($certamen){
-                    $errores = $item->cantidad_intentos - 1 <= $certamen->cantidad_penalizacion? $item->cantidad_intentos - 1 : $certamen->cantidad_penalizacion;
-                    $item->maximo_puntaje = $item->maximo_puntaje - ($errores*$certamen->penalizacion_error);
+                    if($item->cantidad_intentos>0){
+                        $errores = $item->cantidad_intentos - 1 <= $certamen->cantidad_penalizacion? $item->cantidad_intentos - 1 : $certamen->cantidad_penalizacion;
+                        $item->maximo_puntaje = $item->maximo_puntaje - ($errores*$certamen->penalizacion_error);
+                    }
                     return $item;
                 });
             }

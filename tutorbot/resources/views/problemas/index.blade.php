@@ -94,10 +94,10 @@
                                         </td>
                                         <td>
                                             <div class="row">
-                                                @foreach ($problema->lenguajes()->get() as $lenguaje)
+                                                @foreach ($problema->lenguajes()->get()->pluck('abreviatura')->unique() as $lenguaje)
                                                     <div class="col-auto">
                                                         <span
-                                                            class="badge bg-gradient-secondary">{{ $lenguaje->abreviatura }}</span>
+                                                            class="badge bg-gradient-secondary">{{ $lenguaje }}</span>
                                                     </div>
                                                 @endforeach
                                             </div>

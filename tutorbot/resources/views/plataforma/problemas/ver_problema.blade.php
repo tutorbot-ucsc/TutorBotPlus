@@ -64,7 +64,7 @@
                             <li class="list-group-item"><strong>Categorías:</strong>
                                 {{ implode(', ', $problema->categorias()->get()->pluck('nombre')->toArray()) }}</li>
                             <li class="list-group-item"><strong>Lenguajes:</strong>
-                                @foreach($problema->lenguajes()->get()->pluck('abreviatura')->toArray() as $item) 
+                                @foreach($problema->lenguajes()->get()->pluck('abreviatura')->unique() as $item) 
                                 <span class="badge text-bg-secondary">{{strtoupper($item)}}</span>
                                 @endforeach
                             </li>

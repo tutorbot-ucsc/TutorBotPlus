@@ -25,7 +25,7 @@ class ProblemasFactory extends Factory
             'nombre' => $nombre,
             'codigo' => str_replace(' ', '-', $nombre),
             'body_problema' => fake()->text(500),
-            'memoria_limite'=>fake()->numberBetween(2048, 5000),
+            'memoria_limite'=>fake()->numberBetween(5500, 8000),
             'tiempo_limite'=>fake()->numberBetween(1,5),
             'visible'=>fake()->boolean(),
             'habilitar_llm'=>fake()->boolean(),

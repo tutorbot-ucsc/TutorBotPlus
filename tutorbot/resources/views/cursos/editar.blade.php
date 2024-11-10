@@ -11,7 +11,7 @@
             <div class="card">
                 <div class="card-body">
                     @include('cursos.form')
-                    <input type="submit" class="btn btn-primary" value="Editar">
+                    <input type="submit" class="btn btn-primary" value="Guardar Cambios">
                     <a href="{{route('cursos.index')}}" class="btn btn-outline-primary">Volver</a>
                 </div>
             </div>
