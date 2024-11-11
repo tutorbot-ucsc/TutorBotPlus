@@ -1,14 +1,14 @@
-@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100', 'title_url' => 'Envios del Problema'])
+@extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100', 'title_url' => 'Envios del Curso'])
 
 @section('content')
-    @include('layouts.navbars.auth.topnav', ['title' => 'Envios del Problema "'.$problema->nombre.'"'])
+    @include('layouts.navbars.auth.topnav', ['title' => 'Envios realizado en el curso "'.$curso->nombre.'"'])
     <div class="row mt-4 mx-4">
         <div class="col-12">
             <div class="card mb-4">
                 <div class="card-header pb-0">
                     <div class="d-flex justify-content-between">
                         <h6>Envios</h6>
-                        <a href="{{route('informes.problemas.index', ['id'=>$problema->id])}}" class="btn btn-outline-primary">Volver</a>
+                        <a href="#" class="btn btn-outline-primary">Volver</a>
                     </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">

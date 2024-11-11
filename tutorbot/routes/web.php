@@ -182,6 +182,8 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/problemas/{id}/index', [InformeController::class, 'index_problema'])->name('informes.problemas.index')->middleware('can:ver informe del problema'); 
 		Route::get('/problemas/envios/{id_curso}/{id_problema}/{id_usuario?}', [InformeController::class, 'ver_envios_problema'])->name('informe.envios.problema')->middleware('can:ver informe del problema'); 
 		Route::get('/problemas/informe/{id_curso}/{id_problema}', [InformeController::class, 'ver_informe_problema'])->name('informe.problema')->middleware('can:ver informe del problema'); 
+		Route::get('/curso/{id_curso}', [InformeController::class, 'ver_informe_curso'])->name('informe.curso')->middleware('can:ver informe del problema'); 
+		Route::get('/curso/{id_curso}/envios/{id_usuario?}', [InformeController::class, 'ver_envios_curso'])->name('informe.envios.curso')->middleware('can:ver informe del problema'); 
 
 	});
 });
