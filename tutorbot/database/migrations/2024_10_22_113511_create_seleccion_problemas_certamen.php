@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('seleccion_problemas_certamen', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('id_res_certamen');
-            $table->unsignedBigInteger('id_problema');
-            $table->timestamps();
-
-            $table->foreign('id_res_certamen')->references('id')->on('resolucion_certamenes')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('id_problema')->references('id')->on('problemas')->onDelete('cascade')->onUpdate('cascade');
-        });
+        if(!Schema::hasTable('seleccion_problemas_certamen')){
+            Schema::create('seleccion_problemas_certamen', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('id_res_certamen');
+                $table->unsignedBigInteger('id_problema');
+                $table->timestamps();
+    
+                $table->foreign('id_res_certamen')->references('id')->on('resolucion_certamenes')->onDelete('cascade')->onUpdate('cascade');
+                $table->foreign('id_problema')->references('id')->on('problemas')->onDelete('cascade')->onUpdate('cascade');
+            });
+        }
     }
 
     /**
