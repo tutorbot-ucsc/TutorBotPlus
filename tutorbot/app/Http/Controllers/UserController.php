@@ -96,7 +96,11 @@ class UserController extends Controller
                 if($string_info == ""){
                     continue;
                 }
-                $usuario_data = array_filter(explode(";", $string_info));
+                if(str_contains($string_info,';')){
+                    $usuario_data = array_filter(explode(";", $string_info));
+                }else{
+                    $usuario_data = array_filter(explode(",", $string_info));
+                }
                 if(sizeof($usuario_data)<7){
                     throw new \Exception("Faltan datos en el usuario de la columna ".($key+1).": [".$string_info."]. Ingrese nuevamente el archivo corregido y asegúrese de que todos los datos requeridos estén presentes.");
                 }
@@ -143,6 +147,8 @@ class UserController extends Controller
         }catch(Exception $e){
             DB::rollBack();
             return back()->with("error", $e->getMessage());
+        }catch(\ValueError $e){
+            return back()->with("error", "Error: Asegúrese de que los valores estén separados por punto y coma (;).");
         }
         /*try{
             foreach($users as $user){

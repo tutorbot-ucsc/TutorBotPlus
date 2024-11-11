@@ -50,7 +50,12 @@ class CertamenesController extends Controller
             $certamen->descripcion = $request->input("descripcion");
             $certamen->fecha_inicio = Carbon::parse($request->input("fecha_inicio"));
             $certamen->fecha_termino = Carbon::parse($request->input("fecha_termino"));
-            $certamen->penalizacion_error = $request->input("penalizacion_error");
+            if(isset($request->penalizacion_error)){
+                $certamen->penalizacion_error = $request->input("penalizacion_error");
+            }
+            if(isset($request->cantidad_penalizacion)){
+                $certamen->cantidad_penalizacion = $request->input("cantidad_penalizacion");
+            }
             $certamen->curso()->associate(Cursos::find($request->curso));
             $certamen->save();
             DB::commit();
@@ -70,7 +75,12 @@ class CertamenesController extends Controller
             $certamen->descripcion = $request->input("descripcion");
             $certamen->fecha_inicio = Carbon::parse($request->input("fecha_inicio"));
             $certamen->fecha_termino = Carbon::parse($request->input("fecha_termino"));
-            $certamen->penalizacion_error = $request->input("penalizacion_error");
+            if(isset($request->penalizacion_error)){
+                $certamen->penalizacion_error = $request->input("penalizacion_error");
+            }
+            if(isset($request->cantidad_penalizacion)){
+                $certamen->cantidad_penalizacion = $request->input("cantidad_penalizacion");
+            }
             if($certamen->curso->id != $request->input('curso')){
                 $certamen->curso()->dissociate();
                 $certamen->curso()->associate(Cursos::find($request->input("curso")));
@@ -133,6 +143,9 @@ class CertamenesController extends Controller
             if(!($_now->gte(Carbon::parse($certamen->fecha_inicio)) && $_now->lte(Carbon::parse($certamen->fecha_termino)))){
                 $certamen->disponibilidad = false;
             }
+            if($certamen->categorias()->count()==0){
+                $certamen->disponibilidad = false;
+            }
             $res_certamen = $certamen->resoluciones()->with(['ProblemasSeleccionadas','envios'])->where('id_usuario', '=', auth()->user()->id)->first();
             $resultado = null;
             if(isset($res_certamen)){
@@ -140,6 +153,7 @@ class CertamenesController extends Controller
                 ->leftJoin('resolver', 'envio_solucion_problemas.id_resolver', '=', 'resolver.id')
                 ->select('resolver.id_problema', DB::raw('count(envio_solucion_problemas.id) as cantidad_intentos'), DB::raw('COALESCE(max(envio_solucion_problemas.puntaje),0) as maximo_puntaje'), DB::raw('COALESCE(max(solucionado),0) as resuelto'), DB::raw('COALESCE(max(cant_casos_resuelto), 0) as max_casos_resueltos'))
                 ->where('envio_solucion_problemas.id_certamen', '=', $res_certamen->id)
+                ->whereNotNull('termino')
                 ->groupBy('resolver.id_problema');
 
                 $resultado = DB::table('problemas')
@@ -148,8 +162,15 @@ class CertamenesController extends Controller
                 ->select('problemas.id', 'problemas.nombre', DB::raw('sum(casos__pruebas.puntos) as puntos_total'), DB::raw('count(casos__pruebas.id) as total_casos'), DB::raw('COALESCE(cantidad_intentos, 0) as cantidad_intentos'), DB::raw('COALESCE(maximo_puntaje, 0) as maximo_puntaje'), DB::raw('COALESCE(resuelto, 0) as resuelto'),DB::raw('COALESCE(max_casos_resueltos, 0) as max_casos_resueltos'))
                 ->groupBy('problemas.id', 'problemas.nombre', 'cantidad_intentos', 'maximo_puntaje', 'resuelto', 'max_casos_resueltos')
                 ->whereIn('problemas.id',$res_certamen->ProblemasSeleccionadas()->pluck('id_problema'))
-                ->get();
+                ->get()->map(function($item) use($certamen){
+                    if($item->cantidad_intentos>0){
+                        $errores = $item->cantidad_intentos - 1 <= $certamen->cantidad_penalizacion? $item->cantidad_intentos - 1 : $certamen->cantidad_penalizacion;
+                        $item->maximo_puntaje = $item->maximo_puntaje - ($errores*$certamen->penalizacion_error);
+                    }
+                    return $item;
+                });
             }
+            
             $certamen->fecha_inicio = Carbon::parse( $certamen->fecha_inicio)->locale('es_ES')->isoFormat('lll');
             $certamen->fecha_termino = Carbon::parse( $certamen->fecha_termino)->locale('es_ES')->isoFormat('lll');
         }catch(\PDOException $e){
@@ -178,7 +199,11 @@ class CertamenesController extends Controller
                 $problemas_seleccionados_id = [];
                 foreach ($categorias as $categoria){
                     //selecciona un problema aleatorio, ignorando los problemas que ya fueron escogidos previamente
-                    $problema_aleatorio = $categoria->problemas()->inRandomOrder()->first();
+                    $problema_aleatorio = $categoria->problemas()
+                    ->join('disponible', 'disponible.id_problema', '=', 'problemas.id')
+                    ->where('disponible.id_curso', '=', $certamen->id_curso)
+                    ->whereNotIn('problemas.id', $problemas_seleccionados_id)
+                    ->inRandomOrder()->first();
                     $seleccion = new SeleccionProblemasCertamenes;
                     $seleccion->problema()->associate($problema_aleatorio);
                     array_push($problemas_seleccionados, $seleccion);        
@@ -253,9 +278,9 @@ class CertamenesController extends Controller
             $res_certamen = ResolucionCertamenes::where('token', '=', $request->token)->first();
             $res_certamen->finalizar_certamen();
         }catch(\PDOException $e){
-            return redirect()->route('certamenes.listado')->with("error", $e->getMessage());
+            return redirect()->route('certamenes.ver', ['id_certamen'=>$res_certamen->id_certamen])->with("error", $e->getMessage());
         }
-            return redirect()->route('certamenes.listado')->with("success", "Has finalizado el certamen");
+            return redirect()->route('certamenes.ver', ['id_certamen'=>$res_certamen->id_certamen])->with("success", "Has finalizado el certamen");
     }
     
 

@@ -61,7 +61,11 @@ class EvaluarEnvios extends Command
                     if ($item['status']["id"] != 1 && $item['status']["id"] != 2) {
                         $evaluacion->tiempo = $item['time'];
                         $evaluacion->memoria = $item['memory'];
-                        $evaluacion->stout = $item['stdout'];
+                        if(strlen($item['stdout'])<=65535){
+                            $evaluacion->stout = $item['stdout'];
+                        }else{
+                            $evaluacion->stout = base64_encode("Error: El texto de salida es muy largo.");
+                        }
                         if (isset($item["stderr"])) {
                             $evaluacion->error_compilacion = $item["stderr"];
                         } else {

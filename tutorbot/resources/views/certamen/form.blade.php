@@ -70,9 +70,18 @@
     <div class="form-group has-danger">
         <label for="example-text-input"
             class="form-control-label @error('penalizacion_error') is-invalid @enderror">Penalización por Error</label>
-        <input class="form-control" type="number" name="penalizacion_error" placeholder="Ejemplo: 0.5" min="0" step="0.01"
+        <input class="form-control" type="number" name="penalizacion_error" placeholder="Ejemplo: 0.5 por error ocurrido" min="0" step="0.01"
             value="{{ isset($certamen) ? old('penalizacion_error', $certamen->penalizacion_error) : old('penalizacion_error', 0) }}">
         @error('penalizacion_error')
+            <p class="text-danger text-xs pt-1"> {{ $message }} </p>
+        @enderror
+    </div>
+    <div class="form-group has-danger">
+        <label for="example-text-input"
+            class="form-control-label @error('cantidad_penalizacion') is-invalid @enderror">Cantidad Máxima de Penalización</label>
+        <input class="form-control" type="number" name="cantidad_penalizacion" placeholder="Ejemplo: solo 3 penalizaciones por error por problema" min="0"
+            value="{{ isset($certamen) ? old('cantidad_penalizacion', $certamen->cantidad_penalizacion) : old('cantidad_penalizacion', 0) }}">
+        @error('cantidad_penalizacion')
             <p class="text-danger text-xs pt-1"> {{ $message }} </p>
         @enderror
     </div>

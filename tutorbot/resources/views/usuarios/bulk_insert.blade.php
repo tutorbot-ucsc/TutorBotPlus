@@ -21,15 +21,15 @@
                     @error('csvFile')
                         <p class="text-danger text-xs pt-1"> {{ $message }} </p>
                     @enderror
-                    <br><strong> <span class="text-warning">Importante:</span> Debe seguir el siguiente orden.</strong> <br>
+                    <br><strong> <span class="text-warning">Importante:</span> Asegurese de que la separación en el archivo sea con punto y coma y debe seguir el siguiente orden.</strong> <br>
                         <ul class="list-group list-group-numbered mb-2">
                             <li class="list-group-item"><strong>Nombre de Usuario</strong></li>
                             <li class="list-group-item"><strong>Nombre</strong></li>
                             <li class="list-group-item"><strong>Apellido</strong></li>
                             <li class="list-group-item"><strong>Correo</strong></li>
                             <li class="list-group-item"><strong>Rut</strong></li>
-                            <li class="list-group-item"><strong>Códigos de los cursos en un Array</strong></li>
-                            <li class="list-group-item"><strong>Nombres de los roles en un array</strong></li>
+                            <li class="list-group-item"><strong>Códigos de los cursos en un array separados por coma</strong></li>
+                            <li class="list-group-item"><strong>Nombres de los roles en un array separados por coma</strong></li>
                         </ul>
                     <br><strong> <span class="text-warning">Importante: No debe ingresar una fila de encabezado al archivo.</strong> </span><br>
                     <input type="submit" class="btn btn-primary mt-4" value="Insertar">

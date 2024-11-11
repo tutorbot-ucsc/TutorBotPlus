@@ -1,5 +1,4 @@
 @extends('layout_plataforma.app', ['title_html' => $problema->nombre, 'title' => 'Problema - ' . $problema->nombre, 'breadcrumbs' => [['nombre' => 'Cursos', 'route' => route('cursos.listado')], ['nombre' => 'Problemas', 'route' => route('problemas.listado', ['id' => $id_curso])], ['nombre' => $problema->nombre]]])
-
 @section('content')
     <div class="container-fluid py-3 px-4">
         @include('components.alert')
@@ -65,7 +64,7 @@
                             <li class="list-group-item"><strong>Categorías:</strong>
                                 {{ implode(', ', $problema->categorias()->get()->pluck('nombre')->toArray()) }}</li>
                             <li class="list-group-item"><strong>Lenguajes:</strong>
-                                @foreach($problema->lenguajes()->get()->pluck('abreviatura')->toArray() as $item) 
+                                @foreach($problema->lenguajes()->get()->pluck('abreviatura')->unique() as $item) 
                                 <span class="badge text-bg-secondary">{{strtoupper($item)}}</span>
                                 @endforeach
                             </li>
@@ -87,15 +86,18 @@
 
 @push('js')
     <script>
-        var table = document.querySelector("#body_markdown table")
+        var table = document.querySelectorAll("#body_markdown table")
         if (table != null) {
-            var table_body = table.querySelector("tbody")
-            table.classList.add("table")
-            table.classList.add("table-bordered")
-            table.classList.add("table-hover")
-            table.classList.add("mt-3")
-            table.style.width = "auto"
-            table_body.classList.add("table-group-divider")
+            for(var i = 0; i<table.length; i++){
+                var table_body = table[i].querySelector("tbody")
+                table[i].classList.add("table")
+                table[i].classList.add("table-bordered")
+                table[i].classList.add("table-hover")
+                table[i].classList.add("mt-3")
+                table[i].style.width = "auto"
+                table_body.classList.add("table-group-divider")
+            }
+            
         }
     </script>
 @endpush

@@ -15,9 +15,9 @@ class BancoProblemasCertamenesController extends Controller
     {
         $certamen = Certamenes::find($request->id_certamen);
         $categorias_id = $certamen->categorias()->pluck('categoria__problemas.id')->toArray();
-        $problemas_usados = DB::table('problemas')->join('pertenece', 'pertenece.id_problema', '=', 'problemas.id')->whereIn('id_categoria', $categorias_id)->pluck('problemas.id')->toArray();
-        $categorias = Categoria_Problema::has('problemas')->whereNotIn('categoria__problemas.id', $categorias_id)->get()->map(function ($categoria) use ($problemas_usados) {
-            $problemas = $categoria->problemas()->get();
+        $problemas_usados = DB::table('problemas')->join('pertenece', 'pertenece.id_problema', '=', 'problemas.id')->whereIn('id_categoria', $categorias_id)->join('disponible', 'disponible.id_problema', '=', 'problemas.id')->where('disponible.id_curso', '=', $certamen->id_curso)->pluck('problemas.id')->toArray();
+        $categorias = Categoria_Problema::has('problemas')->whereNotIn('categoria__problemas.id', $categorias_id)->get()->map(function ($categoria) use ($problemas_usados, $certamen) {
+            $problemas = $categoria->problemas()->join('disponible', 'disponible.id_problema', '=', 'problemas.id')->where('disponible.id_curso', '=', $certamen->id_curso)->get();
             $problemas = $problemas->except($problemas_usados);
             if (sizeof(value: $problemas) > 0) {
                 return $categoria;
