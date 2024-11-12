@@ -5,7 +5,7 @@
                 <div class="row">
                     <div class="col-8">
                         <div class="numbers">
-                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Cantidad de Resueltos</p>
+                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Cantidad de Soluciones Enviadas</p>
                             <h5 class="font-weight-bolder">
                                 {{$curso_estadistica->sum_cantidad_resueltos}}
                             </h5>

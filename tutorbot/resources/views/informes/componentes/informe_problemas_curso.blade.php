@@ -51,7 +51,7 @@
             borderColor: 'rgba(255, 91, 123, 1)',
         };
         var cantidadResueltos = {
-            label: 'Cantidad de problemas resueltos',
+            label: 'Cantidad de Soluciones',
             data: datos_cantidad_resueltos,
             backgroundColor: 'rgba(0, 99, 132, 0.6)',
             borderColor: 'rgba(0, 99, 132, 1)',

@@ -9,12 +9,11 @@
             </div>
             <div class="modal-body">
                 <p>
-                    Se deben añadir problemas al banco de problemas de la evaluación que has creado, debes ingresar al menos un problema para que la evaluación pueda ser resuelto por un estudiante. <br>
-                    <br>Los problemas que se pueden añadir a la evaluación son los que están asociados al curso que asignó para la evaluación, por lo tanto, debe ingresar problemas en la <a href="{{route("problemas.index")}}">Gestión de Problemas</a> los problemas, asociandolo al curso correspondiente de la evaluación. <br>
-                    <br> <strong class="text-warning">Ojo: Puedes hacer uso de problemas que están ocultos, se mostrarán en la lista de problemas para su selección.</strong> <br>
-                    <br>Los problemas están asociados a un puntaje, si no se ingresa un puntaje, entonces se le asiganara automaticamente 1 puntaje. La selección de problemas durante el desarrollo se basa en la cantidad de problemas asociados a cada puntaje. <br>
-                    <br>Por ejemplo: el banco de problemas de la evaluación tiene 3 problemas de 10 puntos, 3 problemas de 20 puntos. Entonces, cuando un estudiante desarrolle la evaluación, el sistema escogera un problema de manera aleatorio en cada puntaje distintos (un problema de 10 puntos y un problema de 20 puntos), dando un total de 2 problemas para desarrollar en la evaluación.
-                </p>
+                    Se deben añadir categorias al banco de problemas (una categoría es un problema) para resolver de la evaluación que has creado, debes ingresar al menos una categoría para que la evaluación pueda ser resuelto por un estudiante. <br>
+                    <br>Las categorías que se pueden añadir a la evaluación son los que contienen problemas asociados al curso, por lo tanto, debe ingresar categorías en la <a href="{{route("categorias.index")}}">Gestión de Cattegorías</a>, asociandolo a los problemas, estos problemas deben estar asociados al curso correspondiente de la evaluación. <br>
+                    <br> <strong class="text-warning">Ojo: Puedes hacer uso de problemas que están ocultos, el sistema puede seleccionarlo para que sea resuelto durante la evaluación de un estudiante</strong> <br>
+                    <br>Es recomendable que tengas categorías creadas especializado para la realización de evaluaciones, asi no utilizar problemas que se utilizan o han sido utilizado durante el desarrollo de ejercicios en clases u otro.<br>
+                    <br>Como se menciono anteriormente, una categoría representa un problema a resolver en la evaluación, si la categoría presenta tres problemas distintos, se seleccionará uno aleatorio de los tres problemas asignados con la categoría. </p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Cerrar</button>

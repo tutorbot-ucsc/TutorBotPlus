@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Certamenes;
 use Illuminate\Http\Request;
 use App\Models\Problemas;
 use App\Models\Cursos;
@@ -27,10 +28,10 @@ class InformeController extends Controller
     public function ver_envios_problema(Request $request){
         $problema = Problemas::find($request->id_problema);
         if(!isset($problema) && !Cursos::where("id", "=", $request->id_curso)->exists()){
-           return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("Error", "El curso o problema no existe");
+           return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("error", "El curso o problema no existe");
         }
         if(!auth()->user()->cursos()->where('cursos.id', '=', $request->id_curso)->exists()){
-           return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("Error", "No tienes acceso para ver éste informe");
+           return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("error", "No tienes acceso para ver éste informe");
         }
         $ultima_evaluacion = DB::table('evaluacion_solucions')
         ->select('resultado', 'id_envio', 'estado')
@@ -66,10 +67,10 @@ class InformeController extends Controller
 
     public function ver_informe_problema(Request $request){
         if(!Problemas::where('problemas.id', '=', $request->id_problema)->exists() || !Cursos::where("cursos.id", "=", $request->id_curso)->exists()){
-            return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("Error", "El curso o problema no existe");
+            return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("error", "El curso o problema no existe");
         }
         if(!auth()->user()->cursos()->where('cursos.id', '=', $request->id_curso)->exists()){
-            return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("Error", "No tienes acceso para ver éste informe porque no estás asignado al curso correspondiente.");
+            return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("error", "No tienes acceso para ver éste informe porque no estás asignado al curso correspondiente.");
         }
         $estadistica_estados = EvaluacionSolucion::join('envio_solucion_problemas', 'envio_solucion_problemas.id', '=', 'evaluacion_solucions.id_envio')->join('resolver','resolver.id', '=', 'envio_solucion_problemas.id_resolver')->join('cursa','cursa.id', '=', 'envio_solucion_problemas.id_cursa')->select('resultado')->where('resolver.id_problema', '=', $request->id_problema)->where('cursa.id_curso', '=', $request->id_curso)->get()->countBy('resultado')->toArray();
         $cantidad_solucionados = EnvioSolucionProblema::join('resolver','resolver.id', '=', 'envio_solucion_problemas.id_resolver')->join('cursa','cursa.id', '=', 'envio_solucion_problemas.id_cursa')->where("id_problema", "=", $request->id_problema)->where('id_curso', '=', $request->id_curso)->where('solucionado', '=', true)->count();
@@ -130,7 +131,7 @@ class InformeController extends Controller
 
     public function ver_informe_curso(Request $request){
         if(!auth()->user()->cursos()->where('cursos.id', '=', $request->id_curso)->exists()){
-            return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("Error", "No tienes acceso para ver éste informe porque no estás asignado al curso correspondiente.");
+            return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("error", "No tienes acceso para ver éste informe porque no estás asignado al curso correspondiente.");
         }
         //Consulta estadistica de los resultados de evaluación de los envios en todos los problemas del curso
         $estadistica_estados = EvaluacionSolucion::join('envio_solucion_problemas', 'envio_solucion_problemas.id', '=', 'evaluacion_solucions.id_envio')
@@ -172,14 +173,12 @@ class InformeController extends Controller
         ->join('problemas', 'resolver.id_problema', '=', 'problemas.id')
         ->join('cursa', 'cursa.id', '=', 'envio_solucion_problemas.id_cursa')
         ->select('cursa.id_usuario', DB::raw('count(envio_solucion_problemas.id) as cantidad_intentos'), DB::raw('CAST(sum(envio_solucion_problemas.solucionado) AS int) as cantidad_resueltos'), DB::raw('count(solicitud_ra_llms.id) as cantidad_ra'))
+        ->whereNull('id_certamen')
         ->orderByDesc('cantidad_intentos')
         ->groupBy('cursa.id_usuario');
         $listado_estudiantes = DB::table('users')
         ->joinSub($subquery_envios, 'informacion_envios', 'informacion_envios.id_usuario', '=', 'users.id')
-        ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
-        ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
         ->select('users.id as id_usuario','users.firstname', 'users.lastname', 'users.rut', 'cantidad_intentos', 'cantidad_resueltos', 'cantidad_ra')
-        ->where('roles.name','LIKE', '%estudiante%')
         ->get();
         if($curso_estadistica->sum_cantidad_resueltos !=0){
             $curso_estadistica->tiempo_promedio = $curso_estadistica->sum_tiempo_total/$curso_estadistica->sum_cantidad_resueltos;
@@ -194,10 +193,10 @@ class InformeController extends Controller
     public function ver_envios_curso(Request $request){
         $curso = Cursos::find($request->id_curso);
         if(!isset($curso)){
-           return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("Error", "El curso o problema no existe");
+           return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("error", "El curso o problema no existe");
         }
         if(!auth()->user()->cursos()->where('cursos.id', '=', $request->id_curso)->exists()){
-           return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("Error", "No tienes acceso para ver éste informe");
+           return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("error", "No tienes acceso para ver éste informe");
         }
         $ultima_evaluacion = DB::table('evaluacion_solucions')
         ->select('resultado', 'id_envio', 'estado')
@@ -229,5 +228,41 @@ class InformeController extends Controller
         $envios = $envios->get();
         return view("informes.cursos.envios", compact("envios", "curso"));
     }
+    public function ver_informe_certamen(Request $request){
+        $certamen = Certamenes::find($request->id_certamen);
+        if(!isset($certamen)){
+            return redirect()->route('certamen.index')->with("error", "La evaluación no existe");
+        }
+        if(!auth()->user()->cursos()->where('cursos.id', '=', $certamen->id_curso)->exists()){
+            return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("error", "No tienes acceso para ver éste informe");
+        }
 
+        $certamen_estadistica = DB::table('certamenes')
+        ->join('resolucion_certamenes', 'resolucion_certamenes.id_certamen', '=', 'certamenes.id')
+        ->join('envio_solucion_problemas', 'resolucion_certamenes.id', '=', 'envio_solucion_problemas.id_certamen')
+        ->select('certamenes.id', 'certamenes.nombre',DB::raw('count(envio_solucion_problemas.id) as cantidad_intentos'), DB::raw('sum(envio_solucion_problemas.solucionado) as cantidad_resueltos'), DB::raw('avg(problemas_resueltos) as promedio_resolucion_problemas'), DB::raw('avg(puntaje_obtenido) as puntaje_promedio'))
+        ->where('certamenes.id', '=', $request->id_certamen)
+        ->groupBy('certamenes.id', 'certamenes.nombre')
+        ->first();
+        
+        $estadistica_estados = EvaluacionSolucion::join('envio_solucion_problemas', 'envio_solucion_problemas.id', '=', 'evaluacion_solucions.id_envio')
+        ->join('resolucion_certamenes', 'resolucion_certamenes.id', '=', 'envio_solucion_problemas.id_certamen')
+        ->join('certamenes', 'resolucion_certamenes.id_certamen', '=', 'certamenes.id')
+        ->select('resultado')
+        ->where('certamenes.id', '=', $request->id_certamen)
+        ->get()->countBy('resultado')->toArray();
+
+        //Consulta estadistica de los lenguajes utilizados en el certamen
+        $lenguajes_estadistica = DB::table('lenguajes_programaciones')
+        ->join('resolver', 'resolver.id_lenguaje', '=', 'lenguajes_programaciones.id')
+        ->join('envio_solucion_problemas', 'envio_solucion_problemas.id_resolver', '=', 'resolver.id')
+        ->join('resolucion_certamenes', 'resolucion_certamenes.id', '=', 'envio_solucion_problemas.id_certamen')
+        ->join('certamenes', 'resolucion_certamenes.id_certamen', '=', 'certamenes.id')
+        ->select('lenguajes_programaciones.nombre')
+        ->where('certamenes.id', '=', $request->id_certamen)
+        ->whereNotNull('envio_solucion_problemas.termino')
+        ->get()->countBy('nombre')->toArray();
+        
+        dd($certamen_estadistica, $lenguajes_estadistica, $estadistica_estados);
+    }
 }

@@ -8,7 +8,7 @@
 
                 <input type="hidden" id="codigo_save" name="codigo_save">
                 <input type="hidden" id="lenguaje_save" name="lenguaje_save">
-                <button class="btn btn-outline-primary btn-sm" type="submit">{{isset($res_certamen)? "Guardar y Volver al Certamen" : "Guardar y Volver"}}</button>
+                <button class="btn btn-outline-primary btn-sm" type="submit" id="boton_guardar">{{isset($res_certamen)? "Guardar y Volver al Certamen" : "Guardar y Volver"}}</button>
             </div>
         </form>
         <form
@@ -16,7 +16,7 @@
             method="POST" id="evaluacion_form">
             @csrf
             <div class="row px-5">
-                <button class="btn btn-primary" type="submit">Enviar Solución</button>
+                <button class="btn btn-primary" type="submit" id="boton_enviar_solucion">Enviar Solución</button>
             </div>
             <h6 class="text-center mt-4">Lenguaje de Programación</h6>
             <select class="form-select mb-3" id="lenguaje" name="lenguaje"
