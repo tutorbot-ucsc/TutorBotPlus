@@ -19,14 +19,13 @@
                                     Rut
                                 </th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                    Intentos Totales
+                                    Resueltos
                                 </th>
+                                @for($i=1; $i<=$certamen_estadistica->cantidad_problemas; $i++)
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                    Soluciones Enviadas
+                                    {{"P".$i}}
                                 </th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                    Ayuda Solicitada
-                                </th>
+                                @endfor
                                 @canany(['ver informe del problema'])
                                     <th
                                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
@@ -35,7 +34,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($listado_estudiantes as $item)
+                            @foreach ($listado_resultados as $item)
                                 <tr>
                                     <td>
                                         <div class="d-flex px-3 py-1">
@@ -55,23 +54,27 @@
                                     <td>
                                         <div class="d-flex px-3 py-1">
                                             <div class="d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm">{{ $item->cantidad_intentos }}</h6>
+                                                <h6 class="mb-0 text-sm">{{ $item->problemas_resueltos."/".$certamen_estadistica->cantidad_problemas }}</h6>
                                             </div>
                                         </div>
                                     </td>
+                                    @for($i=0; $i<$certamen_estadistica->cantidad_problemas; $i++)
                                     <td>
                                         <div class="d-flex px-3 py-1">
                                             <div class="d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm">{{ $item->cantidad_resueltos }}</h6>
+                                                <h6 class="mb-0 text-sm">
+                                                    {{$item->resultados[$i]->maximo_puntaje."/".$item->resultados[$i]->puntos_total}}
+                                                </h6>
                                             </div>
                                         </div>
                                     </td>
-                                    <td>{{ $item->cantidad_ra }} </td>
+                                    @endfor
+                                    
                                     @canany(['ver informe del problema'])
                                         <td class="align-middle text-end">
                                             <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                 @can('ver informe del problema')
-                                                    <a class="btn btn-outline-warning" href="{{route('informe.envios.curso', ['id_curso'=>$curso_estadistica->id, 'id_usuario'=>$item->id_usuario])}}">Envios</a>
+                                                    <a class="btn btn-outline-warning" href="#">Envios</a>
                                                 @endcan
                                             </div>
                                         </td>

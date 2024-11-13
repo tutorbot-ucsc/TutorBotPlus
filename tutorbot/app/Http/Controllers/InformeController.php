@@ -130,8 +130,11 @@ class InformeController extends Controller
     }
 
     public function ver_informe_curso(Request $request){
+        if(!Cursos::exists($request->id_curso)){
+            return redirect()->route('cursos.index')->with("error", "El curso no existe");
+        }
         if(!auth()->user()->cursos()->where('cursos.id', '=', $request->id_curso)->exists()){
-            return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("error", "No tienes acceso para ver éste informe porque no estás asignado al curso correspondiente.");
+            return redirect()->route('cursos.index')->with("error", "No tienes acceso para ver éste informe porque no estás asignado al curso correspondiente.");
         }
         //Consulta estadistica de los resultados de evaluación de los envios en todos los problemas del curso
         $estadistica_estados = EvaluacionSolucion::join('envio_solucion_problemas', 'envio_solucion_problemas.id', '=', 'evaluacion_solucions.id_envio')
@@ -149,17 +152,17 @@ class InformeController extends Controller
         ->whereNotNull('envio_solucion_problemas.termino')
         ->get()->countBy('nombre')->toArray();
         //Consulta estadistica sobre la cantidad de resueltos y de intentos en todos los problemas del curso, cantidad de solicitud de retroalimentación y el tiempo total de desarrollo de todos los problemas
-        $curso_estadistica = DB::table('disponible')
-        ->join('cursos', 'disponible.id_curso', '=', 'cursos.id')
-        ->select('cursos.id', 'cursos.nombre',DB::raw('sum(disponible.cantidad_resueltos) as sum_cantidad_resueltos'), DB::raw('sum(disponible.cantidad_intentos) as sum_cantidad_intentos'), DB::raw('sum(disponible.tiempo_total) as sum_tiempo_total'), DB::raw('sum(cant_retroalimentacion_solicitada) as sum_cant_ra_solicitada'))
-        ->where('disponible.id_curso', '=', $request->id_curso)
+        $curso_estadistica = DB::table('cursos')
+        ->leftJoin('disponible', 'disponible.id_curso', '=', 'cursos.id')
+        ->select('cursos.id', 'cursos.nombre',DB::raw('coalesce(sum(disponible.cantidad_resueltos), 0) as sum_cantidad_resueltos'), DB::raw('coalesce(sum(disponible.cantidad_intentos), 0) as sum_cantidad_intentos'), DB::raw('coalesce(sum(disponible.tiempo_total), 0) as sum_tiempo_total'), DB::raw('coalesce(sum(cant_retroalimentacion_solicitada), 0) as sum_cant_ra_solicitada'))
+        ->where('cursos.id', '=', $request->id_curso)
         ->groupBy('cursos.id', 'cursos.nombre')
         ->first();
         //Consulta del problemas más resuelto y el problema con más intentos
         $dataset_problemas = DB::table('problemas')
-        ->join('disponible', 'disponible.id_problema', '=', 'problemas.id')
+        ->leftJoin('disponible', 'disponible.id_problema', '=', 'problemas.id')
         ->where('disponible.id_curso', '=', $request->id_curso)  
-        ->select('problemas.nombre', 'problemas.codigo', 'problemas.id','disponible.cantidad_intentos', 'disponible.cantidad_resueltos', 'disponible.cant_retroalimentacion_solicitada', 'disponible.tiempo_total')
+        ->select('problemas.nombre', 'problemas.codigo', 'problemas.id', DB::raw('coalesce(disponible.cantidad_intentos, 0) as cantidad_intentos'), DB::raw('coalesce(disponible.cantidad_resueltos) as cantidad_resueltos'), DB::raw('coalesce(disponible.cant_retroalimentacion_solicitada) as cant_retroalimentacion_solicitada'), DB::raw('coalesce(disponible.tiempo_total,0) as tiempo_total'))
         ->distinct();
         $problema_mas_intentado = clone $dataset_problemas;
         $problema_mas_resuelto = clone $dataset_problemas;
@@ -174,18 +177,21 @@ class InformeController extends Controller
         ->join('cursa', 'cursa.id', '=', 'envio_solucion_problemas.id_cursa')
         ->select('cursa.id_usuario', DB::raw('count(envio_solucion_problemas.id) as cantidad_intentos'), DB::raw('CAST(sum(envio_solucion_problemas.solucionado) AS int) as cantidad_resueltos'), DB::raw('count(solicitud_ra_llms.id) as cantidad_ra'))
         ->whereNull('id_certamen')
+        ->where('cursa.id_curso', '=', $request->id_curso)
         ->orderByDesc('cantidad_intentos')
         ->groupBy('cursa.id_usuario');
         $listado_estudiantes = DB::table('users')
         ->joinSub($subquery_envios, 'informacion_envios', 'informacion_envios.id_usuario', '=', 'users.id')
         ->select('users.id as id_usuario','users.firstname', 'users.lastname', 'users.rut', 'cantidad_intentos', 'cantidad_resueltos', 'cantidad_ra')
         ->get();
-        if($curso_estadistica->sum_cantidad_resueltos !=0){
+        if(isset($curso_estadistica->sum_cantidad_resueltos) && $curso_estadistica->sum_cantidad_resueltos !=0){
             $curso_estadistica->tiempo_promedio = $curso_estadistica->sum_tiempo_total/$curso_estadistica->sum_cantidad_resueltos;
-        }else{
+        }else if(isset($curso_estadistica)){
             $curso_estadistica->tiempo_promedio = 0;
         }
-        $curso_estadistica->tiempo_promedio = gmdate('H:i:s', $curso_estadistica->tiempo_promedio);
+        if(isset($curso_estadistica)){
+            $curso_estadistica->tiempo_promedio = gmdate('H:i:s', $curso_estadistica->tiempo_promedio);
+        }
         //dd($listado_estudiantes, $problema_mas_intentado, $problema_mas_resuelto, $estadistica_estados, $lenguajes_estadistica, $curso_estadistica);
         return view('informes.cursos.informe', compact('dataset_problemas','listado_estudiantes', 'problema_mas_intentado', 'problema_mas_resuelto', 'estadistica_estados', 'lenguajes_estadistica', 'curso_estadistica'));
     }
@@ -240,11 +246,12 @@ class InformeController extends Controller
         $certamen_estadistica = DB::table('certamenes')
         ->join('resolucion_certamenes', 'resolucion_certamenes.id_certamen', '=', 'certamenes.id')
         ->join('envio_solucion_problemas', 'resolucion_certamenes.id', '=', 'envio_solucion_problemas.id_certamen')
-        ->select('certamenes.id', 'certamenes.nombre',DB::raw('count(envio_solucion_problemas.id) as cantidad_intentos'), DB::raw('sum(envio_solucion_problemas.solucionado) as cantidad_resueltos'), DB::raw('avg(problemas_resueltos) as promedio_resolucion_problemas'), DB::raw('avg(puntaje_obtenido) as puntaje_promedio'))
+        ->select('certamenes.id', 'certamenes.cantidad_problemas', 'certamenes.nombre',DB::raw('count(envio_solucion_problemas.id) as cantidad_intentos'), DB::raw('sum(envio_solucion_problemas.solucionado) as cantidad_resueltos'), DB::raw('avg(problemas_resueltos) as promedio_resolucion_problemas'), DB::raw('avg(puntaje_obtenido) as puntaje_promedio'))
         ->where('certamenes.id', '=', $request->id_certamen)
-        ->groupBy('certamenes.id', 'certamenes.nombre')
+        ->groupBy('certamenes.id', 'certamenes.nombre', 'certamenes.cantidad_problemas')
         ->first();
         
+        //Estados de las evaluaciones por caso de prueba
         $estadistica_estados = EvaluacionSolucion::join('envio_solucion_problemas', 'envio_solucion_problemas.id', '=', 'evaluacion_solucions.id_envio')
         ->join('resolucion_certamenes', 'resolucion_certamenes.id', '=', 'envio_solucion_problemas.id_certamen')
         ->join('certamenes', 'resolucion_certamenes.id_certamen', '=', 'certamenes.id')
@@ -263,6 +270,38 @@ class InformeController extends Controller
         ->whereNotNull('envio_solucion_problemas.termino')
         ->get()->countBy('nombre')->toArray();
         
-        dd($certamen_estadistica, $lenguajes_estadistica, $estadistica_estados);
+
+        $problemas_subquery = DB::table('problemas')
+        ->leftJoin('casos__pruebas', 'casos__pruebas.id_problema', '=', 'problemas.id')
+        ->select('problemas.id',DB::raw('sum(casos__pruebas.puntos) as puntos_total'), DB::raw('count(casos__pruebas.id) as total_casos'))
+        ->groupBy('problemas.id');
+
+        $resultado_certamenes = DB::table('envio_solucion_problemas')
+        ->join('resolucion_certamenes', 'envio_solucion_problemas.id_certamen', '=', 'resolucion_certamenes.id')
+        ->join('certamenes', 'resolucion_certamenes.id_certamen', '=', 'certamenes.id')
+        ->leftJoin('resolver', 'envio_solucion_problemas.id_resolver', '=', 'resolver.id')
+        ->leftJoinSub($problemas_subquery, 'problemas', 'problemas.id', '=', 'resolver.id_problema')
+        ->select('resolucion_certamenes.id as id_res_certamen', 'problemas.id as id_problema', 'puntos_total', 'total_casos', DB::raw('count(envio_solucion_problemas.id) as cantidad_intentos'), DB::raw('COALESCE(max(envio_solucion_problemas.puntaje),0) as maximo_puntaje'), DB::raw('COALESCE(max(solucionado),0) as resuelto'), DB::raw('COALESCE(max(cant_casos_resuelto), 0) as max_casos_resueltos'))
+        ->where('certamenes.id', '=', $request->id_certamen)
+        ->whereNotNull('termino')
+        ->groupBy('problemas.id','resolucion_certamenes.id', 'puntos_total', 'total_casos')->get()->map(function($item) use($certamen){
+            if($item->cantidad_intentos>0){
+                $errores = $item->cantidad_intentos - 1 <= $certamen->cantidad_penalizacion? $item->cantidad_intentos - 1 : $certamen->cantidad_penalizacion;
+                $item->maximo_puntaje = $item->maximo_puntaje - ($errores*$certamen->penalizacion_error);
+            }
+            return $item;
+        });
+        $listado_resultados = DB::table('users')
+        ->join('resolucion_certamenes', 'resolucion_certamenes.id_usuario','=','users.id')
+        ->select('resolucion_certamenes.id', 'users.firstname', 'users.lastname', 'users.rut', 'puntaje_obtenido', 'problemas_resueltos')
+        ->where('id_certamen', '=', $request->id_certamen)
+        ->get()->map(function($item) use($resultado_certamenes){
+            $item->resultados = $resultado_certamenes->where('id_res_certamen','=',$item->id)->all();
+            return $item;
+        });
+
+        //dd($listado_resultados ,$certamen_estadistica, $lenguajes_estadistica, $estadistica_estados);
+        return view("informes.certamenes.informe", compact("listado_resultados" ,"certamen_estadistica", "lenguajes_estadistica", "estadistica_estados"));
+
     }
 }
