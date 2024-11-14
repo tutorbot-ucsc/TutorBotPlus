@@ -245,8 +245,8 @@ class InformeController extends Controller
         }
 
         $certamen_estadistica = DB::table('certamenes')
-        ->join('resolucion_certamenes', 'resolucion_certamenes.id_certamen', '=', 'certamenes.id')
-        ->join('envio_solucion_problemas', 'resolucion_certamenes.id', '=', 'envio_solucion_problemas.id_certamen')
+        ->leftJoin('resolucion_certamenes', 'resolucion_certamenes.id_certamen', '=', 'certamenes.id')
+        ->leftJoin('envio_solucion_problemas', 'resolucion_certamenes.id', '=', 'envio_solucion_problemas.id_certamen')
         ->select('certamenes.id', 'certamenes.cantidad_problemas', 'certamenes.nombre',DB::raw('count(envio_solucion_problemas.id) as cantidad_intentos'), DB::raw('sum(envio_solucion_problemas.solucionado) as cantidad_resueltos'), DB::raw('avg(problemas_resueltos) as promedio_resolucion_problemas'), DB::raw('avg(puntaje_obtenido) as puntaje_promedio'))
         ->where('certamenes.id', '=', $request->id_certamen)
         ->groupBy('certamenes.id', 'certamenes.nombre', 'certamenes.cantidad_problemas')
