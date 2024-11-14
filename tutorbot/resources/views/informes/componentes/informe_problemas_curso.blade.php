@@ -14,7 +14,7 @@
                             class="mb-3">{{ $problema_mas_resuelto->nombre }}
                             ({{ $problema_mas_resuelto->cantidad_resueltos }} soluciones y
                             {{ $problema_mas_resuelto->cantidad_intentos }} intentos)</a>
-                        <span><strong>Problema más intentos de solución: </strong></span>
+                        <span><strong>Problema con más intentos: </strong></span>
                         <a href="{{ route('problemas.ver', ['id_curso' => $curso_estadistica->id, 'codigo' => $problema_mas_intentado->codigo]) }}"
                             class="mb-3">{{ $problema_mas_intentado->nombre }}
                             ({{ $problema_mas_intentado->cantidad_resueltos }} soluciones y

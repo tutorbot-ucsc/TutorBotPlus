@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\EvaluacionSolucion;
 use App\Models\LenguajesProgramaciones;
 use App\Models\EnvioSolucionProblema;
+use App\Models\ResolucionCertamenes;
 use App\Models\SolicitudRaLlm;
 use Illuminate\Database\Query\Builder;
 use Carbon\Carbon;
@@ -199,10 +200,10 @@ class InformeController extends Controller
     public function ver_envios_curso(Request $request){
         $curso = Cursos::find($request->id_curso);
         if(!isset($curso)){
-           return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("error", "El curso o problema no existe");
+           return redirect()->route('cursos.index')->with("error", "El curso no existe");
         }
         if(!auth()->user()->cursos()->where('cursos.id', '=', $request->id_curso)->exists()){
-           return redirect()->route('informes.problemas.index', ["id"=>$request->id_problema])->with("error", "No tienes acceso para ver éste informe");
+           return redirect()->route('cursos.index')->with("error", "No tienes acceso para ver éste informe");
         }
         $ultima_evaluacion = DB::table('evaluacion_solucions')
         ->select('resultado', 'id_envio', 'estado')
@@ -299,9 +300,70 @@ class InformeController extends Controller
             $item->resultados = $resultado_certamenes->where('id_res_certamen','=',$item->id)->all();
             return $item;
         });
-
         //dd($listado_resultados ,$certamen_estadistica, $lenguajes_estadistica, $estadistica_estados);
         return view("informes.certamenes.informe", compact("listado_resultados" ,"certamen_estadistica", "lenguajes_estadistica", "estadistica_estados"));
 
+    }
+
+    public function ver_envios_certamen(Request $request){
+        $certamen = Certamenes::find($request->id_certamen);
+        if(!isset($certamen)){
+           return redirect()->route('certamen.index')->with("error", "La evaluación no existe");
+        }
+        if(!auth()->user()->cursos()->where('cursos.id', '=', $certamen->id_curso)->exists()){
+           return redirect()->route('certamen.index')->with("error", "No tienes acceso para ver éste informe");
+        }
+
+        $res_certamen = ResolucionCertamenes::find($request->id_res_certamen);
+        $resultado_certamenes = DB::table('envio_solucion_problemas')
+        ->leftJoin('resolver', 'envio_solucion_problemas.id_resolver', '=', 'resolver.id')
+        ->select('resolver.id_problema', DB::raw('count(envio_solucion_problemas.id) as cantidad_intentos'), DB::raw('COALESCE(max(envio_solucion_problemas.puntaje),0) as maximo_puntaje'), DB::raw('COALESCE(max(solucionado),0) as resuelto'), DB::raw('COALESCE(max(cant_casos_resuelto), 0) as max_casos_resueltos'))
+        ->where('envio_solucion_problemas.id_certamen', '=', $res_certamen->id)
+        ->whereNotNull('termino')
+        ->groupBy('resolver.id_problema');
+
+        $resultado = DB::table('problemas')
+        ->join('casos__pruebas', 'casos__pruebas.id_problema', '=', 'problemas.id')
+        ->leftJoinSub($resultado_certamenes,'resultados_certamenes','problemas.id', '=', 'resultados_certamenes.id_problema')
+        ->select('problemas.id', 'problemas.nombre', DB::raw('sum(casos__pruebas.puntos) as puntos_total'), DB::raw('count(casos__pruebas.id) as total_casos'), DB::raw('COALESCE(cantidad_intentos, 0) as cantidad_intentos'), DB::raw('COALESCE(maximo_puntaje, 0) as maximo_puntaje'), DB::raw('COALESCE(resuelto, 0) as resuelto'),DB::raw('COALESCE(max_casos_resueltos, 0) as max_casos_resueltos'))
+        ->groupBy('problemas.id', 'problemas.nombre', 'cantidad_intentos', 'maximo_puntaje', 'resuelto', 'max_casos_resueltos')
+        ->whereIn('problemas.id',$res_certamen->ProblemasSeleccionadas()->pluck('id_problema'))
+        ->get()->map(function($item) use($certamen){
+            if($item->cantidad_intentos>0){
+                $errores = $item->cantidad_intentos - 1 <= $certamen->cantidad_penalizacion? $item->cantidad_intentos - 1 : $certamen->cantidad_penalizacion;
+                $item->maximo_puntaje = $item->maximo_puntaje - ($errores*$certamen->penalizacion_error);
+            }
+            return $item;
+        });
+
+        //Envios
+        $ultima_evaluacion = DB::table('evaluacion_solucions')
+        ->select('resultado', 'id_envio', 'estado')
+        ->where('estado', '=', 'Rechazado')
+        ->orWhere('estado', '=', 'En Proceso')
+        ->orWhere('estado', '=', 'Error')
+        ->orderBy('updated_at','DESC')
+        ->groupBy('id_envio', 'resultado', 'estado');
+        $envios = DB::table("envio_solucion_problemas")
+        ->join('resolucion_certamenes', 'resolucion_certamenes.id', '=', 'envio_solucion_problemas.id_certamen')
+        ->join('certamenes', 'certamenes.id', '=', 'resolucion_certamenes.id_certamen')
+        ->join('resolver', 'resolver.id', '=', 'envio_solucion_problemas.id_resolver')
+        ->join('cursa', 'cursa.id', '=', 'envio_solucion_problemas.id_cursa')
+        ->join('problemas', 'problemas.id', '=', 'resolver.id_problema')
+        ->leftJoin('casos__pruebas', 'casos__pruebas.id_problema', '=', 'problemas.id')
+        ->join("users", "users.id", "=", "cursa.id_usuario")
+        ->join("lenguajes_programaciones", "lenguajes_programaciones.id", "=", "resolver.id_lenguaje")
+        ->leftJoinSub($ultima_evaluacion, 'ultima_evaluacion', function (JoinClause $join){
+            $join->on('envio_solucion_problemas.id', '=', 'ultima_evaluacion.id_envio');
+        })
+        ->select("envio_solucion_problemas.token","cursa.id_curso", "problemas.nombre","problemas.codigo", "resolver.id_problema","users.firstname", "users.lastname", "users.rut", 'envio_solucion_problemas.token', 'envio_solucion_problemas.cant_casos_resuelto','envio_solucion_problemas.puntaje','lenguajes_programaciones.nombre as nombre_lenguaje', 'envio_solucion_problemas.solucionado', 'envio_solucion_problemas.inicio', 'envio_solucion_problemas.termino', 'ultima_evaluacion.resultado', 'ultima_evaluacion.estado', DB::raw('count(casos__pruebas.id) as total_casos'))
+        ->where("envio_solucion_problemas.id_certamen", "=", $res_certamen->id)
+        ->whereNotNull("termino")
+        ->groupBy("envio_solucion_problemas.token","cursa.id_curso", "problemas.nombre","resolver.id_problema", "problemas.codigo","users.firstname", "users.lastname", "users.rut", 'envio_solucion_problemas.token', 'envio_solucion_problemas.cant_casos_resuelto','envio_solucion_problemas.puntaje','lenguajes_programaciones.nombre', 'envio_solucion_problemas.solucionado', 'envio_solucion_problemas.inicio', 'envio_solucion_problemas.termino', 'ultima_evaluacion.resultado', 'ultima_evaluacion.estado')
+        ->orderBy("envio_solucion_problemas.created_at", "DESC")
+        ->orderBy("users.firstname", "ASC")
+        ->get();
+
+        return view("informes.certamenes.envios", compact("envios", "certamen", "resultado"));
     }
 }

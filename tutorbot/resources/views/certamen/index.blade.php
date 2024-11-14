@@ -82,6 +82,10 @@
                                         @canany(['editar problemas', 'eliminar problemas'])
                                             <td class="align-middle text-end">
                                                 <div class="d-flex px-3 py-1 justify-content-center align-items-center">
+                                                    @can('ver informe del certamen')
+                                                    <a class="btn btn-outline-warning"
+                                                            href="{{ route('informe.certamen', ['id_certamen' => $certamen->id]) }}">Informe</a>
+                                                    @endcan
                                                     @can('editar certamen')
                                                     <a class="btn btn-outline-warning"
                                                             href="{{ route('certamen.banco_problemas', ['id_certamen' => $certamen->id]) }}">Banco</a>

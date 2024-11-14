@@ -74,7 +74,7 @@
                                         <td class="align-middle text-end">
                                             <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                 @can('ver informe del problema')
-                                                    <a class="btn btn-outline-warning" href="#">Envios</a>
+                                                    <a class="btn btn-outline-warning" href="{{route('informe.certamen.detalle', ['id_certamen'=>$certamen_estadistica->id, 'id_res_certamen'=>$item->id])}}">Detalle</a>
                                                 @endcan
                                             </div>
                                         </td>
@@ -86,7 +86,7 @@
 
                 </div>
             </div>
-            <a href="{{route('cursos.index')}}" class="btn btn-outline-primary mt-3 mx-5">Volver</a>
+            <a href="{{route('certamen.index')}}" class="btn btn-outline-primary mt-3 mx-5">Volver</a>
         </div>
     </div>
 </div>

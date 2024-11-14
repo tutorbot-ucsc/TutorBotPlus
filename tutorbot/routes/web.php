@@ -187,6 +187,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/curso/{id_curso}/envios/{id_usuario?}', [InformeController::class, 'ver_envios_curso'])->name('informe.envios.curso')->middleware('can:ver informe del curso'); 
 
 		Route::get('/evaluacion/{id_certamen}', [InformeController::class, 'ver_informe_certamen'])->name('informe.certamen')->middleware('can:ver informe del certamen'); 
+		Route::get('/evaluacion/{id_certamen}/detalle/{id_res_certamen}', [InformeController::class, 'ver_envios_certamen'])->name('informe.certamen.detalle')->middleware('can:ver informe del certamen'); 
 
 
 	});

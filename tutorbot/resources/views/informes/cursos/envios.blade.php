@@ -8,7 +8,7 @@
                 <div class="card-header pb-0">
                     <div class="d-flex justify-content-between">
                         <h6>Envios</h6>
-                        <a href="#" class="btn btn-outline-primary">Volver</a>
+                        <a href="{{route('informe.curso', ['id_curso' => $curso->id])}}" class="btn btn-outline-primary">Volver</a>
                     </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">

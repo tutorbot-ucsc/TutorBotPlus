@@ -31,6 +31,26 @@
             </div>
         </div>
     </div>
+    <div class="col-xl-2 col-sm-5 mb-xl-0 mb-4">
+        <div class="card">
+            <div class="card-body p-3">
+                <div class="row">
+                    <div class="col-8">
+                        <div class="numbers">
+                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Evaluaciones Aceptadas</p>
+                            <h5 class="font-weight-bolder">
+                                @if(sizeof($estadistica_estados)>0)
+                                    {{ $estadistica_estados["Accepted"]}}
+                                @else
+                                    0
+                                @endif
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
         <div class="card">
             <div class="card-body p-3">
