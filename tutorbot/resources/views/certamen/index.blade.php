@@ -8,7 +8,9 @@
                 <div class="card-header pb-0">
                     <div class="d-flex justify-content-between">
                         <h6>Evaluaciones</h6>
+                        @can('crear certamen')
                         <a class="btn btn-primary active" href="{{ route('certamen.crear') }}">Crear</a>
+                        @endcan
                     </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
@@ -41,7 +43,7 @@
                                     <th
                                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                         Creado</th>
-                                    @canany(['editar certamen', 'eliminar certamen'])
+                                    @canany(['editar certamen', 'eliminar certamen', 'ver informe del certamen'])
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             Acción</th>

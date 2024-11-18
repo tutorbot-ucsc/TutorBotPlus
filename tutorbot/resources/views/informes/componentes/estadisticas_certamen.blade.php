@@ -73,7 +73,7 @@
                 <div class="row">
                     <div class="col-8">
                         <div class="numbers">
-                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Puntaje Promeio</p>
+                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Puntaje Promedio</p>
                             <h5 class="font-weight-bolder">
                                 {{round($certamen_estadistica->puntaje_promedio)}}
                             </h5>

@@ -50,7 +50,12 @@
                     </a>
                 </li>
             @endcan
-            @can('ver curso')
+            @canany(['ver curso', 'ver informe del curso'])
+                <li class="nav-item mt-3 d-flex align-items-center">
+                    <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Cursos</h6>
+                </li>
+            @endcanany
+            @canany(['ver curso', 'ver informe del curso'])
                 <li class="nav-item">
                     <a class="nav-link {{ str_contains(request()->url(), 'cursos') == true ? 'active' : '' }}"
                         href="{{ route('cursos.index') }}">
@@ -84,7 +89,7 @@
                 <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Problemas</h6>
             </li>
             @endcanany
-            @can('ver problemas')
+            @canany(['ver problemas', 'ver informe del problema'])
                 <li class="nav-item">
                     <a class="nav-link {{ str_starts_with(Route::currentRouteName(), 'problemas') == true ? 'active' : '' }}"
                         href="{{ route('problemas.index') }}">

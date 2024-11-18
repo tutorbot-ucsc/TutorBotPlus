@@ -134,7 +134,7 @@ class InformeController extends Controller
         if(!Cursos::exists($request->id_curso)){
             return redirect()->route('cursos.index')->with("error", "El curso no existe");
         }
-        if(!auth()->user()->cursos()->where('cursos.id', '=', $request->id_curso)->exists()){
+        if(!auth()->user()->hasRole('administrador') && !auth()->user()->cursos()->where('cursos.id', '=', $request->id_curso)->exists()){
             return redirect()->route('cursos.index')->with("error", "No tienes acceso para ver éste informe porque no estás asignado al curso correspondiente.");
         }
         //Consulta estadistica de los resultados de evaluación de los envios en todos los problemas del curso
@@ -202,7 +202,7 @@ class InformeController extends Controller
         if(!isset($curso)){
            return redirect()->route('cursos.index')->with("error", "El curso no existe");
         }
-        if(!auth()->user()->cursos()->where('cursos.id', '=', $request->id_curso)->exists()){
+        if(!auth()->user()->hasRole('administrador') && !auth()->user()->cursos()->where('cursos.id', '=', $request->id_curso)->exists()){
            return redirect()->route('cursos.index')->with("error", "No tienes acceso para ver éste informe");
         }
         $ultima_evaluacion = DB::table('evaluacion_solucions')

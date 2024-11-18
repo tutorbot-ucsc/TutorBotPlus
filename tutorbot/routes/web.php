@@ -129,7 +129,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/update', [LenguajesProgramacionesController::class, 'update'])->name('lenguaje_programacion.update')->middleware('can:editar lenguaje de programación'); 
 	});
 	Route::prefix('cursos')->group(function () {
-		Route::get('/index', [CursosController::class, 'index'])->name('cursos.index')->middleware('can:ver curso'); 
+		Route::get('/index', [CursosController::class, 'index'])->name('cursos.index')->middleware('permission:ver curso|ver informe del curso'); 
 		Route::get('/crear', [CursosController::class, 'crear'])->name('cursos.crear')->middleware('can:crear curso'); 
 		Route::get('/editar', [CursosController::class, 'editar'])->name('cursos.editar')->middleware('can:editar curso'); 
 		Route::post('/eliminar', [CursosController::class, 'eliminar'])->name('cursos.eliminar')->middleware('can:eliminar curso'); 

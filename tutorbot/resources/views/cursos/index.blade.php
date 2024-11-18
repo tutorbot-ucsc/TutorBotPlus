@@ -8,7 +8,9 @@
                 <div class="card-header pb-0">
                     <div class="d-flex justify-content-between">
                         <h6>Cursos</h6>
+                        @can('crear curso')
                         <a class="btn btn-primary active" href="{{ route('cursos.crear') }}">Crear</a>
+                        @endcan
                     </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
@@ -34,7 +36,7 @@
                                     <th
                                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                         Creado</th>
-                                    @canany(['editar curso', 'eliminar curso'])
+                                    @canany(['editar curso', 'eliminar curso', 'ver informe del curso'])
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             Acción</th>
@@ -62,7 +64,7 @@
                                             <p class="text-sm font-weight-bold mb-0">
                                                 {{ $curso->fecha ? $curso->fecha : 'Desconocido' }}</p>
                                         </td>
-                                        @canany(['editar curso', 'eliminar curso'])
+                                        @canany(['editar curso', 'eliminar curso', 'ver informe del curso'])
                                             <td class="align-middle text-end">
                                                 <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                     @can('ver informe del curso')
