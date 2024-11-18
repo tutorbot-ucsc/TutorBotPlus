@@ -8,7 +8,9 @@
                 <div class="card-header pb-0">
                     <div class="d-flex justify-content-between">
                         <h6>Lenguajes de Programación</h6>
+                        @can('crear lenguaje de programación')
                         <a class="btn btn-primary active" href="{{ route('lenguaje_programacion.crear') }}">Crear</a>
+                        @endcan
                     </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">

@@ -8,7 +8,9 @@
                 <div class="card-header pb-0">
                     <div class="d-flex justify-content-between">
                         <h6>Cursos</h6>
+                        @can('crear curso')
                         <a class="btn btn-primary active" href="{{ route('cursos.crear') }}">Crear</a>
+                        @endcan
                     </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
@@ -34,7 +36,7 @@
                                     <th
                                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                         Creado</th>
-                                    @canany(['editar curso', 'eliminar curso'])
+                                    @canany(['editar curso', 'eliminar curso', 'ver informe del curso'])
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             Acción</th>
@@ -62,9 +64,15 @@
                                             <p class="text-sm font-weight-bold mb-0">
                                                 {{ $curso->fecha ? $curso->fecha : 'Desconocido' }}</p>
                                         </td>
-                                        @canany(['editar curso', 'eliminar curso'])
+                                        @canany(['editar curso', 'eliminar curso', 'ver informe del curso'])
                                             <td class="align-middle text-end">
                                                 <div class="d-flex px-3 py-1 justify-content-center align-items-center">
+                                                    @can('ver informe del curso')
+                                                        <a class="btn btn-outline-warning"
+                                                            href="{{ route('informe.curso', ['id_curso' => $curso->id]) }}">Informe</a>
+                                                        <a class="btn btn-outline-warning"
+                                                            href="{{ route('informe.envios.curso', ['id_curso' => $curso->id]) }}">Envios</a>
+                                                    @endcan
                                                     @can('editar curso')
                                                         <a class="btn btn-outline-warning"
                                                             href="{{ route('cursos.editar', ['id' => $curso->id]) }}"><i
@@ -72,7 +80,9 @@
                                                     @endcan
                                                     @can('eliminar curso')
                                                         <form action="{{ route('cursos.eliminar', ['id' => $curso->id]) }}"
-                                                            method="POST" onsubmit="event.preventDefault();submitFormEliminar('{{'el curso '.$curso->nombre}}', {{$curso->id}})" id="eliminarForm_{{$curso->id}}">
+                                                            method="POST"
+                                                            onsubmit="event.preventDefault();submitFormEliminar('{{ 'el curso ' . $curso->nombre }}', {{ $curso->id }})"
+                                                            id="eliminarForm_{{ $curso->id }}">
                                                             @csrf
                                                             <button type="submit" class="btn btn-outline-danger"><i
                                                                     class="fa fa-fw fa-trash"></i></button>
@@ -99,5 +109,5 @@
     <script src="{{ asset('assets/js/DataTables/datatables.min.js') }}"></script>
 
     <script src="{{ asset('assets/js/DataTables/gestion_initialize_es_cl.js') }}"></script>
-    <script src="{{ asset('assets/js/alertas_administracion.js') }}"></script> 
+    <script src="{{ asset('assets/js/alertas_administracion.js') }}"></script>
 @endpush

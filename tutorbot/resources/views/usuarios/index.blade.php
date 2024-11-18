@@ -8,10 +8,12 @@
                 <div class="card-header pb-0">
                     <div class="d-flex justify-content-between">
                         <h6>Usuarios</h6>
+                        @can('crear usuario')
                         <div>
                             <a class="btn btn-primary active" href="{{ route('usuarios.crear') }}">Crear</a>
                             <a class="btn btn-primary active" href="{{ route('usuarios.bulk') }}">Inserción Masiva</a>
                         </div>
+                        @endcan
                     </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">

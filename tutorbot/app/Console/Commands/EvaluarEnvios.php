@@ -61,6 +61,7 @@ class EvaluarEnvios extends Command
                     if ($item['status']["id"] != 1 && $item['status']["id"] != 2) {
                         $evaluacion->tiempo = $item['time'];
                         $evaluacion->memoria = $item['memory'];
+                        //Previene almacenar salidas muy largas debido a loops infinito en códigos que imprimen de manera infinita strings
                         if(strlen($item['stdout'])<=65535){
                             $evaluacion->stout = $item['stdout'];
                         }else{
@@ -87,12 +88,14 @@ class EvaluarEnvios extends Command
                 }
                 if ($cant_evaluaciones == $envio->cant_casos_resuelto && $envio->solucionado == false) {
                     $envio->solucionado = true;
-                    $diferencia = Carbon::parse($envio->termino)->diffInSeconds(Carbon::parse($envio->inicio));
-                    DB::table('disponible')->where('id_curso', '=', $envio->curso->id)->where('id_problema', '=', $problema->id)->incrementEach(
-                        ["cantidad_resueltos"=>1,
-                        "tiempo_total"=>$diferencia,
-                        ]
-                    );
+                    if(!isset($envio->id_certamen)){
+                        $diferencia = Carbon::parse($envio->termino)->diffInSeconds(Carbon::parse($envio->inicio));
+                        DB::table('disponible')->where('id_curso', '=', $envio->curso->id)->where('id_problema', '=', $problema->id)->incrementEach(
+                            ["cantidad_resueltos"=>1,
+                            "tiempo_total"=>$diferencia,
+                            ]
+                        );
+                    }
                 }
                 $envio->save();
                 DB::commit();

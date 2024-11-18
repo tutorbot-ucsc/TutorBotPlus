@@ -129,7 +129,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/update', [LenguajesProgramacionesController::class, 'update'])->name('lenguaje_programacion.update')->middleware('can:editar lenguaje de programación'); 
 	});
 	Route::prefix('cursos')->group(function () {
-		Route::get('/index', [CursosController::class, 'index'])->name('cursos.index')->middleware('can:ver curso'); 
+		Route::get('/index', [CursosController::class, 'index'])->name('cursos.index')->middleware('permission:ver curso|ver informe del curso'); 
 		Route::get('/crear', [CursosController::class, 'crear'])->name('cursos.crear')->middleware('can:crear curso'); 
 		Route::get('/editar', [CursosController::class, 'editar'])->name('cursos.editar')->middleware('can:editar curso'); 
 		Route::post('/eliminar', [CursosController::class, 'eliminar'])->name('cursos.eliminar')->middleware('can:eliminar curso'); 
@@ -182,6 +182,13 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/problemas/{id}/index', [InformeController::class, 'index_problema'])->name('informes.problemas.index')->middleware('can:ver informe del problema'); 
 		Route::get('/problemas/envios/{id_curso}/{id_problema}/{id_usuario?}', [InformeController::class, 'ver_envios_problema'])->name('informe.envios.problema')->middleware('can:ver informe del problema'); 
 		Route::get('/problemas/informe/{id_curso}/{id_problema}', [InformeController::class, 'ver_informe_problema'])->name('informe.problema')->middleware('can:ver informe del problema'); 
+
+		Route::get('/curso/{id_curso}', [InformeController::class, 'ver_informe_curso'])->name('informe.curso')->middleware('can:ver informe del curso'); 
+		Route::get('/curso/{id_curso}/envios/{id_usuario?}', [InformeController::class, 'ver_envios_curso'])->name('informe.envios.curso')->middleware('can:ver informe del curso'); 
+
+		Route::get('/evaluacion/{id_certamen}', [InformeController::class, 'ver_informe_certamen'])->name('informe.certamen')->middleware('can:ver informe del certamen'); 
+		Route::get('/evaluacion/{id_certamen}/detalle/{id_res_certamen}', [InformeController::class, 'ver_envios_certamen'])->name('informe.certamen.detalle')->middleware('can:ver informe del certamen'); 
+
 
 	});
 });

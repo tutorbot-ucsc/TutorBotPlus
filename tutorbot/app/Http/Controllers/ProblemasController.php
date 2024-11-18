@@ -325,8 +325,9 @@ class ProblemasController extends Controller
                 $envio->CursoUsuario()->associate($curso_usuario->pivot);
                 if(isset($res_certamen)){
                     $envio->id_certamen = $res_certamen->id;
+                }else{
+                    DB::table('disponible')->where('id_curso', '=', $request->id_curso)->where('id_problema', '=', $problema->id)->increment('cantidad_intentos');
                 }
-                DB::table('disponible')->where('id_curso', '=', $request->id_curso)->where('id_problema', '=', $problema->id)->increment('cantidad_intentos');
                 if(isset($last_envio->termino) && $last_envio->solucionado==false){
                     $codigo = $last_envio->codigo;
                     $envio->codigo = $codigo;

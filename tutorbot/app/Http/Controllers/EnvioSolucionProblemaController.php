@@ -69,12 +69,16 @@ class EnvioSolucionProblemaController extends Controller
             }else{
                 $envio = EnvioSolucionProblema::where('id_resolver', '=', $request->id_resolver)->where('id_cursa', '=', $request->id_cursa)->orderBy('created_at', 'DESC')->first();
             }
+            if($envio->termino != null){
+                return redirect()->route('envios.ver', ["token" => $envio->token]);
+            }
             $envio->codigo = $request->codigo;
             $envio->juez_virtual()->associate(JuecesVirtuales::find($request->juez_virtual));
             $lenguaje = LenguajesProgramaciones::where("codigo", "=", $request->lenguaje)->first();
             $pivot_problema_lenguaje = $lenguaje->problemas()->find($request->id_problema)->pivot;
             $envio->ProblemaLenguaje()->disassociate();
             $envio->ProblemaLenguaje()->associate($pivot_problema_lenguaje);
+            $envio->termino = Carbon::now();
             $envio->save();
             DB::commit();
         } catch (\PDOException $e) {
@@ -83,9 +87,7 @@ class EnvioSolucionProblemaController extends Controller
         }
         
         $resultado = $this->enviar_api_juez($envio, $request->lenguaje);
-        if ($resultado["estado"]) {
-            $envio->termino = Carbon::now();
-            $envio->save();
+        if ($resultado["estado"]) {            
             return redirect()->route('envios.ver', ["token" => $envio->token]);
         } else {
             return back()->with('error', $resultado["mensaje"])->with("codigo", $request->codigo);

@@ -5,9 +5,9 @@
                 <div class="row">
                     <div class="col-8">
                         <div class="numbers">
-                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Cantidad Resueltos</p>
+                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Cantidad de Soluciones/Intentos</p>
                             <h5 class="font-weight-bolder">
-                                {{$problema_estadistica->cantidad_resueltos}}
+                                {{$problema_estadistica->cantidad_resueltos."/".$problema_estadistica->cantidad_intentos}}
                             </h5>
                         </div>
                     </div>
@@ -21,9 +21,13 @@
                 <div class="row">
                     <div class="col-8">
                         <div class="numbers">
-                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Cantidad de Intentos</p>
+                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Evaluaciones Aceptadas</p>
                             <h5 class="font-weight-bolder">
-                                {{$problema_estadistica->cantidad_intentos}}
+                                @if(sizeof($estadistica_estados)>0)
+                                    {{ $estadistica_estados["Accepted"]}}
+                                @else
+                                    0
+                                @endif
                             </h5>
                         </div>
                     </div>

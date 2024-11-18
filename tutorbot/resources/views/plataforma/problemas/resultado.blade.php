@@ -81,7 +81,7 @@
                             <div class="d-flex flex-column align-items-center @if (isset($res_certamen) || $envio->usuario->id != auth()->user()->id || $evaluaciones->contains('estado', '=', 'En Proceso') || $envio->solucionado == true ||$tieneRetroalimentacion == true) d-none @endif" id="div_btn_retroalimentacion">
                                 <a class="btn btn-primary btn-block {{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? '' : 'disabled' }}"
                                     href="{{ route('envios.generar_retroalimentacion', ['token' => $envio->token]) }}"
-                                    role="button" onclick="solicitarRetroalimentacion(event)"> <img src="{{asset('img/AlienitoPensativo.png')}}" style="width:65px" class="me-3"><span class="align-middle"> {{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? 'Solicitar Ayuda' : 'Ayuda no disponible' }}</span></a>
+                                    role="button" onclick="solicitarRetroalimentacion(event)" id="boton_ra"> <img src="{{asset('img/AlienitoPensativo.png')}}" style="width:65px" class="me-3"><span class="align-middle"> {{ $problema->habilitar_llm == true && $cant_retroalimentacion > 0 ? 'Solicitar Ayuda' : 'Ayuda no disponible' }}</span></a>
                                     <strong class="text-center mt-2">Cantidad de Ayuda Disponible: {{$cant_retroalimentacion}}</strong>
                             </div>
                             <div class="d-flex flex-column align-items-center @if(isset($res_certamen) || $envio->usuario->id != auth()->user()->id || $tieneRetroalimentacion == false) d-none @endif" id="div_btn_ver_ayuda">
@@ -98,7 +98,7 @@
                             </div>
                         @endif
                         <div class="row px-5 mt-2">
-                            <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block"
+                            <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block @if(isset($res_certamen) && $res_certamen->finalizado) disabled @endif"
                                 href="{{ isset($res_certamen)? route('certamenes.resolucion', ["token"=>$res_certamen->token]) : route('problemas.ver', ['codigo' => $problema->codigo, 'id_curso' => $envio->curso->id]) }}"
                                 role="button">{{isset($res_certamen)? "Volver al Certamen" : "Volver al Enunciado"}}</a>
                         </div>
@@ -108,6 +108,12 @@
                                     <a class="btn btn-outline-secondary btn-sm btn-block"
                                         href="{{ route('informe.envios.problema', ['id_curso' => $envio->curso->id, 'id_problema' => $envio->problema->id]) }}"
                                         role="button">Volver al informe de envios del problema</a>
+                                </div>
+                            @else
+                            <div class="row px-5 mt-2">
+                                <a class="btn btn-outline-secondary btn-sm btn-block"
+                                    href="{{route('informe.certamen.detalle', ['id_certamen'=>$res_certamen->id_certamen, 'id_res_certamen'=>$res_certamen->id])}}"
+                                    role="button">Volver al informe de envios de la Evaluación</a>
                                 </div>
                             @endif
                         @endcan
