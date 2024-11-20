@@ -14,24 +14,24 @@ class JuecesVirtualesSeeder extends Seeder
      */
     public function run(): void
     {
-        if(env('JUDGE0_API_KEY_TESTING')!=null && env('JUDGE0_API_KEY_TESTING')!=''){
+        if(env('JUDGE0_API_KEY_RAPID_API')!=null && env('JUDGE0_API_KEY_RAPID_API')!=''){
             DB::table('jueces_virtuales')->insert([
-                'nombre' => 'Testing',
+                'nombre' => 'Juez RapidApi',
                 'direccion' => 'https://judge0-ce.p.rapidapi.com',
                 'host' => 'judge0-ce.p.rapidapi.com',
-                'api_token' => env('JUDGE0_API_KEY_TESTING'),
+                'api_token' => env('JUDGE0_API_KEY_RAPID_API'),
                 'autenticacion' => 'x-rapid-key',
                 'created_at' => Carbon::now()->toDateString(),
             ]);
         }
         if(env('JUDGE0_API_KEY_PROD')!=null && env('JUDGE0_API_KEY_PROD')!=''  && env('JUDGE0_AUTHORIZE_KEY_PROD')!=null && env('JUDGE0_AUTHORIZE_KEY_PROD')!=''){
             DB::table('jueces_virtuales')->insert([
-                'nombre' => 'TutorBot Juez',
+                'nombre' => 'Juez Principal',
                 'direccion' => '127.0.0.1:2358',
                 'host' => '127.0.0.1:2358',
                 'api_token' => env('JUDGE0_API_KEY_PROD'),
                 'authorize' => env('JUDGE0_AUTHORIZE_KEY_PROD'),
-                'autenticacion' => env('JUDGE0_HEADER_AUTH'),
+                'autenticacion' => env('JUDGE0_AUTHENTICATION_KEY_PROD'),
                 'created_at' => Carbon::now()->toDateString(),
             ]);
         }

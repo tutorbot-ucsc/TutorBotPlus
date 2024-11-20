@@ -29,7 +29,7 @@ return new class extends Migration
             $table->foreign('id_cursa')->references('id')->on('cursa')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('id_resolver')->references('id')->on('resolver')->onDelete('set null')->onUpdate('cascade');
             $table->foreign('id_juez')->references('id')->on('jueces_virtuales')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('id_certamen')->references('id')->on('resolucion_certamenes')->onDelete('set null')->onUpdate('cascade');
+            $table->foreign('id_certamen')->references('id')->on('resolucion_certamenes')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 
