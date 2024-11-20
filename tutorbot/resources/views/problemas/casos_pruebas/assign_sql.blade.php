@@ -45,6 +45,10 @@
                                     @enderror
                                 </div>
                                 <button class="btn btn-primary" type="submit">Guardar</button>
+                                <button type="button" class="btn bg-outline-primary" data-bs-toggle="modal" data-bs-target="#ejemplo_modal">
+                                    Ver Ejemplo
+                                </button>
+                                <a href="{{route('problemas.index')}}" class="btn bg-outline-primary">Volver</a>
                             </div>
                         </div>
                     </form>
@@ -53,6 +57,7 @@
             </div>
         </div>
     </div>
+    @include('problemas.casos_pruebas.ejemplo_sql')
 @endsection
 @push('js')
     <link href="{{ asset('assets/js/DataTables/datatables.min.css') }}" rel="stylesheet">
