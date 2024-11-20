@@ -20,7 +20,7 @@
                         </div>
                         <div class="row px-5">
                             <a class="btn btn-primary btn-block {{ $retroalimentacion->habilitar_llm == true && $cant_retroalimentacion > 0 ? '' : 'disabled' }}"
-                                href="{{ route('envios.generar_retroalimentacion', ['token' => $token]) }}"
+                                href="{{ route('envios.generar_retroalimentacion', ['token' => $token]) }}" id="boton_ra"
                                 role="button" onclick="solicitarRetroalimentacion(event)">{{ $retroalimentacion->habilitar_llm == true && $cant_retroalimentacion > 0 ? 'Generar Nueva Ayuda (Cantidad Disponible: ' . $cant_retroalimentacion . ')' : 'Ayuda no disponible' }}</a>
                         </div>
                         <div class="row px-5 mt-2">
