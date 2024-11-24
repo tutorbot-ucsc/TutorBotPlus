@@ -33,7 +33,7 @@
                         </div>
                         @can('ver informe del certamen')
                             <div class="row px-5 mt-2 mb-2">
-                                <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block" href="#"
+                                <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block" href="{{ route('informe.certamen', ['id_certamen' => $certamen->id]) }}"
                                     role="button">Ver Informe de la Evaluación</a>
                             </div>
                         @endcan

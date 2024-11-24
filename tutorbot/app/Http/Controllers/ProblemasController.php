@@ -102,7 +102,7 @@ class ProblemasController extends Controller
         try {
             db::beginTransaction();
             $problema = new Problemas;
-            $this->problemaModificacion($problema, $request);
+            $this->set_datos_problemas($problema, $request);
             db::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -110,7 +110,7 @@ class ProblemasController extends Controller
         }
         return redirect()->route('casos_pruebas.assign', ["id" => $problema->id])->with('success', 'El Problema ' . $problema->nombre . ' ha sido creado, ingrese los casos de prueba.');
     }
-    private static function problemaModificacion(Problemas $problema, Request $request){
+    private static function set_datos_problemas(Problemas $problema, Request $request){
             $problema->nombre = $request->input('nombre');
             $problema->codigo = $request->input('codigo');
             if(isset($request->set_fecha_inicio)){
@@ -123,8 +123,10 @@ class ProblemasController extends Controller
             }else{
                 $problema->fecha_termino = null;
             }
-            if(isset($request->memoria_limite)){
+            if(isset($request->memoria_limite) && $request->memoria_limite>0){
                 $problema->memoria_limite = $request->input('memoria_limite');
+            }else{
+                $problema->memoria_limite = 0;
             }
             $problema->tiempo_limite = $request->input('tiempo_limite');
             $problema->body_problema = $request->input('body_problema');
@@ -172,7 +174,7 @@ class ProblemasController extends Controller
         try {
             db::beginTransaction();
             $problema = Problemas::find($request->id);
-            $this->problemaModificacion($problema, $request);
+            $this->set_datos_problemas($problema, $request);
             db::commit();
         } catch (\Exception $e) {
             return redirect()->route('problemas.index')->with('error', $e->getMessage());

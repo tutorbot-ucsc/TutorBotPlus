@@ -112,7 +112,7 @@ class EnvioSolucionProblemaController extends Controller
             //añade la opción de compilador -lm para incluir la libreria <math.h>, esto es solo para soluciones desarrolladas en C.
             $initial_json_string = $initial_json_string.',"compiler_options":"-lm"';
         }
-        if(isset($problema->memoria_limite)){
+        if(isset($problema->memoria_limite) && $problema->memoria_limite>0){
             $initial_json_string = $initial_json_string.',"memory_limit":"'.$problema->memoria_limite.'"';
         }
         if(isset($problema->tiempo_limite) && $problema->tiempo_limite>0){

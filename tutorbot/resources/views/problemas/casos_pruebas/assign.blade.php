@@ -24,7 +24,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('casos_pruebas.add', ['id' => $problema->id]) }}" method="POST">
+                    <form action="{{ route('casos_pruebas.add', ['id' => $problema->id]) }}" method="POST" onsubmit="deshabilitar_boton()">
                         @csrf
                         @include('problemas.casos_pruebas.form')
                     </form>
@@ -105,4 +105,10 @@
     <script src="{{ asset('assets/js/DataTables/datatables.min.js') }}"></script>
 
     <script src="{{ asset('assets/js/DataTables/gestion_initialize_es_cl.js') }}"></script>
+    <script>
+        function deshabilitar_boton(){
+            const boton = document.getElementById('boton_crear');
+            boton.setAttribute('disabled', true);
+        }
+    </script>
 @endpush
