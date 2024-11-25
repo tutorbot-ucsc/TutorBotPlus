@@ -100,7 +100,7 @@
                         <p class="text-danger text-xs pt-1"> {{ $message }} </p>
                     @enderror
                     <div class="d-flex justify-content-center">
-                        <button class="btn btn-primary" type="submit">Modificar</button>
+                        <button class="btn btn-primary" type="submit">Guardar Cambios</button>
                     </div>
                 </form>
             </div>

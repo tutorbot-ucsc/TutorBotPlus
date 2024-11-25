@@ -29,7 +29,7 @@
             <input class="form-check-input" type="checkbox" role="switch" id="ejemplo" name="ejemplo" value="{{true}}" @if(old('ejemplo')) checked @endif>
             <label class="form-check-label" for="ejemplo">Ocultar entradas y salidas esperadas en los resultados</label>
         </div>
-        <button class="btn btn-primary mt-2" type="submit">Añadir</button>
+        <button class="btn btn-primary mt-2" type="submit" id="boton_crear">Añadir</button>
         <button type="button" class="btn bg-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#ejemplo_modal">
             Ver Ejemplo
         </button>

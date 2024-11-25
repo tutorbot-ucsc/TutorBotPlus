@@ -24,7 +24,7 @@
                                             @error('email') <p class="text-danger text-xs pt-1"> {{$message}} </p>@enderror
                                         </div>
                                         <div class="text-center">
-                                            <button type="submit" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Recuperar de Contraseña</button>
+                                            <button type="submit" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Recuperar Contraseña</button>
                                         </div>
                                         <div class="text-center">
                                             <a class="btn btn-lg btn-outline-primary btn-lg w-100 mt-2 mb-0" href="{{route('login')}}">Volver</a>

@@ -100,7 +100,7 @@
                         <div class="row px-5 mt-2">
                             <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block @if(isset($res_certamen) && $res_certamen->finalizado) disabled @endif"
                                 href="{{ isset($res_certamen)? route('certamenes.resolucion', ["token"=>$res_certamen->token]) : route('problemas.ver', ['codigo' => $problema->codigo, 'id_curso' => $envio->curso->id]) }}"
-                                role="button">{{isset($res_certamen)? "Volver al Certamen" : "Volver al Enunciado"}}</a>
+                                role="button">{{isset($res_certamen)? "Volver a la Evaluación   " : "Volver al Enunciado"}}</a>
                         </div>
                         @can('ver informe del problema')
                             @if(!isset($res_certamen))
@@ -109,7 +109,7 @@
                                         href="{{ route('informe.envios.problema', ['id_curso' => $envio->curso->id, 'id_problema' => $envio->problema->id]) }}"
                                         role="button">Volver al informe de envios del problema</a>
                                 </div>
-                            @else
+                            @elseif(isset($res_certamen) && $res_certamen->finalizado == true)
                             <div class="row px-5 mt-2">
                                 <a class="btn btn-outline-secondary btn-sm btn-block"
                                     href="{{route('informe.certamen.detalle', ['id_certamen'=>$res_certamen->id_certamen, 'id_res_certamen'=>$res_certamen->id])}}"

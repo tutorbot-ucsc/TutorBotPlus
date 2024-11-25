@@ -8,7 +8,7 @@
 
                 <input type="hidden" id="codigo_save" name="codigo_save">
                 <input type="hidden" id="lenguaje_save" name="lenguaje_save">
-                <button class="btn btn-outline-primary btn-sm" type="submit" id="boton_guardar">{{isset($res_certamen)? "Guardar y Volver al Certamen" : "Guardar y Volver"}}</button>
+                <button class="btn btn-outline-primary btn-sm" type="submit" id="boton_guardar">{{isset($res_certamen)? "Guardar y Volver a la Evaluación" : "Guardar y Volver"}}</button>
             </div>
         </form>
         <form

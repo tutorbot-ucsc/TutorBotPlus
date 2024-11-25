@@ -84,15 +84,18 @@
         var converter = new showdown.Converter();
 
         function style_table() {
-            var table = document.querySelector("#body_markdown table")
+            var table = document.querySelectorAll("#body_markdown table")
             if (table != null) {
-                var table_body = table.querySelector("tbody")
-                table.classList.add("table")
-                table.classList.add("table-bordered")
-                table.classList.add("table-hover")
-                table.classList.add("mt-3")
-                table.style.width = "auto"
-                table_body.classList.add("table-group-divider")
+                for (var i = 0; i < table.length; i++) {
+                    var table_body = table[i].querySelector("tbody")
+                    table[i].classList.add("table")
+                    table[i].classList.add("table-bordered")
+                    table[i].classList.add("table-hover")
+                    table[i].classList.add("mt-3")
+                    table[i].style.width = "auto"
+                    table_body.classList.add("table-group-divider")
+                }
+
             }
         }
         style_table()
@@ -169,29 +172,29 @@
 
         var actualizar_informacion = setInterval(function() {
 
-            fetch("{{route('certamenes.update_data', ["token"=>$res_certamen->token])}}", {
-                method: 'GET', 
-                headers: {
-                'Content-Type': 'application/json',
-                },
+            fetch("{{ route('certamenes.update_data', ['token' => $res_certamen->token]) }}", {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                 })
                 .then(function(response) {
                     return response.json();
                 })
                 .then(function(result) {
                     problemas = result;
-                    for(var i=0; i<result.length;i++){
-                        var button_problema = document.getElementById('problema_'+i);
-                        button_problema.classList.remove('btn-success','btn-danger','btn-outline-secondary')
-                        
-                        if(result[i]["resuelto"] == true){
+                    for (var i = 0; i < result.length; i++) {
+                        var button_problema = document.getElementById('problema_' + i);
+                        button_problema.classList.remove('btn-success', 'btn-danger', 'btn-outline-secondary')
+
+                        if (result[i]["resuelto"] == true) {
                             button_problema.classList.add('btn-success');
-                            if(i==id_problema_activo && !boton_resolver.contains('disabled')){
+                            if (i == id_problema_activo && !boton_resolver.contains('disabled')) {
                                 boton_resolver.classList.toggle('disabled');
                             }
-                        }else if(result[i]["resuelto"] == false){
+                        } else if (result[i]["resuelto"] == false) {
                             button_problema.classList.add('btn-danger');
-                        }else{
+                        } else {
                             button_problema.classList.add('btn-outline-secondary');
                         }
 

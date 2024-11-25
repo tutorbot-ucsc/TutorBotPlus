@@ -24,24 +24,23 @@
                             @if (isset($res_certamen))
                                 <a class="btn btn-primary text-nowrap btn-block {{ $res_certamen->finalizado == true ? 'disabled' : '' }}"
                                     href="{{ route('certamenes.resolucion', ['token' => $res_certamen->token]) }}"
-                                    role="button">{{ $res_certamen->finalizado == true ? 'Has finalizado el Certamen' : 'Volver al Certamen' }}</a>
+                                    role="button">{{ $res_certamen->finalizado == true ? 'Has finalizado la evaluación' : 'Volver a la Evaluación' }}</a>
                             @else
                                 <a class="btn btn-primary text-nowrap btn-block {{ $certamen->disponibilidad ? '' : 'disabled' }}"
                                     href="{{ route('certamenes.iniciar_resolucion', ['id_certamen' => $certamen->id]) }}"
-                                    role="button">{{ $certamen->disponibilidad ? 'Resolver Certamen' : 'Certamen No Disponible' }}</a>
+                                    role="button">{{ $certamen->disponibilidad ? 'Resolver Evaluación' : 'Evaluación No Disponible' }}</a>
                             @endif
                         </div>
                         @can('ver informe del certamen')
                             <div class="row px-5 mt-2 mb-2">
-                                <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block" href="#"
-                                    role="button">Ver Informe del Certamen</a>
+                                <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block" href="{{ route('informe.certamen', ['id_certamen' => $certamen->id]) }}"
+                                    role="button">Ver Informe de la Evaluación</a>
                             </div>
                         @endcan
                         @can('editar certamen')
                             <div class="row px-5 mt-2 mb-2">
                                 <a class="btn btn-outline-secondary text-nowrap btn-sm btn-block"
-                                    href="{{ route('certamen.editar', ['id' => $certamen->id]) }}" role="button">Editar
-                                    Certamen</a>
+                                    href="{{ route('certamen.editar', ['id' => $certamen->id]) }}" role="button">Editar Evaluación</a>
                             </div>
                         @endcan
                         <hr>
