@@ -63,7 +63,7 @@
                                         <div class="d-flex px-3 py-1">
                                             <div class="d-flex flex-column justify-content-center">
                                                 <h6 class="mb-0 text-sm">
-                                                    {{$item->resultados[$i]->maximo_puntaje."/".$item->resultados[$i]->puntos_total}}
+                                                    {{ isset($item->resultados[$i])? $item->resultados[$i]->maximo_puntaje."/".$item->resultados[$i]->puntos_total : 'NR'}}
                                                 </h6>
                                             </div>
                                         </div>
