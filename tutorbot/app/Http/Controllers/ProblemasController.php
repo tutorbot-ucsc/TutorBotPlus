@@ -65,6 +65,9 @@ class ProblemasController extends Controller
         if(isset($problema->fecha_termino)){
             $problema->fecha_termino = Carbon::parse($problema->fecha_termino)->toDateTimeString();
         }
+        if($problema->memoria_limite==0){
+            $problema->memoria_limite = null;
+        }
         $categorias = Categoria_Problema::all();
         $cursos = auth()->user()->cursos()->get();
         $lenguajes = LenguajesProgramaciones::where('abreviatura', 'NOT LIKE', '%sql%')->get();

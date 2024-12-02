@@ -27,8 +27,8 @@ class JuecesVirtualesSeeder extends Seeder
         if(env('JUDGE0_API_KEY_PROD')!=null && env('JUDGE0_API_KEY_PROD')!=''  && env('JUDGE0_AUTHORIZE_KEY_PROD')!=null && env('JUDGE0_AUTHORIZE_KEY_PROD')!=''){
             DB::table('jueces_virtuales')->insert([
                 'nombre' => 'Juez Principal',
-                'direccion' => '127.0.0.1:2358',
-                'host' => '127.0.0.1:2358',
+                'direccion' => env('JUDGE0_URL_PROD'),
+                'host' => env('JUDGE0_URL_PROD'),
                 'api_token' => env('JUDGE0_API_KEY_PROD'),
                 'authorize' => env('JUDGE0_AUTHORIZE_KEY_PROD'),
                 'autenticacion' => env('JUDGE0_AUTHENTICATION_KEY_PROD'),
