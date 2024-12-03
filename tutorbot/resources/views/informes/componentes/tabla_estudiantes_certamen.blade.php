@@ -8,6 +8,7 @@
             </div>
 
             <div class="card-body pb-0">
+            <i class="ms-3" style="font-size: 15px;">NR: No Resuelto</i>
                 <div class="table-responsive p-0">
                     <table class="table align-items-center mb-0" id="tabla_estudiantes">
                         <thead>
@@ -21,10 +22,11 @@
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                     Resueltos
                                 </th>
-                                @for($i=1; $i<=$certamen_estadistica->cantidad_problemas; $i++)
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                    {{"P".$i}}
-                                </th>
+                                @for ($i = 1; $i <= $certamen_estadistica->cantidad_problemas; $i++)
+                                    <th
+                                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        {{ 'P' . $i }}
+                                    </th>
                                 @endfor
                                 @canany(['ver informe del problema'])
                                     <th
@@ -54,27 +56,30 @@
                                     <td>
                                         <div class="d-flex px-3 py-1">
                                             <div class="d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm">{{ $item->problemas_resueltos."/".$certamen_estadistica->cantidad_problemas }}</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    @for($i=0; $i<$certamen_estadistica->cantidad_problemas; $i++)
-                                    <td>
-                                        <div class="d-flex px-3 py-1">
-                                            <div class="d-flex flex-column justify-content-center">
                                                 <h6 class="mb-0 text-sm">
-                                                    {{$item->resultados[$i]->maximo_puntaje."/".$item->resultados[$i]->puntos_total}}
+                                                    {{ $item->problemas_resueltos . '/' . $certamen_estadistica->cantidad_problemas }}
                                                 </h6>
                                             </div>
                                         </div>
                                     </td>
+                                    @for ($i = 0; $i < $certamen_estadistica->cantidad_problemas; $i++)
+                                        <td>
+                                            <div class="d-flex px-3 py-1">
+                                                <div class="d-flex flex-column justify-content-center">
+                                                    <h6 class="mb-0 text-sm">
+                                                        {{ isset($item->resultados[$i]) ? $item->resultados[$i]->maximo_puntaje . '/' . $item->resultados[$i]->puntos_total : 'NR' }}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </td>
                                     @endfor
-                                    
+
                                     @canany(['ver informe del problema'])
                                         <td class="align-middle text-end">
                                             <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                 @can('ver informe del problema')
-                                                    <a class="btn btn-outline-warning" href="{{route('informe.certamen.detalle', ['id_certamen'=>$certamen_estadistica->id, 'id_res_certamen'=>$item->id])}}">Detalle</a>
+                                                    <a class="btn btn-outline-warning"
+                                                        href="{{ route('informe.certamen.detalle', ['id_certamen' => $certamen_estadistica->id, 'id_res_certamen' => $item->id]) }}">Detalle</a>
                                                 @endcan
                                             </div>
                                         </td>
@@ -86,7 +91,7 @@
 
                 </div>
             </div>
-            <a href="{{route('certamen.index')}}" class="btn btn-outline-primary mt-3 mx-5">Volver</a>
+            <a href="{{ route('certamen.index') }}" class="btn btn-outline-primary mt-3 mx-5">Volver</a>
         </div>
     </div>
 </div>

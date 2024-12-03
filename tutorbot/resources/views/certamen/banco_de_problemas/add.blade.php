@@ -24,7 +24,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('certamen.add_categoria', ['id_certamen' => $certamen->id]) }}" method="POST">
+                    <form action="{{ route('certamen.add_categoria', ['id_certamen' => $certamen->id]) }}" method="POST" id="submitForm">
                         @csrf
                         @include('certamen.banco_de_problemas.form')
                     </form>
@@ -54,8 +54,8 @@
                                                     <form action="{{ route('certamen.eliminar_categoria', ['id_certamen' => $certamen->id, 'id_categoria'=>$categoria->id_categoria]) }}"
                                                         method="POST">
                                                         @csrf
-                                                        <button type="submit" class="btn btn-outline-danger"><i
-                                                                class="fa fa-fw fa-trash"></i></button>
+                                                        <button type="submit" class="btn btn-outline-danger delete_button"><i
+                                                                class="fa fa-fw fa-trash" onclick="deactivate_buttons()"></i></button>
                                                     </form>
                                                 @endcan
                                             </div>
@@ -77,4 +77,18 @@
     <script src="{{ asset('assets/js/DataTables/datatables.min.js') }}"></script>
 
     <script src="{{ asset('assets/js/DataTables/gestion_initialize_es_cl.js') }}"></script>
+    
+    <script>
+        function deactivate_buttons(){
+            document.getElementById('add_button').setAttribute('disabled', true);
+            var delete_buttons = document.querySelectorAll('.delete_button');
+            for(let i=0; i<delete_buttons.length; i++){
+                delete_buttons[i].setAttribute('disabled', true);
+            }
+        }
+        document.querySelector('#submitForm').addEventListener('submit', e => {
+            deactivate_buttons()
+        });
+
+    </script>
 @endpush

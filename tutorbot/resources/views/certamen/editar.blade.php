@@ -42,6 +42,7 @@
             placeholder: 'Ingrese el enunciado del problema',
             initialValue: `{{ isset($certamen) ? old('descripcion', $certamen->descripcion) : old('descripcion') }}`,
         })
+
         document.querySelector('#editarForm').addEventListener('submit', e => {
             document.querySelector('#descripcion').value = editor.getMarkdown();
         });

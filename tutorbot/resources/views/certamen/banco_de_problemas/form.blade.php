@@ -16,7 +16,7 @@
 </div>
 <div class="row">
 <div class="col d-flex justify-content-end">
-    <button class="btn btn-primary mt-2" type="submit">Añadir</button>
+    <button class="btn btn-primary mt-2" type="submit" id="add_button">Añadir</button>
     <button type="button" class="btn bg-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#ejemplo_modal">
         Ayuda
     </button>
