@@ -80,9 +80,9 @@
                                             <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                 @can('editar problemas')
                                                     <form action="{{ route('casos_pruebas.eliminar', ['id' => $item->id]) }}"
-                                                        method="POST">
+                                                        method="POST" onsubmit="deshabilitar_boton()">
                                                         @csrf
-                                                        <button type="submit" class="btn btn-outline-danger"><i
+                                                        <button type="submit" class="btn btn-outline-danger delete_button"><i
                                                                 class="fa fa-fw fa-trash"></i></button>
                                                     </form>
                                                 @endcan
@@ -107,8 +107,12 @@
     <script src="{{ asset('assets/js/DataTables/gestion_initialize_es_cl.js') }}"></script>
     <script>
         function deshabilitar_boton(){
-            const boton = document.getElementById('boton_crear');
-            boton.setAttribute('disabled', true);
+            const add_button = document.getElementById('boton_crear');
+            const delete_button = document.querySelectorAll('.delete_button');
+            add_button.setAttribute('disabled', true);
+            for(let i=0; i<delete_button.length; i++){
+                delete_button[i].setAttribute('disabled', true);
+            }
         }
     </script>
 @endpush

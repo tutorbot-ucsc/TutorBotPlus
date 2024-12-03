@@ -52,7 +52,7 @@
                                             <div class="d-flex px-3 py-1 justify-content-center align-items-center">
                                                 @can('editar certamen')
                                                     <form action="{{ route('certamen.eliminar_categoria', ['id_certamen' => $certamen->id, 'id_categoria'=>$categoria->id_categoria]) }}"
-                                                        method="POST" id="deleteForm">
+                                                        method="POST">
                                                         @csrf
                                                         <button type="submit" class="btn btn-outline-danger delete_button"><i
                                                                 class="fa fa-fw fa-trash" onclick="deactivate_buttons()"></i></button>
@@ -90,8 +90,5 @@
             deactivate_buttons()
         });
 
-        document.querySelector('#deleteForm').addEventListener('submit', e => {
-            deactivate_buttons()
-        });
     </script>
 @endpush
