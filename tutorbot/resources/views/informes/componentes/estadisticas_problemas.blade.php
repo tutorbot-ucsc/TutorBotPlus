@@ -23,7 +23,7 @@
                         <div class="numbers">
                             <p class="text-sm mb-0 text-uppercase font-weight-bold">Evaluaciones Aceptadas</p>
                             <h5 class="font-weight-bolder">
-                                @if(sizeof($estadistica_estados)>0)
+                                @if(isset($estadistica_estados["Accepted"]))
                                     {{ $estadistica_estados["Accepted"]}}
                                 @else
                                     0
